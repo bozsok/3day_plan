@@ -2,6 +2,27 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.4.0] - 2026-02-12
+
+Negyedik iteráció: valódi SVG térkép integráció és a Program Idővonal teljes vizuális újratervezése.
+
+### Hozzáadva
+- **Interaktív Magyarország térkép (`HungaryMap.tsx`):**
+    - SimpleMaps `hu.svg` dinamikus betöltése (`fetch` + DOMParser).
+    - 20 megyét 7 NUTS2 turisztikai régióba csoportosítva (Budapest és környéke, Közép-Dunántúl, Nyugat-Dunántúl, Dél-Dunántúl, Észak-Magyarország, Észak-Alföld, Dél-Alföld).
+    - Budapest jelölő: piros kör fehér szegéllyel + „Budapest" felirat.
+    - Event delegation alapú kattintás/hover kezelés (`data-region` attribútummal).
+- **ProgramTimeline újratervezése (dizájn referencia alapján):**
+    - Kétoszlopos elrendezés: bal sidebar (Utazás Összegzése, becsült költség, Mentés/Megosztás gombok, Útiterv Adatok) + jobb tartalom.
+    - Nap-fülek `border-bottom-4` aktív jelzéssel és dinamikus napnév (`date-fns`).
+    - Timeline idővonal: zöld körök Material Icons-szal, időpont badge, kategória címke, opcionális kép.
+- **Material Icons Outlined** betűtípus betöltése az `index.html`-ben.
+- **Gazdagított mock adatok:** `icon`, `category`, `estimatedCost` mezők + 4 programelem naponként régiónként.
+
+### Módosítva
+- **`mockData.ts`:** Region interface `countyIds` tömbbel és `countyToRegion` lookup-pal bővítve.
+- **`MapSelection.tsx`:** Az új `HungaryMap` komponenst használja; hover és kiválasztás info panel.
+
 ## [0.3.0] - 2026-02-12
 
 Harmadik iteráció: Tailwind CSS migráció, saját naptár komponens, projekttisztítás és szerveroldali deploy javítás.

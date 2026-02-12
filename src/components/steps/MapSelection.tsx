@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, ChevronLeft, MapPin, Map } from 'lucide-react';
 import { regions } from '../../data/mockData';
+import { HungaryMap } from '../common/HungaryMap';
 
 interface MapSelectionProps {
     selectedRegionId: string | undefined;
@@ -10,15 +11,13 @@ interface MapSelectionProps {
 }
 
 export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: MapSelectionProps) {
-    const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+    const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
 
-    const selectedRegionName = regions.find(r => r.id === selectedRegionId)?.name;
+    const selectedRegion = regions.find(r => r.id === selectedRegionId);
+    const hoveredRegion = regions.find(r => r.id === hoveredRegionId);
 
-    const hoveredRegionData = regions.find(r => r.name === hoveredRegion);
-    const tooltipStyle = hoveredRegionData ? {
-        left: `${(hoveredRegionData.centerX / 800) * 100}%`,
-        top: `${(hoveredRegionData.centerY / 450) * 100}%`
-    } : {};
+    // A tooltip szöveg: hover > kijelölés > semmi
+    const displayRegion = hoveredRegion || selectedRegion;
 
     return (
         <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
@@ -59,51 +58,37 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
                 </div>
             </div>
 
-            {/* Jobb oldal - Térkép */}
+            {/* Jobb oldal — Térkép */}
             <div className="md:w-5/12 bg-gray-50 p-8 md:p-10 flex flex-col items-center justify-center border-l border-gray-100">
-                <div className="w-full max-w-sm">
-                    <div className="flex items-center justify-between mb-8">
+                <div className="w-full">
+                    <div className="flex items-center justify-between mb-6">
                         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                             <Map size={20} className="text-primary-dark" />
                             Magyarország régiói
                         </h2>
                     </div>
 
-                    <div className="relative w-full flex items-center justify-center" style={{ aspectRatio: '1.6 / 1' }}>
-                        <svg viewBox="0 0 800 450" className="w-full h-auto drop-shadow-sm">
-                            {regions.map((region) => (
-                                <g key={region.id}
-                                    onClick={() => onSelect(region.id)}
-                                    onMouseEnter={() => setHoveredRegion(region.name)}
-                                    onMouseLeave={() => setHoveredRegion(null)}
-                                >
-                                    <path
-                                        d={region.path}
-                                        className={`region-path ${selectedRegionId === region.id ? 'selected' : ''}`}
-                                    />
-                                </g>
-                            ))}
-                        </svg>
-                        {hoveredRegion && (
-                            <div
-                                className="absolute bg-background-dark text-white text-[10px] font-bold px-2 py-1 rounded shadow-xl whitespace-nowrap pointer-events-none -translate-x-1/2 -translate-y-[150%]"
-                                style={tooltipStyle}
-                            >
-                                {hoveredRegion}
-                            </div>
-                        )}
-                    </div>
+                    {/* Interaktív térkép */}
+                    <HungaryMap
+                        selectedRegionId={selectedRegionId}
+                        hoveredRegionId={hoveredRegionId}
+                        onRegionClick={onSelect}
+                        onRegionHover={setHoveredRegionId}
+                    />
 
-                    <div className="mt-12 pt-6 border-t border-gray-200 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark">
+                    {/* Kiválasztott/hovered régió info */}
+                    <div className="mt-6 pt-6 border-t border-gray-200 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark shrink-0">
                             <MapPin size={20} />
                         </div>
-                        <div>
-                            <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">Kiválasztott terület</p>
-                            <p className="text-gray-500 text-[10px]">
-                                {selectedRegionName
-                                    ? `${selectedRegionName} és környéke`
-                                    : 'Nincs régió kiválasztva'}
+                        <div className="min-w-0">
+                            <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">
+                                {displayRegion ? displayRegion.name : 'Kiválasztott terület'}
+                            </p>
+                            <p className="text-gray-500 text-[10px] truncate">
+                                {displayRegion
+                                    ? displayRegion.description
+                                    : 'Kattints a térképre!'}
                             </p>
                         </div>
                     </div>

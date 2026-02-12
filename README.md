@@ -8,10 +8,11 @@ A célunk egyszerű: levenni a tervezés terhét a válladról. Nem kell óráka
 
 ## Hogyan működik?
 
-A tervezés nálunk egy játékos, két lépéses folyamat:
+A tervezés nálunk egy játékos, három lépéses folyamat:
 
 1.  **Időzítés**: Válaszd ki a naptárban azt a három egymást követő napot (péntek-szombat-vasárnap), amikor utazni szeretnél.
-2.  **Tájegység**: Egy interaktív SVG térképen böngészhetsz Magyarország vonzó úti céljai között. Kattints a szimpatikus régióra, és máris megkapod a 3 napos programtervet.
+2.  **Tájegység**: Egy interaktív SVG térképen (SimpleMaps `hu.svg`) böngészhetsz Magyarország 7 turisztikai régiója között — hover-rel kiemeled, kattintással kiválasztod.
+3.  **Programterv**: Részletes, napokra bontott idővonal a kiválasztott régió látnivalóival, étkezéseivel és aktív programjaival — összegzéssel, becsült költséggel.
 
 ## Technológiai háttér
 
@@ -19,7 +20,9 @@ A tervezés nálunk egy játékos, két lépéses folyamat:
 - **Tailwind CSS v4** — utility-first stílusozás, egyedi `@theme` konfiguráció
 - **Vite** — gyors fejlesztői szerver és optimalizált production build
 - **Saját naptár komponens** — CSS Grid alapú, magyar lokalizációval
-- **Lucide React** — ikoncímtár
+- **Interaktív SVG térkép** — dinamikus `hu.svg` betöltés, 7 NUTS2 régió, Budapest jelölő
+- **Material Icons Outlined** — program timeline ikonok
+- **Lucide React** — általános ikoncímtár
 - **date-fns** — dátumkezelés magyar locale-lal
 
 ## Fejlesztés
