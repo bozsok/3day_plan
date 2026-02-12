@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* =============================================
+   Custom Theme — A forrás code.html-ből
+   ============================================= */
+@theme {
+    --color-primary: #13ec13;
+    --color-primary-dark: #0fb80f;
+    --color-background-light: #f1f5f9;
+    --color-background-dark: #0f172a;
+    --color-neutral-light: #f1f5f9;
+    --color-neutral-dark: #1e293b;
+
+    --font-family-display: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* =============================================
+   Global
+   ============================================= */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* =============================================
+   SVG Térkép régiók
+   ============================================= */
+.region-path {
+    fill: #e2e8f0;
+    stroke: #cbd5e1;
+    stroke-width: 1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.region-path:hover {
+    fill: #cbd5e1;
+}
+
+.region-path.selected {
+    fill: #13ec13;
+    stroke: #0fb80f;
+}
+
+/* =============================================
+   ProgramTimeline pseudo-elemek
+   ============================================= */
+.timeline-line {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-line::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.timeline-card {
+    position: relative;
+}
+
+.timeline-card::before {
+    content: '';
+    position: absolute;
+    left: calc(-2rem - 2px);
+    top: 1.5rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: #13ec13;
+    border: 2px solid white;
+}
