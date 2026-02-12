@@ -1,0 +1,1 @@
+Hosszúhétvége tervező program
