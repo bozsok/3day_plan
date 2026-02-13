@@ -16,22 +16,41 @@ A tervezés nálunk egy játékos, három lépéses folyamat:
 
 ## Technológiai háttér
 
+### Frontend
 - **React 19** + **TypeScript** — komponens-alapú architektúra
 - **Tailwind CSS v4** — utility-first stílusozás, egyedi `@theme` konfiguráció
 - **Vite** — gyors fejlesztői szerver és optimalizált production build
 - **Saját naptár komponens** — CSS Grid alapú, magyar lokalizációval
 - **Interaktív SVG térkép** — dinamikus `hu.svg` betöltés, 7 NUTS2 régió, Budapest jelölő
-- **Material Icons Outlined** — program timeline ikonok
-- **Lucide React** — általános ikoncímtár
-- **date-fns** — dátumkezelés magyar locale-lal
+
+### Backend (v0.5+)
+- **Node.js + Express** — REST API kiszolgáló
+- **SQLite (@sql.js)** — hordozható, fájl-alapú adatbázis (`data/app.db`)
+- **Multi-user támogatás** — egyedi felhasználói azonosítás és szavazás
+- **Valós idejű szinkronizáció** — dátumok és szavazatok azonnali mentése
 
 ## Fejlesztés
 
+A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is:
+
+### 1. Backend indítása
 ```bash
-npm install     # Függőségek telepítése
-npm run dev     # Fejlesztői szerver indítása
-npm run build   # Production build
-npm run preview # Build előnézet
+cd server
+npm install     # Függőségek telepítése (csak egyszer)
+npm run dev     # Backend szerver indítása (port: 3001)
 ```
+
+### 2. Frontend indítása (új terminálban)
+```bash
+# Gyökérkönyvtárban
+npm install     # Függőségek telepítése (csak egyszer)
+npm run dev     # Frontend szerver indítása (port: 5173 - proxy: 3001)
+```
+
+## Funkciók
+- **Közös Tervezés:** Oszd meg az oldalt barátaiddal, és tervezzetek együtt!
+- **Dátum Egyeztetés:** Mindenki megjelölheti a neki megfelelő hétvégéket, a rendszer pedig összegzi a legnépszerűbb időpontot.
+- **Régió Szavazás:** Szavazzatok a kedvenc úti célokra! Egy felhasználó **több régióra** és egy régión belül **több időpontra** is leadhat szavazatot.
+- **Több Időpont:** Rugalmas tervezés: jelöld meg az összes hétvégét, amikor ráérsz, a rendszer pedig összesíti a legjobb átfedéseket.
 
 Jó tervezést és még jobb kikapcsolódást kívánunk!

@@ -2,6 +2,7 @@ import { differenceInCalendarDays, format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { ArrowRight, ChevronLeft, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../common/CustomCalendar';
+import { useUser } from '../../context/UserContext';
 
 interface DateSelectionProps {
     selected: Date[] | undefined;
@@ -11,6 +12,7 @@ interface DateSelectionProps {
 }
 
 export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelectionProps) {
+    const { user } = useUser();
     const dates = selected ?? [];
 
     const isConsecutive = (d: Date[]) => {
@@ -22,10 +24,11 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
         );
     };
 
-    const hasThreeConsecutiveDays = isConsecutive(dates);
+    const hasThreeConsecutiveDays = isConsecutive(dates) && dates.length > 0 && dates[0].getDay() === 5;
 
     const handleNext = () => {
-        if (hasThreeConsecutiveDays) onNext();
+        if (!hasThreeConsecutiveDays || !user) return;
+        onNext();
     };
 
     const handleCalendarSelect = (newDates: Date[]) => {
@@ -91,7 +94,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
                         onSelect={handleCalendarSelect}
                     />
 
-                    {/* Info box — forrás sor 132-141 */}
+                    {/* Info box */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark">
@@ -102,6 +105,14 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
                                 <p className="text-gray-500 text-[10px]">{formattedRange}</p>
                             </div>
                         </div>
+
+                        {/* Figyelmeztetés ha nem Péntek-Vasárnap */}
+                        {isConsecutive(dates) && dates.length > 0 && dates[0].getDay() !== 5 && (
+                            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-medium flex items-center gap-2">
+                                <span className="text-lg">⚠️</span>
+                                Csak Péntek-Vasárnap hétvége választható!
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

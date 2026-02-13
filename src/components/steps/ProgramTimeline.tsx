@@ -1,17 +1,98 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { ChevronLeft, Save, Share2 } from 'lucide-react';
+import { Share2, ThumbsUp, Calendar } from 'lucide-react';
 import { mockPrograms, regions } from '../../data/mockData';
+import { useUser } from '../../context/UserContext';
+import { api } from '../../api/client';
 
 interface ProgramTimelineProps {
     regionId: string | undefined;
     dates: Date[] | undefined;
     onBack: () => void;
+    onFinish: () => void;
 }
 
-export function ProgramTimeline({ regionId, dates, onBack }: ProgramTimelineProps) {
+export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTimelineProps) {
+    const { user } = useUser();
     const [selectedDayIndex, setSelectedDayIndex] = useState(1);
+    const [userVoteBlockId, setUserVoteBlockId] = useState<number | null>(null);
+    const [isVoting, setIsVoting] = useState(false);
+
+    // Szavazat státusz ellenőrzése
+    useEffect(() => {
+        if (!user || !regionId || !dates) return;
+
+        // Formázzuk a jelenlegi dátumokat összehasonlításhoz
+        const currentDateStrings = dates.map(d => format(d, 'yyyy-MM-dd')).sort();
+        const currentJson = JSON.stringify(currentDateStrings);
+
+        api.votes.list(user.id).then(votes => {
+            // Keressük, van-e OLYAN szavazat, ami erre a régióra ÉS ezekre a dátumokra szól
+            const vote = votes.find(v => {
+                if (v.regionId !== regionId) return false;
+                // A votes.dates már string[] az API kliensből
+                const voteDates = [...v.dates].sort();
+                return JSON.stringify(voteDates) === currentJson;
+            });
+            setUserVoteBlockId(vote ? vote.id : null);
+        });
+    }, [user, regionId, dates]);
+
+    const handleRevoke = async () => {
+        if (!user || !regionId || isVoting || userVoteBlockId === null) return;
+
+        setIsVoting(true);
+        try {
+            await api.votes.revoke(user.id, userVoteBlockId);
+            setUserVoteBlockId(null);
+        } catch (error) {
+            console.error('Hiba visszavonáskor:', error);
+            alert('Hiba történt.');
+        } finally {
+            setIsVoting(false);
+        }
+    };
+
+    const handleVote = async () => {
+        if (!user || !regionId || isVoting) return;
+
+        setIsVoting(true);
+        try {
+            // 1. Dátumok mentése (APPEND - hozzáadja az újakat)
+            // Megjegyzés: A votes.cast is megkapja a dátumokat, de a date_selections-t is illik frissíteni/bővíteni.
+            // A SPEC szerint a votes.cast validálja, hogy léteznek-e a date_selections-ben?
+            // "a 3 dátum már szerepeljen a date_selections között... ha nem -> hibát ad"
+            // Szóval ELŐBB el kell menteni a date_selections-be.
+
+            const dateStrings = dates && dates.length > 0 ? dates.map(d => format(d, 'yyyy-MM-dd')) : [];
+
+            if (dateStrings.length > 0) {
+                await api.dates.save(user.id, dateStrings, regionId);
+            }
+
+            // 2. Szavazás (Blokk létrehozása 3 dátummal)
+            if (dateStrings.length !== 3) {
+                alert("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
+                return;
+            }
+
+            const res = await api.votes.cast(user.id, regionId, dateStrings);
+            // @ts-ignore
+            if (res.success && res.block) {
+                // @ts-ignore
+                setUserVoteBlockId(res.block.id);
+            }
+
+            // Opcionális: Visszajelzés
+            // alert('Szavazat és időpontok rögzítve!');
+        } catch (error) {
+            console.error('Hiba szavazáskor:', error);
+            alert('Hiba történt a művelet során.');
+        } finally {
+            setIsVoting(false);
+        }
+    };
 
     const programs = mockPrograms.find(p => p.regionId === regionId);
     const region = regions.find(r => r.id === regionId);
@@ -84,41 +165,57 @@ export function ProgramTimeline({ regionId, dates, onBack }: ProgramTimelineProp
 
                     {/* Akció gombok */}
                     <div className="space-y-3 mb-6">
-                        <button className="w-full bg-primary hover:bg-primary-dark text-gray-900 font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
-                            <Save size={18} />
-                            Csomag mentése
+                        {/* 1. Szavazat (Mindig aktív - Hozzáadás/Frissítés) */}
+                        <button
+                            className={`w-full font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 
+                                ${userVoteBlockId !== null ? 'bg-green-600 hover:bg-green-700 shadow-green-200' : 'bg-primary hover:bg-primary-dark'} 
+                                text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+                            onClick={handleVote}
+                            disabled={isVoting}
+                        >
+                            {isVoting ? (
+                                <span className="animate-spin text-xl">↻</span>
+                            ) : (
+                                <ThumbsUp size={18} className={userVoteBlockId !== null ? 'fill-white' : ''} />
+                            )}
+                            Szavazok erre!
                         </button>
-                        <button className="w-full bg-white border-2 border-primary/20 hover:border-primary/50 text-gray-700 font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                            <Share2 size={18} />
-                            Megosztás
-                        </button>
+
+                        {/* 2. Visszavonás (Csak ha van szavazat) */}
+                        {userVoteBlockId !== null && (
+                            <button
+                                className="w-full font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 disabled:opacity-50"
+                                onClick={handleRevoke}
+                                disabled={isVoting}
+                            >
+                                <span className="material-icons-outlined text-sm">delete</span>
+                                Visszavonás
+                            </button>
+                        )}
                     </div>
 
-                    {/* Útiterv adatok */}
-                    <div className="pt-6 border-t border-gray-200">
-                        <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">
-                            Útiterv Adatok
-                        </h3>
-                        <ul className="space-y-4">
-                            <li className="flex items-center gap-3 text-gray-600 text-sm">
-                                <span className="material-icons-outlined text-primary text-lg">calendar_today</span>
-                                {dateRangeLabel}
-                            </li>
-                            <li className="flex items-center gap-3 text-gray-600 text-sm">
-                                <span className="material-icons-outlined text-primary text-lg">location_on</span>
-                                {region?.name ?? 'Ismeretlen régió'}
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Vissza gomb */}
+                    {/* Tovább gomb (Mindig látszik, auto-vote ha kell) */}
                     <button
-                        className="mt-8 w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-lg font-medium text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
-                        onClick={onBack}
+                        className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full shadow-xl animate-bounce-slow"
+                        onClick={onFinish}
+                        disabled={isVoting}
                     >
-                        <ChevronLeft size={18} />
-                        Vissza a térképhez
+                        {isVoting ? 'Szavazás rögzítése...' : 'Eredmények'}
+                        {!isVoting && <Share2 size={18} className="rotate-180" />}
                     </button>
+
+                    {/* Dátum infó */}
+                    <div className="mt-8 pt-8 border-t border-gray-200">
+                        <div className="flex items-center gap-3 text-gray-600 mb-2">
+                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <Calendar size={16} />
+                            </div>
+                            <div>
+                                <span className="text-xs text-gray-400 block uppercase tracking-wider">Időpont</span>
+                                <span className="font-medium text-sm">{dateRangeLabel}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -133,8 +230,8 @@ export function ProgramTimeline({ regionId, dates, onBack }: ProgramTimelineProp
                                 key={tab.dayIndex}
                                 onClick={() => setSelectedDayIndex(tab.dayIndex)}
                                 className={`flex-1 py-6 px-4 text-center border-b-4 transition-all ${isActive
-                                        ? 'border-primary bg-primary/5 text-gray-900 font-bold'
-                                        : 'border-transparent hover:bg-gray-50 text-gray-500 font-semibold'
+                                    ? 'border-primary bg-primary/5 text-gray-900 font-bold'
+                                    : 'border-transparent hover:bg-gray-50 text-gray-500 font-semibold'
                                     }`}
                             >
                                 <span className={`block text-xs uppercase tracking-widest mb-1 ${isActive ? 'text-primary' : 'text-gray-400'
@@ -165,7 +262,7 @@ export function ProgramTimeline({ regionId, dates, onBack }: ProgramTimelineProp
                                         <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full w-fit">
                                             {item.time}
                                         </span>
-                                        <span className="text-xs text-gray-400 font-medium">
+                                        <span className="text-sm text-gray-400 font-medium uppercase tracking-wider">
                                             {item.category}
                                         </span>
                                     </div>

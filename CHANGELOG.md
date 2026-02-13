@@ -2,6 +2,64 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.5.4] - 2026-02-13
+
+### Újdonságok és Változások
+- **Backend Szinkronizáció (Dual Stack):**
+    - A fejlesztés során használt **Node.js** (`server/src`) és az éles környezethez szánt **PHP** (`server/api`) backend kódok teljeskörűen szinkronizálva lettek.
+    - Mindkét rendszer támogatja az új többszörös szavazási logikát és a javított összegzést, így a projekt tetszőleges környezetbe (Node vagy PHP/Apache) telepíthető.
+- **Többszörös Szavazás:** A felhasználók mostantól **több különböző időpontra** is szavazhatnak ugyanazon régión belül. A rendszer csak a teljesen azonos (Dátum + Régió) duplikációkat tiltja.
+- **Összegzés (Summary) Javítás:**
+    - A "Mikor menjünk?" statisztika mostantól a **leadott szavazatok (blokkok)** számát összegzi, nem a felhasználók számát.
+    - Javítottuk a duplikált kulcs hibákat a felhasználói listákban.
+- **Frontend:**
+    - Intelligens "Szavazok erre / Visszavonás" gomb.
+
+## [0.5.3] - 2026-02-12
+
+### Újdonságok
+- **Több Időpont Támogatása:** A felhasználók mostantól több különálló időszakot is megjelölhetnek a naptárban. Az "Összegzés" oldal intelligensen csoportosítja ezeket (pl. "feb. 20-22" és "márc. 1-3").
+- **UI Tisztítás:** A Program oldalról eltávolításra került a felesleges "Megosztás" gomb. A "Tovább az eredményekhez" gomb kék színűre változott a jobb láthatóság érdekében.
+
+### Javítások
+- **Backend:** A dátummentés mostantól hozzáadó (append) logikával működik, nem felülíróval.
+- **Stabilitás:** Javított típuskezelés a szerver oldali adatbázis műveleteknél (szám vs szöveg ID).
+
+## [0.5.2] - 2026-02-12
+
+### Módosítva
+- **Összegzés (Frontend/Backend):** A "Mikor menjünk?" szekció mostantól intelligensen csoportosítja a felhasználók 3 napos választásait intervallumokba (pl. "júl. 15. - júl. 17."), ahelyett hogy külön napokat listázna.
+- **Navigáció:** A "Hova menjünk?" listában a régiók mostantól kattinthatóak. A kattintás közvetlenül a Program Idővonalra visz, betöltve a választott régió tervét.
+
+## [0.5.1] - 2026-02-12
+
+### Hozzáadva
+- **Navigáció:** "Tovább tervezek" lebegő gomb a Summary oldalon, amely visszavisz a Térképválasztóhoz (2. lépés), lehetővé téve újabb régiók megtekintését és szavazását.
+
+## [0.5.0] - 2026-02-12
+
+Ötödik iteráció: Backend integráció és többfelhasználós funkciók (MVP).
+
+### Hozzáadva
+- **Backend (Node.js + Express + SQLite):**
+    - `server/` mappa: önálló Express alkalmazás.
+    - `sql.js` alapú SQLite adatbázis (fájl alapú perzisztencia: `data/app.db`).
+    - API végpontok:
+        - `POST /api/users`: Név alapú "login" (idempotens).
+        - `POST /api/dates`: Dátumválasztás mentése.
+        - `POST /api/votes`: Szavazat leadása/visszavonása régiókra.
+        - `GET /api/summary`: Összesített adatok (Mátrix, Rangsor, Státusz).
+- **Többfelhasználós Frontend Funkciók:**
+    - **Login (Hero):** Név bekérése induláskor, `UserContext` + `localStorage` perzisztencia.
+    - **Adatmentés:** A naptárban kiválasztott dátumok automatikusan mentésre kerülnek a backendre.
+    - **Szavazás (Timeline):** "Szavazok erre!" gomb a ProgramTimeline oldalsávjában (zöld feedback szavazás után).
+    - **Élő Összegzés (Summary):** Új 4. lépés, amely valós időben (5mp poll) mutatja:
+        - Melyik napot hányan választották (névsorral).
+        - Melyik régió vezet a szavazatokban.
+        - Csapattagok státusza (ki végzett a tervezéssel).
+    - **Navigáció:** "Tovább az eredményekhez" gomb szavazás után.
+- **Deploy:** A backend szerver production módban kiszolgálja a statikus frontend fájlokat is (SPA fallback).
+
 ## [0.4.0] - 2026-02-12
 
 Negyedik iteráció: valódi SVG térkép integráció és a Program Idővonal teljes vizuális újratervezése.
