@@ -53,4 +53,15 @@ npm run dev     # Frontend szerver indítása (port: 5173 - proxy: 3001)
 - **Régió Szavazás:** Szavazzatok a kedvenc úti célokra! Egy felhasználó **több régióra** és egy régión belül **több időpontra** is leadhat szavazatot.
 - **Több Időpont:** Rugalmas tervezés: jelöld meg az összes hétvégét, amikor ráérsz, a rendszer pedig összesíti a legjobb átfedéseket.
 
+## Adminisztráció 🛠️
+
+A rendszer tartalmaz egy rejtett adminisztrációs felületet karbantartási célokra:
+
+1.  **Elérés:** Navigálj az **Összegzés** (4. lépés) oldalra.
+2.  **Titkos Kapcsoló:** Kattints **5-ször gyorsan** a fejlécben található "Közös Tervezés" címre.
+3.  **Funkciók:**
+    - **Adatbázis Reset (Atomcsapás):** Egyetlen gombnyomással töröl minden adatot (felhasználók, szavazatok, dátumok) és kiléptet minden klienst. Hasznos újratervezés indításakor.
+    - **Felhasználó Törlés:** Egyesével törölhetők a beragadt vagy duplikált felhasználók.
+    - **Figyelem:** A műveletek azonnal végrehajtódnak, megerősítő kérdés (alert) nélkül!
+
 Jó tervezést és még jobb kikapcsolódást kívánunk!

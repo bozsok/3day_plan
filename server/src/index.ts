@@ -8,6 +8,7 @@ import usersRouter from './routes/users.js';
 import datesRouter from './routes/dates.js';
 import votesRouter from './routes/votes.js';
 import summaryRouter from './routes/summary.js';
+import adminRouter from './routes/admin.js'; // [NEW]
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -29,6 +30,7 @@ async function main() {
     app.use('/api/dates', datesRouter);
     app.use('/api/votes', votesRouter);
     app.use('/api/summary', summaryRouter);
+    app.use('/api/admin', adminRouter); // [NEW]
 
     // Production: statikus frontend kiszolgálás
     if (isProduction) {

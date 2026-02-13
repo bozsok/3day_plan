@@ -43,8 +43,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
                             setUser(localUser); // Jobb híján
                         }
                     } catch (serverErr) {
-                        console.warn('UserContext: User ID not found on server (DB reset?). Attempting silent re-login...', serverErr);
+                        console.warn('UserContext: User ID not found on server (DB reset?). Clearing local session.', serverErr);
+                        localStorage.removeItem('3nap_user');
+                        setUser(null);
 
+                        /* DISABLED SILENT RE-LOGIN to prevent Zombie Users after Reset
                         // 2. Erőltetett újralogin a helyi névvel
                         if (localUser.name) {
                             try {
@@ -65,6 +68,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                             localStorage.removeItem('3nap_user');
                             setUser(null);
                         }
+                        */
                     }
 
                 } catch (e) {

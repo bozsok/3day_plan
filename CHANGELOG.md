@@ -2,6 +2,21 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.5.5] - 2026-02-13
+
+### Újdonságok
+- **Adminisztrációs Felület (Rendszergazda):**
+    - Új "Admin Zone" (titkos elérés: 5x kattintás a címre az Összegzés oldalon).
+    - **Adatbázis Törlés (Atomcsapás):** Egyetlen gombnyomással törölhető a teljes adatbázis és minden felhasználó munkamenete.
+    - **Felhasználó Törlés:** Lehetőség van egyes felhasználók célzott törlésére is.
+    - **Instant Reakció:** Minden megerősítő kérdés ("Biztos?") eltávolítva – a gombok azonnal végrehajtják az utasítást.
+- **UI Finomhangolás:**
+    - Csomagválasztó kártyák: A képek hover effektusa javítva (nem lóg ki a keretből).
+    - Szövegezés: "Kattints kettőt..." -> "Kattints párat...", "Válassza ki" -> "Válaszd ki" (tegeződés egységesítése).
+
+### Javítások
+- **"Zombie User" Hiba:** Adatbázis reset után a kliens oldali `localStorage` is automatikusan törlődik, megakadályozva, hogy a törölt felhasználók "szellemként" visszatérjenek. Kikapcsoltuk a "Silent Re-login" funkciót, ami korábban ezt okozta.
+
 ## [0.5.4] - 2026-02-13
 
 ### Újdonságok és Változások

@@ -72,17 +72,14 @@ export const regions: Region[] = [
 export const countyToRegion: Record<string, string> = {};
 regions.forEach(r => r.countyIds.forEach(cid => { countyToRegion[cid] = r.id; }));
 
-/* ── Mock programadatok ── */
+/* ── Mock programadatok (Csomagok) ── */
 export interface ProgramItem {
     id: string;
     time: string;
     title: string;
     description: string;
-    /** Material Icons Outlined icon neve (pl. 'restaurant', 'terrain') */
     icon: string;
-    /** Kategória címke (pl. 'GASZTRO', 'AKTÍV', 'KULTÚRA') */
     category: string;
-    /** Opcionális kép URL */
     imageUrl?: string;
 }
 
@@ -91,177 +88,137 @@ export interface DailyProgram {
     items: ProgramItem[];
 }
 
-export interface RegionProgram {
+export interface PackageTag {
+    icon: string;
+    label: string;
+}
+
+export interface Package {
+    id: string;
     regionId: string;
     title: string;
-    /** Becsült összköltség (szövegként, pl. "45.000") */
+    description: string; // Kártyán megjelenő rövid leírás
+    imageUrl: string; // Kártya háttérkép
+    tags: PackageTag[]; // Kártya címkék (pl. Túra, Bor, Wellness)
     estimatedCost: string;
     days: DailyProgram[];
 }
 
-export const mockPrograms: RegionProgram[] = [
+export const packages: Package[] = [
+    // ── Észak-Magyarország ──
     {
+        id: 'matrai-magassagok', // Re-created from Tokaji template
         regionId: 'eszak-magyarorszag',
-        title: 'Hegyvidéki Kalandok',
+        title: 'Mátrai Magasságok',
+        description: 'Hódítsa meg Magyarország legmagasabb csúcsait, töltődjön fel a tiszta hegyi levegőn és élvezze az erdei csendet.',
+        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPud2dEWrfLNXmY-oiPgDaJT_DnDZrSEGET7_Ykv2xpEGleogvVeG9OfVu0BpmIz9u_cn3NOP00KjMo3JKIJskjKadeHC73BpAxdUFVGHKh7DBYjV91xj4ax_8QYd9d03iY68nKnNDdOqvlJJJcQdyDofJjcnjOw3l1yix4RBquqwagWhFHQSIjmyuNgUPZAmQ8RAsBV6ggUzIXJSQBQacg8Yjgr_jr8G6gY8JWiFZViNQApnOyZ0_y6lCXpvn7odXFXdtR0Hpt6U',
+        tags: [
+            { icon: 'flag', label: 'Hegyvidék' },
+            { icon: 'spa', label: 'Wellness' },
+            { icon: 'self_improvement', label: 'Relax' }
+        ],
         estimatedCost: '52.000',
         days: [
             {
                 dayIndex: 1,
                 items: [
-                    {
-                        id: '1-1', time: '10:00', icon: 'luggage', category: 'ÉRKEZÉS',
-                        title: 'Érkezés Egerbe',
-                        description: 'Szállás elfoglalása és séta a hangulatos Dobó István téren, ahol a vár és a Minaret vár ránk.',
-                    },
-                    {
-                        id: '1-2', time: '13:00', icon: 'wine_bar', category: 'GASZTRO',
-                        title: 'Ebéd a Szépasszonyvölgyben',
-                        description: 'Borkóstoló az egri bikavérrel és hagyományos magyar ételek egy autentikus pincében.',
-                    },
-                    {
-                        id: '1-3', time: '16:00', icon: 'castle', category: 'KULTÚRA',
-                        title: 'Egri Vár látogatás',
-                        description: 'Történelmi séta a várban, interaktív kiállítások és páratlan panoráma a város felett.',
-                    },
-                    {
-                        id: '1-4', time: '19:30', icon: 'restaurant', category: 'GASZTRO',
-                        title: 'Vacsora az Óvárosban',
-                        description: 'Hangulatos étterem a belváros szívében, helyi specialitásokkal és élőzenével.',
-                    },
-                ],
+                    { id: 'm1-1', time: '10:00', icon: 'luggage', category: 'ÉRKEZÉS', title: 'Érkezés Mátraházára', description: 'Szállás elfoglalása a hegyek ölelésében.' },
+                    { id: 'm1-2', time: '12:00', icon: 'restaurant', category: 'GASZTRO', title: 'Ebéd a Vörösmarty fogadóban', description: 'Vadételek és palóc leves.' },
+                    { id: 'm1-3', time: '14:00', icon: 'hiking', category: 'AKTÍV', title: 'Kékestető meghódítása', description: 'Séta Magyarország legmagasabb pontjára.' }
+                ]
             },
-            {
-                dayIndex: 2,
-                items: [
-                    {
-                        id: '2-1', time: '08:30', icon: 'restaurant', category: 'GASZTRO',
-                        title: 'Reggeli a szálláson',
-                        description: 'Bőséges magyar reggeli házi lekvárokkal és friss péksüteményekkel.',
-                    },
-                    {
-                        id: '2-2', time: '10:00', icon: 'terrain', category: 'AKTÍV',
-                        title: 'Túra a Szalajka-völgyben',
-                        description: 'Gyönyörű erdei séta a Fátyol-vízesésig. Családbarát, közepes nehézségű útvonal.',
-                    },
-                    {
-                        id: '2-3', time: '14:00', icon: 'train', category: 'ÉLMÉNY',
-                        title: 'Lillafüredi kisvonat',
-                        description: 'Utazás a festői erdei vasúttal a Garadna-völgyön keresztül Lillafüredig.',
-                    },
-                    {
-                        id: '2-4', time: '17:00', icon: 'spa', category: 'WELLNESS',
-                        title: 'Miskolctapolca Barlangfürdő',
-                        description: 'Relaxálás Európa egyedülálló barlangi termálfürdőjében, természetes sziklák között.',
-                    },
-                ],
-            },
-            {
-                dayIndex: 3,
-                items: [
-                    {
-                        id: '3-1', time: '09:00', icon: 'local_cafe', category: 'GASZTRO',
-                        title: 'Kávé és palacsinta',
-                        description: 'Nyugodt reggeli indítás egy hangulatos kávézóban, házi palacsintával.',
-                    },
-                    {
-                        id: '3-2', time: '11:00', icon: 'church', category: 'KULTÚRA',
-                        title: 'Eger Minaret',
-                        description: 'Európa legészakibb minaretje — 97 lépcsőfokon feljutva páratlan kilátás vár.',
-                    },
-                    {
-                        id: '3-3', time: '13:00', icon: 'local_dining', category: 'GASZTRO',
-                        title: 'Búcsú ebéd',
-                        description: 'Utolsó egri étkezés a piac melletti étteremben, helyi alapanyagokból készült fogásokkal.',
-                    },
-                    {
-                        id: '3-4', time: '15:00', icon: 'home', category: 'HAZAUTAZÁS',
-                        title: 'Hazautazás',
-                        description: 'Búcsú a hegyektől, emlékezetes élményekkel a poggyászban.',
-                    },
-                ],
-            },
-        ],
+            { dayIndex: 2, items: [] },
+            { dayIndex: 3, items: [] }
+        ]
     },
     {
+        id: 'tokaji-borvidek',
+        regionId: 'eszak-magyarorszag',
+        title: 'Tokaji Borvidék',
+        description: 'Merüljön el a világhírű aszú hazájában. Pincetúrák, dűlőséták és exkluzív borkóstolók várják.',
+        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCy9v6A98guH7AZKCtlaRQ81mU_zV6RXbjAkXr2RCmBRHAGiXO3l8Z_ZtJ84nUUI1QDLFGElN_LOVy0s7wzewUL14ZMTXyl2cgsdXtH1k0D8KMximmYYyU7Lbnf5iWrXPmB3IRZLQ3dqzNrhMkcg7sDEfpSzH8C8cjuV5tSrGGd7--dNyaGLfCvy93U0V0hW-AzFd7I80nyAxsZ9YbjZSOorV6-QQD3WK6P2Y29FNPZ9Fdy3Ikvcs1jtZNiOhYVTpF6SojnTJQdsTc',
+        tags: [
+            { icon: 'wine_bar', label: 'Bor' },
+            { icon: 'restaurant', label: 'Gasztró' },
+            { icon: 'spa', label: 'Wellness' }
+        ],
+        estimatedCost: '65.000',
+        days: [
+            // Copy of original layout but adapted for Tokaj if needed, or keeping generic for now
+            {
+                dayIndex: 1,
+                items: [
+                    { id: 't1-1', time: '14:00', icon: 'wine_bar', category: 'KULTÚRA', title: 'Pincelátogatás', description: 'Ismerkedés a Tokaji Aszú készítésével.' }
+                ]
+            },
+            { dayIndex: 2, items: [] },
+            { dayIndex: 3, items: [] }
+        ]
+    },
+
+    // ── Észak-Alföld ──
+    {
+        id: 'puszta-romantika',
         regionId: 'eszak-alfold',
         title: 'Puszta Romantika',
+        description: 'Fedezze fel a Hortobágy varázsát, a kilenclyukú hidat és a végtelen puszta nyugalmát.',
+        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBYVfkYik-AxXeAwvEOdbbw35cO04hdTTEjF7IB1mktETIU5JLx0hztrGxxaqYmWW9vBdDGntFcOs4ho89HhL4CPYl9aTGK0GibPxu3kF15nVCQ5WeW2GrfZULftIyLpQ5Yz0HRrHVj2dwwPY-GBiAICdgeO9w2nBaDaIzWWQOfiSmrflkdIXVHJ44_nXit-tXMlhnP-zcCMEjwzyCUa8qZS6IhyljQlvVhM-mHeK9Nn8lk8aYLU7j4H0cYtqoHDMobeEoN_j0kdlY', // Placeholder image
+        tags: [
+            { icon: 'pets', label: 'Természet' },
+            { icon: 'restaurant', label: 'Gasztró' },
+            { icon: 'museum', label: 'Kultúra' }
+        ],
         estimatedCost: '38.000',
         days: [
             {
                 dayIndex: 1,
                 items: [
-                    {
-                        id: 'a1-1', time: '10:00', icon: 'directions_car', category: 'ÉRKEZÉS',
-                        title: 'Érkezés a Hortobágyra',
-                        description: 'Szállás elfoglalása a Hortobágyi Csárda közelében.',
-                    },
-                    {
-                        id: 'a1-2', time: '12:00', icon: 'photo_camera', category: 'LÁTNIVALÓ',
-                        title: 'Kilenclyukú híd',
-                        description: 'Séta a világörökség részét képező hídnál, a puszta ikonikus jelképénél.',
-                    },
-                    {
-                        id: 'a1-3', time: '14:00', icon: 'museum', category: 'KULTÚRA',
-                        title: 'Pásztormúzeum',
-                        description: 'Ismerkedés a hagyományos pusztai élettel, pásztoreszközök és néprajzi gyűjtemény.',
-                    },
-                    {
-                        id: 'a1-4', time: '18:00', icon: 'restaurant', category: 'GASZTRO',
-                        title: 'Vacsora a Csárdában',
-                        description: 'Hortobágyi palacsinta, bográcsgulyás és birkapörkölt, élőzenés vacsora.',
-                    },
-                ],
+                    { id: 'a1-1', time: '10:00', icon: 'directions_car', category: 'ÉRKEZÉS', title: 'Érkezés a Hortobágyra', description: 'Szállás elfoglalása a csárda közelében.' },
+                    { id: 'a1-2', time: '12:00', icon: 'photo_camera', category: 'LÁTNIVALÓ', title: 'Kilenclyukú híd', description: 'Séta a világörökség részét képező hídnál.' }
+                ]
             },
-            {
-                dayIndex: 2,
-                items: [
-                    {
-                        id: 'a2-1', time: '09:00', icon: 'restaurant', category: 'GASZTRO',
-                        title: 'Reggeli',
-                        description: 'Tanyasi reggeli frissen fejt tejjel és házi kenyérrel.',
-                    },
-                    {
-                        id: 'a2-2', time: '10:30', icon: 'pets', category: 'ÉLMÉNY',
-                        title: 'Lovasbemutató',
-                        description: 'Csikósok látványos bemutatója a Mátai Ménesben — az ötös fogat bravúrja.',
-                    },
-                    {
-                        id: 'a2-3', time: '14:00', icon: 'water', category: 'TERMÉSZET',
-                        title: 'Tisza-tavi Ökocentrum',
-                        description: 'Európa legnagyobb édesvízi akváriuma és a Tisza-tó élővilága.',
-                    },
-                    {
-                        id: 'a2-4', time: '17:00', icon: 'kayaking', category: 'AKTÍV',
-                        title: 'Csónakázás a Tisza-tavon',
-                        description: 'Nyugodt evezés a holtágak és vízililiomok között naplementében.',
-                    },
-                ],
-            },
-            {
-                dayIndex: 3,
-                items: [
-                    {
-                        id: 'a3-1', time: '09:00', icon: 'local_cafe', category: 'GASZTRO',
-                        title: 'Reggeli kávé',
-                        description: 'Kávé és kürtőskalács a debreceni belvárosban.',
-                    },
-                    {
-                        id: 'a3-2', time: '10:30', icon: 'church', category: 'KULTÚRA',
-                        title: 'Debreceni Nagytemplom',
-                        description: 'Városnézés a Református Nagytemplommal és a Kossuth térrel.',
-                    },
-                    {
-                        id: 'a3-3', time: '13:00', icon: 'local_dining', category: 'GASZTRO',
-                        title: 'Ebéd Debrecenben',
-                        description: 'Debreceni specialitások: sült kolbász, debreceni és töltött káposzta.',
-                    },
-                    {
-                        id: 'a3-4', time: '15:00', icon: 'home', category: 'HAZAUTAZÁS',
-                        title: 'Hazautazás',
-                        description: 'Búcsú az Alföldtől — csodálatos puszta-élmények emlékével.',
-                    },
-                ],
-            },
-        ],
+            { dayIndex: 2, items: [] },
+            { dayIndex: 3, items: [] }
+        ]
     },
+
+    // ── Budapest és környéke (Dunakanyar) ──
+    {
+        id: 'dunakanyar-kaland',
+        regionId: 'budapest', // Using 'budapest' region for Dunakanyar based on user map logic
+        title: 'Dunakanyar Kaland',
+        description: 'Fedezze fel a fenséges Dunakanyart, Visegrád történelmi várát és a környék lélegzetelállító panorámáját.',
+        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUS-YUmmlaB6dz4HVi4rHseCozEBuOu_3sh6icjVVD-laPuRQSx7NAM4t3_WReZJyPUJbuObjTd9EhPou0mnneryhGWKBhr3S6QXYeOkZCrZETshuiscgq0woXsosTZnAOv9EbFEj5s6liNGfU5K5RCOS8WrwQU1RAHLSDJydykSkI1By3dObKrVI-c4ZTBp8zeBmSgnZgiTecXj1KrJ7v9fvXRZnqonGtmTYRH_gf66Jdm5YlEh7XVa5LWY-m5tPLoFT-DSPo92o',
+        tags: [
+            { icon: 'hiking', label: 'Túra' },
+            { icon: 'castle', label: 'Kultúra' },
+            { icon: 'restaurant', label: 'Gasztró' }
+        ],
+        estimatedCost: '45.000',
+        days: [
+            { dayIndex: 1, items: [] },
+            { dayIndex: 2, items: [] },
+            { dayIndex: 3, items: [] }
+        ]
+    },
+
+    // ── Közép-Dunántúl (Balaton) ──
+    {
+        id: 'balatoni-riviera',
+        regionId: 'kozep-dunantul',
+        title: 'Balatoni Riviéra',
+        description: 'Vitorlázás a magyar tengeren, naplemente a Tihanyi Apátságnál és felejthetetlen mediterrán hangulat.',
+        imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBYVfkYik-AxXeAwvEOdbbw35cO04hdTTEjF7IB1mktETIU5JLx0hztrGxxaqYmWW9vBdDGntFcOs4ho89HhL4CPYl9aTGK0GibPxu3kF15nVCQ5WeW2GrfZULftIyLpQ5Yz0HRrHVj2dwwPY-GBiAICdgeO9w2nBaDaIzWWQOfiSmrflkdIXVHJ44_nXit-tXMlhnP-zcCMEjwzyCUa8qZS6IhyljQlvVhM-mHeK9Nn8lk8aYLU7j4H0cYtqoHDMobeEoN_j0kdlY',
+        tags: [
+            { icon: 'sailing', label: 'Vízi sport' },
+            { icon: 'directions_bike', label: 'Bicikli' },
+            { icon: 'festival', label: 'Életérzés' }
+        ],
+        estimatedCost: '55.000',
+        days: [
+            { dayIndex: 1, items: [] },
+            { dayIndex: 2, items: [] },
+            { dayIndex: 3, items: [] }
+        ]
+    }
 ];

@@ -110,5 +110,17 @@ export const api = {
             if (!res.ok) throw new Error('Summary fetch failed');
             return res.json();
         }
+    },
+    admin: {
+        reset: async () => {
+            const res = await fetch(`${API_URL}/admin/reset`, { method: 'POST' });
+            if (!res.ok) throw new Error('Admin reset failed');
+            return res.json();
+        },
+        deleteUser: async (id: number) => {
+            const res = await fetch(`${API_URL}/admin/users/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Admin delete user failed');
+            return res.json();
+        }
     }
 };

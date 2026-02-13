@@ -6,6 +6,7 @@ import { DateSelection } from './components/steps/DateSelection';
 import { MapSelection } from './components/steps/MapSelection';
 import { ProgramTimeline } from './components/steps/ProgramTimeline';
 import { Summary } from './components/steps/Summary';
+import { PackageSelection } from './components/steps/PackageSelection';
 import { StepIndicator } from './components/common/StepIndicator';
 import { Card } from './components/common/Card';
 
@@ -13,23 +14,24 @@ function App() {
   const [step, setStep] = useState(0);
   const [selectedDates, setSelectedDates] = useState<Date[] | undefined>([]);
   const [selectedRegion, setSelectedRegion] = useState<string | undefined>();
+  const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>();
 
-  const nextStep = () => setStep((p) => Math.min(p + 1, 4));
+  const nextStep = () => setStep((p) => Math.min(p + 1, 5));
   const prevStep = () => setStep((p) => Math.max(p - 1, 0));
 
   return (
     <UserProvider>
       <MainLayout>
-        {/* StepIndicator – felső idővonal (1-2-3) */}
-        {step > 0 && step < 4 && (
+        {/* StepIndicator – felső idővonal (1-5) */}
+        {step > 0 && step < 5 && (
           <div className="flex justify-center w-full mb-4">
-            <StepIndicator currentStep={step} totalSteps={3} />
+            <StepIndicator currentStep={step} totalSteps={4} />
           </div>
         )}
 
         {/* Step 0: Hero */}
         <Card isActive={step === 0} isBack={false}>
-          <Hero onStart={nextStep} onSkip={() => setStep(4)} />
+          <Hero onStart={nextStep} onSkip={() => setStep(5)} />
         </Card>
 
         {/* Step 1: Date Selection */}
@@ -52,26 +54,39 @@ function App() {
           />
         </Card>
 
-        {/* Step 3: Program Timeline */}
+        {/* Step 3: Package Selection (NEW) */}
         <Card isActive={step === 3} isBack={false}>
+          <PackageSelection
+            regionId={selectedRegion}
+            onSelect={(pkgId) => {
+              setSelectedPackageId(pkgId);
+              nextStep();
+            }}
+            onBack={prevStep}
+          />
+        </Card>
+
+        {/* Step 4: Program Timeline */}
+        <Card isActive={step === 4} isBack={false}>
           <ProgramTimeline
             regionId={selectedRegion}
+            packageId={selectedPackageId}
             dates={selectedDates}
             onBack={prevStep}
             onFinish={nextStep}
           />
         </Card>
 
-        {/* Step 4: Summary */}
-        <Card isActive={step === 4} isBack={false}>
+        {/* Step 5: Summary */}
+        <Card isActive={step === 5} isBack={false}>
           <Summary
             onContinue={() => {
-              setSelectedDates([]); // Tiszta lappal indítunk, hogy új időpontot válasszon
+              setSelectedDates([]);
               setStep(1);
             }}
             onRegionSelect={(regionId) => {
               setSelectedRegion(regionId);
-              setStep(3);
+              setStep(3); // Go to Package Selection instead of Timeline directly
             }}
           />
         </Card>

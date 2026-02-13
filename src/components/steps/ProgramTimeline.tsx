@@ -1,32 +1,46 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { Share2, ThumbsUp, Calendar } from 'lucide-react';
-import { mockPrograms, regions } from '../../data/mockData';
+import { packages, regions } from '../../data/mockData'; // Imported packages
 import { useUser } from '../../context/UserContext';
 import { api } from '../../api/client';
 
+import { useEffect } from 'react';
+
 interface ProgramTimelineProps {
     regionId: string | undefined;
+    packageId: string | undefined; // Added packageId
     dates: Date[] | undefined;
     onBack: () => void;
     onFinish: () => void;
 }
 
-export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTimelineProps) {
+export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }: ProgramTimelineProps) {
     const { user } = useUser();
+
+    // Redirect if no package selected (e.g. after refresh/hot-reload)
+    useEffect(() => {
+        if (!packageId) {
+            onBack();
+        }
+    }, [packageId, onBack]);
     const [selectedDayIndex, setSelectedDayIndex] = useState(1);
     const [isVoting, setIsVoting] = useState(false);
-    // Szavazás kezelése (Simpler logic: Just cast, no revoke here)
-    const [error, setError] = useState<string | null>(null); // New state for error messages
+    const [error, setError] = useState<string | null>(null);
 
+    // Find the specific package selected
+    const selectedPackage = packages.find(p => p.id === packageId);
+    // Fallback or region info
+    const region = regions.find(r => r.id === regionId);
+
+    // Szavazás kezelése
     const handleVote = async () => {
         if (!user || !regionId || isVoting) return;
         setError(null);
 
         setIsVoting(true);
         try {
-            // 1. Dátumok mentése (APPEND - hozzáadja az újakat)
+            // 1. Dátumok mentése
             const dateStrings = dates && dates.length > 0 ? dates.map(d => format(d, 'yyyy-MM-dd')) : [];
 
             if (dateStrings.length > 0) {
@@ -39,8 +53,13 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
                 return;
             }
 
+            // Note: Currently voting is per REGION in the backend (mock). 
+            // Ideally we should vote for a PACKAGE ID if we want granular votes.
+            // For now, adhering to existing API (regionId), assuming 1 vote per region logic mostly.
+            // If the user wants to vote for specific package, backend needs update. 
+            // Based on prompt, we just show the package here.
             await api.votes.cast(user.id, regionId, dateStrings);
-            // Siker esetén tovább lépünk
+
             onFinish();
         } catch (error) {
             console.error('Hiba szavazáskor:', error);
@@ -50,29 +69,27 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
         }
     };
 
-    const programs = mockPrograms.find(p => p.regionId === regionId);
-    const region = regions.find(r => r.id === regionId);
     const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
 
     /* ── Nincs program ── */
-    if (!programs) {
+    if (!selectedPackage) {
         return (
             <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-14 lg:p-16 text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Programok betöltése...</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Csomag betöltése...</h2>
                 <p className="text-gray-500 mb-6">
-                    Nem található program a kiválasztott tájegységhez ({region?.name ?? regionId}).
+                    Nem található a kiválasztott csomag.
                 </p>
                 <button
                     className="px-6 py-3 border border-gray-200 rounded-xl font-semibold text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all"
                     onClick={onBack}
                 >
-                    Vissza
+                    Vissza a csomagokhoz
                 </button>
             </div>
         );
     }
 
-    const currentDayProgram = programs.days.find(d => d.dayIndex === selectedDayIndex);
+    const currentDayProgram = selectedPackage.days.find(d => d.dayIndex === selectedDayIndex);
 
     /* Nap nevek generálása a kiválasztott dátumokból */
     const dayTabs = [1, 2, 3].map(dayIndex => {
@@ -98,13 +115,32 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
             {/* ═══════════ BAL SIDEBAR ═══════════ */}
             <div className="lg:w-80 p-8 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50/50">
                 <div className="sticky top-8">
+                    {/* Vissza gomb */}
+                    <button
+                        onClick={onBack}
+                        className="mb-6 group flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors"
+                    >
+                        <div
+                            className="bg-white rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center"
+                            style={{ width: '48px', height: '48px', minWidth: '48px', minHeight: '48px' }}
+                        >
+                            <span className="material-icons-outlined text-lg">arrow_back</span>
+                        </div>
+                        <span className="font-semibold text-sm">Vissza a csomagokhoz</span>
+                    </button>
+
                     {/* Cím */}
                     <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                            Utazás Összegzése
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
+                                {region?.name}
+                            </span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
+                            {selectedPackage.title}
                         </h2>
                         <p className="text-gray-500 text-sm">
-                            {programs.title}
+                            3 napos programterv
                         </p>
                     </div>
 
@@ -113,7 +149,7 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
                         <span className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
                         <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-bold text-gray-900">
-                                {programs.estimatedCost}
+                                {selectedPackage.estimatedCost}
                             </span>
                             <span className="text-gray-600 font-semibold">Ft</span>
                         </div>
@@ -135,11 +171,7 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
                             onClick={handleVote}
                             disabled={isVoting}
                         >
-                            {isVoting ? (
-                                <span className="animate-spin text-xl">↻</span>
-                            ) : (
-                                <ThumbsUp size={18} />
-                            )}
+                            {isVoting && <span className="animate-spin text-xl">↻</span>}
                             Szavazok erre!
                         </button>
                     </div>
@@ -151,14 +183,13 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
                         disabled={isVoting}
                     >
                         Eredmények
-                        <Share2 size={18} />
                     </button>
 
                     {/* Dátum infó */}
                     <div className="mt-8 pt-8 border-t border-gray-200">
                         <div className="flex items-center gap-3 text-gray-600 mb-2">
                             <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                <Calendar size={16} />
+                                {/* Icon removed - Placeholder */}
                             </div>
                             <div>
                                 <span className="text-xs text-gray-400 block uppercase tracking-wider">Időpont</span>

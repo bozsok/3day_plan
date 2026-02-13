@@ -4,7 +4,7 @@ import { hu } from 'date-fns/locale';
 import { api } from '../../api/client';
 import { regions } from '../../data/mockData';
 import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2 } from 'lucide-react';
-import { VoteManagementModal } from '../modals/VoteManagementModal'; // Import fixed
+import { VoteManagementModal } from '../modals/VoteManagementModal';
 
 interface SummaryData {
     topIntervals: { start: string; end: string; count: number; users: string[] }[];
@@ -20,7 +20,58 @@ interface SummaryProps {
 export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     const [data, setData] = useState<SummaryData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [showVoteModal, setShowVoteModal] = useState(false); // Modal state
+    const [showVoteModal, setShowVoteModal] = useState(false);
+    const [adminMode, setAdminMode] = useState(false);
+    const [titleClicks, setTitleClicks] = useState(0);
+    const [adminStatus, setAdminStatus] = useState<string | null>(null);
+    const [resetConfirm, setResetConfirm] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+    const handleTitleClick = () => {
+        const newCount = titleClicks + 1;
+        setTitleClicks(newCount);
+        if (newCount >= 5) {
+            setAdminMode(true);
+            setTitleClicks(0);
+            setAdminStatus(null);
+        }
+    };
+
+    const handleAdminReset = async () => {
+        if (!resetConfirm) {
+            setResetConfirm(true);
+            return;
+        }
+
+        try {
+            setAdminStatus('🔄 Reset folyamatban...');
+            await api.admin.reset();
+            localStorage.removeItem('3nap_user'); // [NEW] Clear local session
+            setAdminStatus('✅ Sikeres reset! Újratöltés...');
+            setTimeout(() => window.location.reload(), 1500);
+        } catch (e) {
+            setAdminStatus('❌ Hiba a reset során!');
+            setResetConfirm(false);
+        }
+    };
+
+    const handleAdminDeleteUser = async (id: number) => {
+        if (deleteConfirmId !== id) {
+            setDeleteConfirmId(id);
+            return;
+        }
+
+        try {
+            await api.admin.deleteUser(id);
+            setAdminStatus(`✅ Felhasználó (ID: ${id}) törölve!`);
+            setDeleteConfirmId(null);
+            fetchSummary();
+            // Clear status after 3 seconds
+            setTimeout(() => setAdminStatus(null), 3000);
+        } catch (e) {
+            setAdminStatus('❌ Hiba a törlés során!');
+        }
+    };
 
     const fetchSummary = async () => {
         try {
@@ -36,7 +87,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
     useEffect(() => {
         fetchSummary();
-        const interval = setInterval(fetchSummary, 5000); // 5 mp-re csökkentve a jobb élményért
+        const interval = setInterval(fetchSummary, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -64,8 +115,11 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                         Élő Eredmények
                     </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
-                    Közös <span className="text-primary-dark">Tervezés</span>
+                <h1
+                    onClick={handleTitleClick}
+                    className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4 select-none cursor-default active:scale-95 transition-transform"
+                >
+                    Közös <span className="text-primary-dark">tervezés</span>
                 </h1>
                 <p className="text-gray-600 text-lg">
                     Itt láthatod a csapat összesített döntéseit valós időben.
@@ -214,6 +268,57 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                 onClose={() => setShowVoteModal(false)}
                 onVoteDeleted={fetchSummary}
             />
+
+            {/* ADMIN PANEL OVERLAY */}
+            {adminMode && (
+                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-red-600 flex items-center gap-2">
+                                🛠️ RENDSZERGAZDA
+                            </h2>
+                            <button
+                                onClick={() => { setAdminMode(false); setAdminStatus(null); }}
+                                className="text-gray-500 hover:text-gray-900 font-bold"
+                            >
+                                BEZÁRÁS
+                            </button>
+                        </div>
+
+                        {adminStatus && (
+                            <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg text-center font-bold text-gray-800">
+                                {adminStatus}
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <button
+                                onClick={handleAdminReset}
+                                className="w-full font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all bg-red-600 hover:bg-red-700 text-white hover:scale-105"
+                            >
+                                ☢️ ADATBÁZIS TÖRLÉS
+                            </button>
+
+                            <div className="border-t border-gray-200 pt-4 mt-4">
+                                <h3 className="font-bold text-gray-700 mb-2">Felhasználók törlése:</h3>
+                                <div className="max-h-60 overflow-y-auto space-y-2">
+                                    {data?.userStatuses.map(u => (
+                                        <div key={u.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-200">
+                                            <span className="font-medium text-gray-800">{u.name} (ID: {u.id})</span>
+                                            <button
+                                                onClick={() => handleAdminDeleteUser(u.id)}
+                                                className="px-3 py-1 rounded text-xs font-bold transition-colors bg-white text-red-500 hover:bg-red-50 border border-red-200"
+                                            >
+                                                🗑️ Törlés
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
