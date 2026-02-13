@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { api } from '../../api/client';
+import { useUser } from '../../context/UserContext';
 import { regions } from '../../data/mockData';
 import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2 } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
@@ -18,14 +19,15 @@ interface SummaryProps {
 }
 
 export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
+    const { user, logout } = useUser();
     const [data, setData] = useState<SummaryData | null>(null);
     const [loading, setLoading] = useState(true);
     const [showVoteModal, setShowVoteModal] = useState(false);
     const [adminMode, setAdminMode] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
     const [adminStatus, setAdminStatus] = useState<string | null>(null);
-    const [resetConfirm, setResetConfirm] = useState(false);
-    const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+
 
     const handleTitleClick = () => {
         const newCount = titleClicks + 1;
@@ -38,33 +40,32 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     };
 
     const handleAdminReset = async () => {
-        if (!resetConfirm) {
-            setResetConfirm(true);
-            return;
-        }
+
 
         try {
             setAdminStatus('🔄 Reset folyamatban...');
             await api.admin.reset();
-            localStorage.removeItem('3nap_user'); // [NEW] Clear local session
+            logout();
             setAdminStatus('✅ Sikeres reset! Újratöltés...');
             setTimeout(() => window.location.reload(), 1500);
         } catch (e) {
             setAdminStatus('❌ Hiba a reset során!');
-            setResetConfirm(false);
+
         }
     };
 
     const handleAdminDeleteUser = async (id: number) => {
-        if (deleteConfirmId !== id) {
-            setDeleteConfirmId(id);
-            return;
-        }
+
 
         try {
             await api.admin.deleteUser(id);
             setAdminStatus(`✅ Felhasználó (ID: ${id}) törölve!`);
-            setDeleteConfirmId(null);
+
+            if (user && user.id === id) {
+                logout();
+            }
+
+
             fetchSummary();
             // Clear status after 3 seconds
             setTimeout(() => setAdminStatus(null), 3000);
@@ -87,7 +88,8 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
     useEffect(() => {
         fetchSummary();
-        const interval = setInterval(fetchSummary, 5000);
+        // Reduced polling frequency to prevent server congestion
+        const interval = setInterval(fetchSummary, 12000);
         return () => clearInterval(interval);
     }, []);
 

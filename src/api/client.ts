@@ -54,15 +54,12 @@ export const api = {
     },
     dates: {
         save: async (userId: number, dates: string[], regionId?: string) => {
-            console.log('Sending date save request:', { userId, dates, regionId });
             const res = await fetch(`${API_URL}/dates${EXT}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, dates, regionId }),
             });
             if (!res.ok) {
-                const text = await res.text();
-                console.error('Date save failed response:', text);
                 throw new Error(`Date save failed: ${res.statusText}`);
             }
             return res.json(); // Returns { userId, dateSelections: [...] }
@@ -113,12 +110,18 @@ export const api = {
     },
     admin: {
         reset: async () => {
-            const res = await fetch(`${API_URL}/admin/reset`, { method: 'POST' });
+            const url = import.meta.env.PROD
+                ? `${API_URL}/admin.php?action=reset`
+                : `${API_URL}/admin/reset`;
+            const res = await fetch(url, { method: 'POST' });
             if (!res.ok) throw new Error('Admin reset failed');
             return res.json();
         },
         deleteUser: async (id: number) => {
-            const res = await fetch(`${API_URL}/admin/users/${id}`, { method: 'DELETE' });
+            const url = import.meta.env.PROD
+                ? `${API_URL}/admin.php?action=delete_user&id=${id}` // action param is ignored by standard REST but good for doc, id is crucial
+                : `${API_URL}/admin/users/${id}`;
+            const res = await fetch(url, { method: 'DELETE' });
             if (!res.ok) throw new Error('Admin delete user failed');
             return res.json();
         }

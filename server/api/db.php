@@ -1,115 +1,106 @@
 <?php
-// CORS beállítások
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json; charset=UTF-8");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
+// 1. Helper: Send Headers
+function sendHeaders()
+{
+    if (headers_sent())
+        return;
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type");
+    header("Content-Type: application/json; charset=UTF-8");
 }
 
-// JSON Adatbázis Fájl
-$dbPath = __DIR__ . '/../data/db.json';
-$dbDir = dirname($dbPath);
-
-// Mappa létrehozása
-if (!is_dir($dbDir)) {
-    mkdir($dbDir, 0777, true);
+// 2. Helper: Handle Preflight OPTIONS
+function handleOptions()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        sendHeaders();
+        http_response_code(200);
+        exit;
+    }
 }
 
-// Segédfüggvény: JSON input olvasása
+// 3. Helper: Get JSON Input
 function getJsonInput()
 {
     $input = file_get_contents('php://input');
     return json_decode($input, true) ?? [];
 }
 
-// Segédfüggvény: Adatbázis betöltése
-// Segédfüggvény: Adatbázis atomi módosítása (Read-Modify-Write Lock-kal)
+// 4. Helper: Get DB Path & Ensure Directory
+function getDBPath()
+{
+    $path = __DIR__ . '/../data/db.json';
+    $dir = dirname($path);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0777, true);
+    }
+    return $path;
+}
+
+// 5. Helper: Read DB (No Lock for Speed/Stability)
+function readDB()
+{
+    $path = getDBPath();
+    $defaultDB = ["users" => [], "date_selections" => [], "vote_blocks" => []];
+
+    if (!file_exists($path))
+        return $defaultDB;
+
+    // Simple read without lock to avoid file system issues
+    $json = @file_get_contents($path);
+    if ($json === false)
+        return $defaultDB;
+
+    $data = json_decode($json, true);
+    return is_array($data) ? $data : $defaultDB;
+}
+
+// 6. Helper: Process DB (Write Lock)
 function processDB(callable $callback)
 {
-    global $dbPath;
+    $path = getDBPath();
+    $defaultDB = ["users" => [], "date_selections" => [], "vote_blocks" => []];
 
-    // Alapértelmezett adatbázis struktúra
-    $defaultDB = [
-        "users" => [],
-        "date_selections" => [],
-        "vote_blocks" => []
-    ];
-
-    // Fájl megnyitása olvasásra és írásra (c+ = létrehozza ha nincs, pointer az elején)
-    $fp = fopen($dbPath, 'c+');
+    $fp = @fopen($path, 'c+'); // Suppress warning
     if (!$fp) {
         http_response_code(500);
-        echo json_encode(["error" => "Nem sikerült megnyitni az adatbázist."]);
+        echo json_encode(["error" => "Database IO error"]);
         exit;
     }
 
-    // Exkluzív zár kérése (blokkol amíg meg nem kapja)
     if (flock($fp, LOCK_EX)) {
-        // 1. Olvasás
         $json = stream_get_contents($fp);
         $db = !empty($json) ? json_decode($json, true) : $defaultDB;
         if (!is_array($db))
             $db = $defaultDB;
 
-        // 2. Módosítás (Callback hívása)
         try {
-            $result = $callback($db); // A callback visszatérési értéke a válasz adattartalma (nem a DB!)
-            // A callback referencia szerint módosítja a $db-t, vagy visszaadja a módosítottat?
-            // PHP-ben objektum referencia, tömb nem.
-            // Ezért a callback így nézzen ki: function(&$db) { ... return $bizniszLogikaEredmeny; }
+            $result = $callback($db);
         } catch (Exception $e) {
-            // Hiba esetén visszaállítjuk a fájlt (nem írunk) és eldobjuk a hibát
             flock($fp, LOCK_UN);
             fclose($fp);
             throw $e;
         }
 
-        // 3. Írás (Csak ha a callback sikeresen lefutott)
-        ftruncate($fp, 0); // Fájl ürítése
-        rewind($fp); // Pointer az elejére
+        ftruncate($fp, 0);
+        rewind($fp);
         fwrite($fp, json_encode($db, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        fflush($fp); // Buffer ürítése
-
-        // 4. Zár feloldása
+        fflush($fp);
         flock($fp, LOCK_UN);
         fclose($fp);
 
-        return $result; // Visszaadjuk a logikai eredményt (pl. az új user adatait)
-
+        return $result;
     } else {
         fclose($fp);
         http_response_code(503);
-        echo json_encode(["error" => "Az adatbázis jelenleg foglalt, kérlek próbáld újra."]);
+        echo json_encode(["error" => "Database busy"]);
         exit;
     }
 }
 
-// Segédfüggvény: Adatbázis olvasása (Shared Lock)
-function readDB()
-{
-    global $dbPath;
-    $defaultDB = ["users" => [], "date_selections" => [], "votes" => []];
-
-    if (!file_exists($dbPath))
-        return $defaultDB;
-
-    $fp = fopen($dbPath, 'r');
-    if (flock($fp, LOCK_SH)) { // Megosztott zár (többen olvashatják egyszerre, de írni nem lehet)
-        $json = stream_get_contents($fp);
-        flock($fp, LOCK_UN);
-        fclose($fp);
-        return !empty($json) ? json_decode($json, true) : $defaultDB;
-    } else {
-        fclose($fp);
-        return $defaultDB; // Fallback
-    }
-}
-
-// Segédfüggvény: Új ID generálása
+// 7. Helper: ID Generator
 function getNextId($array)
 {
     if (empty($array))
@@ -121,4 +112,3 @@ function getNextId($array)
     }
     return $maxId + 1;
 }
-?>

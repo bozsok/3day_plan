@@ -21,7 +21,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             if (stored) {
                 try {
                     const localUser = JSON.parse(stored);
-                    console.log('UserContext: Found stored user:', localUser);
+
 
                     if (!localUser.id) {
                         console.warn('UserContext: Invalid stored user (no ID). Clearing.');
@@ -33,7 +33,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     // 1. Megpróbáljuk lekérni a szerverről az ID alapján
                     try {
                         const serverUser = await api.users.get(localUser.id);
-                        console.log('UserContext: Server returned user:', serverUser);
+
                         if (serverUser && serverUser.name) {
                             setUser(serverUser);
                             localStorage.setItem('3nap_user', JSON.stringify(serverUser)); // Frissítjük a helyit is
@@ -47,28 +47,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                         localStorage.removeItem('3nap_user');
                         setUser(null);
 
-                        /* DISABLED SILENT RE-LOGIN to prevent Zombie Users after Reset
-                        // 2. Erőltetett újralogin a helyi névvel
-                        if (localUser.name) {
-                            try {
-                                console.log('UserContext: Re-registering user:', localUser.name);
-                                const newUserData = await api.users.login(localUser.name);
 
-                                console.log('UserContext: Re-registration successful. New ID:', newUserData.id);
-                                setUser(newUserData);
-                                localStorage.setItem('3nap_user', JSON.stringify(newUserData));
-                            } catch (loginErr) {
-                                console.error('UserContext: CRITICAL - Silent re-login failed:', loginErr);
-                                // Ha nem sikerült visszalépni, töröljük a szemetet, hogy a user újra tudjon próbálkozni a főoldalon
-                                localStorage.removeItem('3nap_user');
-                                setUser(null);
-                            }
-                        } else {
-                            console.warn('UserContext: No name in local storage, cannot re-login. Cleaning up.');
-                            localStorage.removeItem('3nap_user');
-                            setUser(null);
-                        }
-                        */
                     }
 
                 } catch (e) {
@@ -76,7 +55,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     localStorage.removeItem('3nap_user');
                 }
             } else {
-                console.log('UserContext: No stored user found.');
+
             }
             setIsLoading(false);
         };

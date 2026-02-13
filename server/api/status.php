@@ -1,0 +1,6 @@
+<?php
+// Simplest possible JSON response to test server health
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+echo json_encode(["status" => "ok", "php_version" => phpversion()]);
+exit;

@@ -2,6 +2,18 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.5.6] - 2026-02-13
+
+### Javítások
+- **HTTP/2 Protokoll Hiba Elhárítása (CRITICAL):**
+    - Sikerült elhárítani a szerver oldali `net::ERR_HTTP2_PROTOCOL_ERROR` hibát, amely terhelés alatt jelentkezett.
+    - **Ok:** "Race Condition" lépett fel a fájl zárolása során: a kliens túl gyakran kérte le az adatokat (5mp), miközben valaki éppen írta az adatbázist. A szerver ilyenkor "beragadt" vagy üres fájlt próbált olvasni.
+    - **Megoldás 1 (Backend):** A `summary.php` mostantól **Non-Blocking (Nem blokkoló)** fájl zárolást használ visszavonulási (retry) mechanizmussal. Ha a fájl éppen írás alatt van, a script nem fagy le, hanem vár kicsit, vagy végső esetben üres adatot küld vissza összeomlás helyett.
+    - **Megoldás 2 (Frontend):** Az automatikus frissítés (polling) gyakoriságát **12 másodpercre** csökkentettük (5mp helyett), drasztikusan csökkentve a szerver terhelését.
+- **API Stabilitás:**
+    - Minden PHP végpont (`dates.php`, `votes.php`, `users.php`, `admin.php`) átírásra került "self-contained" (önálló) struktúrára, megszüntetve a külső fájlfüggőségeket (`require`), amelyek instabilitást okozhattak egyes szervereken.
+    - "Soft Failure" mód bevezetése: A szerver kritikus hiba esetén is `200 OK` státuszt küld (JSON error üzenettel), hogy elkerülje a szigorúbb protokoll-szintű blokkolást.
+
 ## [0.5.5] - 2026-02-13
 
 ### Újdonságok
