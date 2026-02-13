@@ -55,8 +55,8 @@ export function Hero({ onStart, onSkip }: HeroProps) {
                 </h1>
 
                 <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-                    A célunk egyszerű: levenni a tervezés terhét a válladról.
-                    Válassz időpontot, úti célt, és mi adjuk a kész programtervet.
+                    Kattints kettőt és már meg is kapod a 3 napos programcsomagokat.<br></br>
+                    Ha most vagy itt először, akkor írd be a neved!
                 </p>
 
                 {/* Feature Icons */}

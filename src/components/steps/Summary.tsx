@@ -3,7 +3,8 @@ import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { api } from '../../api/client';
 import { regions } from '../../data/mockData';
-import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink } from 'lucide-react';
+import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2 } from 'lucide-react';
+import { VoteManagementModal } from '../modals/VoteManagementModal'; // Import fixed
 
 interface SummaryData {
     topIntervals: { start: string; end: string; count: number; users: string[] }[];
@@ -19,22 +20,23 @@ interface SummaryProps {
 export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     const [data, setData] = useState<SummaryData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [showVoteModal, setShowVoteModal] = useState(false); // Modal state
+
+    const fetchSummary = async () => {
+        try {
+            const res = await api.summary.get();
+            // @ts-ignore
+            setData(res);
+        } catch (error) {
+            console.error('Hiba az összegzés betöltésekor:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchSummary = async () => {
-            try {
-                const res = await api.summary.get();
-                // @ts-ignore
-                setData(res);
-            } catch (error) {
-                console.error('Hiba az összegzés betöltésekor:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchSummary();
-        const interval = setInterval(fetchSummary, 12000); // 12 mp-ként frissít (Ritkítás a szerver kímélése érdekében)
+        const interval = setInterval(fetchSummary, 5000); // 5 mp-re csökkentve a jobb élményért
         return () => clearInterval(interval);
     }, []);
 
@@ -46,7 +48,16 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
     return (
         <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-14 lg:p-16 relative">
-            <div className="text-center mb-12">
+            <div className="text-center mb-12 relative">
+                {/* Header Action Button */}
+                <button
+                    onClick={() => setShowVoteModal(true)}
+                    className="absolute top-0 right-0 md:top-2 md:right-2 flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full text-sm font-bold transition-all shadow-sm"
+                >
+                    <Settings2 size={16} />
+                    <span className="hidden md:inline">Szavazataim</span>
+                </button>
+
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
@@ -197,6 +208,12 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     </button>
                 </div>
             )}
+
+            <VoteManagementModal
+                isOpen={showVoteModal}
+                onClose={() => setShowVoteModal(false)}
+                onVoteDeleted={fetchSummary}
+            />
         </div>
     );
 }

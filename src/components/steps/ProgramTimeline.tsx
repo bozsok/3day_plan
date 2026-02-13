@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { Share2, ThumbsUp, Calendar } from 'lucide-react';
@@ -16,55 +16,17 @@ interface ProgramTimelineProps {
 export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTimelineProps) {
     const { user } = useUser();
     const [selectedDayIndex, setSelectedDayIndex] = useState(1);
-    const [userVoteBlockId, setUserVoteBlockId] = useState<number | null>(null);
     const [isVoting, setIsVoting] = useState(false);
-
-    // Szavazat státusz ellenőrzése
-    useEffect(() => {
-        if (!user || !regionId || !dates) return;
-
-        // Formázzuk a jelenlegi dátumokat összehasonlításhoz
-        const currentDateStrings = dates.map(d => format(d, 'yyyy-MM-dd')).sort();
-        const currentJson = JSON.stringify(currentDateStrings);
-
-        api.votes.list(user.id).then(votes => {
-            // Keressük, van-e OLYAN szavazat, ami erre a régióra ÉS ezekre a dátumokra szól
-            const vote = votes.find(v => {
-                if (v.regionId !== regionId) return false;
-                // A votes.dates már string[] az API kliensből
-                const voteDates = [...v.dates].sort();
-                return JSON.stringify(voteDates) === currentJson;
-            });
-            setUserVoteBlockId(vote ? vote.id : null);
-        });
-    }, [user, regionId, dates]);
-
-    const handleRevoke = async () => {
-        if (!user || !regionId || isVoting || userVoteBlockId === null) return;
-
-        setIsVoting(true);
-        try {
-            await api.votes.revoke(user.id, userVoteBlockId);
-            setUserVoteBlockId(null);
-        } catch (error) {
-            console.error('Hiba visszavonáskor:', error);
-            alert('Hiba történt.');
-        } finally {
-            setIsVoting(false);
-        }
-    };
+    // Szavazás kezelése (Simpler logic: Just cast, no revoke here)
+    const [error, setError] = useState<string | null>(null); // New state for error messages
 
     const handleVote = async () => {
         if (!user || !regionId || isVoting) return;
+        setError(null);
 
         setIsVoting(true);
         try {
             // 1. Dátumok mentése (APPEND - hozzáadja az újakat)
-            // Megjegyzés: A votes.cast is megkapja a dátumokat, de a date_selections-t is illik frissíteni/bővíteni.
-            // A SPEC szerint a votes.cast validálja, hogy léteznek-e a date_selections-ben?
-            // "a 3 dátum már szerepeljen a date_selections között... ha nem -> hibát ad"
-            // Szóval ELŐBB el kell menteni a date_selections-be.
-
             const dateStrings = dates && dates.length > 0 ? dates.map(d => format(d, 'yyyy-MM-dd')) : [];
 
             if (dateStrings.length > 0) {
@@ -73,22 +35,16 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
 
             // 2. Szavazás (Blokk létrehozása 3 dátummal)
             if (dateStrings.length !== 3) {
-                alert("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
+                setError("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
                 return;
             }
 
-            const res = await api.votes.cast(user.id, regionId, dateStrings);
-            // @ts-ignore
-            if (res.success && res.block) {
-                // @ts-ignore
-                setUserVoteBlockId(res.block.id);
-            }
-
-            // Opcionális: Visszajelzés
-            // alert('Szavazat és időpontok rögzítve!');
+            await api.votes.cast(user.id, regionId, dateStrings);
+            // Siker esetén tovább lépünk
+            onFinish();
         } catch (error) {
             console.error('Hiba szavazáskor:', error);
-            alert('Hiba történt a művelet során.');
+            setError('Hiba történt a művelet során. Próbáld újra!');
         } finally {
             setIsVoting(false);
         }
@@ -163,45 +119,39 @@ export function ProgramTimeline({ regionId, dates, onBack, onFinish }: ProgramTi
                         </div>
                     </div>
 
+                    {/* Hibajelzés */}
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
+                            {error}
+                        </div>
+                    )}
+
                     {/* Akció gombok */}
                     <div className="space-y-3 mb-6">
-                        {/* 1. Szavazat (Mindig aktív - Hozzáadás/Frissítés) */}
+                        {/* 1. Szavazat (Mindig aktív - Hozzáadás) */}
                         <button
                             className={`w-full font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 
-                                ${userVoteBlockId !== null ? 'bg-green-600 hover:bg-green-700 shadow-green-200' : 'bg-primary hover:bg-primary-dark'} 
-                                text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+                                bg-primary hover:bg-primary-dark text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
                             onClick={handleVote}
                             disabled={isVoting}
                         >
                             {isVoting ? (
                                 <span className="animate-spin text-xl">↻</span>
                             ) : (
-                                <ThumbsUp size={18} className={userVoteBlockId !== null ? 'fill-white' : ''} />
+                                <ThumbsUp size={18} />
                             )}
                             Szavazok erre!
                         </button>
-
-                        {/* 2. Visszavonás (Csak ha van szavazat) */}
-                        {userVoteBlockId !== null && (
-                            <button
-                                className="w-full font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 disabled:opacity-50"
-                                onClick={handleRevoke}
-                                disabled={isVoting}
-                            >
-                                <span className="material-icons-outlined text-sm">delete</span>
-                                Visszavonás
-                            </button>
-                        )}
                     </div>
 
-                    {/* Tovább gomb (Mindig látszik, auto-vote ha kell) */}
+                    {/* Tovább gomb (Szavazás nélküli tovább lépés, pl csak megnézni az eredményeket) */}
                     <button
-                        className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full shadow-xl animate-bounce-slow"
+                        className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full shadow-xl"
                         onClick={onFinish}
                         disabled={isVoting}
                     >
-                        {isVoting ? 'Szavazás rögzítése...' : 'Eredmények'}
-                        {!isVoting && <Share2 size={18} className="rotate-180" />}
+                        Eredmények
+                        <Share2 size={18} />
                     </button>
 
                     {/* Dátum infó */}
