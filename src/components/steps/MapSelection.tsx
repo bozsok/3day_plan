@@ -33,7 +33,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                     description="Kattints arra a régióra a térképen, ahol szívesen eltöltenéd a hétvégét."
                 />
 
-                <div id="region-selection-nav-container" className="flex gap-4 items-center">
+                <div id="region-selection-nav-container" className="flex gap-4 items-center mt-4">
                     <NavButton
                         id="region-selection-back-btn"
                         variant="outline"
@@ -43,7 +43,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                     />
                     <button
                         id="region-selection-next-btn"
-                        className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                        className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 h-14 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={() => navigate('/terv/csomagok')}
                         disabled={!selectedRegionId}
                     >
@@ -54,7 +54,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
             </div>
 
             {/* Jobb oldal — Térkép */}
-            <div id="region-selection-content-right" className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
+            <div id="region-selection-content-right" className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-12 flex items-center justify-center border-l border-gray-100">
                 <div id="region-selection-map-wrapper" className="w-full">
                     <div id="region-selection-map-header" className="flex items-center justify-between mb-6">
                         <h2 id="region-selection-map-title" className="text-lg font-bold text-gray-900 flex items-center gap-2">

@@ -2,6 +2,16 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.10.1] - 2026-02-14
+
+### Vizuális Konzisztencia és UI Finomhangolás
+- **Standardizált padding:** Az összes tervezési lépés (1-4) és az összegzés jobb oldali/fő tartalmi sávja egységesen `md:p-12` (48px) belső margót kapott.
+- **Szegélyek szinkronizálása:** A csomagkártyák és a felső napválasztó fülek szegélye egységesen `border-gray-200` árnyalatra frissült, illeszkedve a szűrőgombokhoz.
+- **Navigációs gombok javítása:** Az 1. és 2. lépés "Tovább" gombjai fix 56px (`h-14`) magasságot kaptak, így pixelpontosan illeszkednek a "Vissza" gombokhoz.
+- **Levegősebb elrendezés:** Az 1. és 2. lépés navigációs konténerei `mt-4` felső margót kaptak a zsúfoltság elkerülése érdekében.
+- **"Clean" stílus:** Eltávolítottuk az alapértelmezett árnyékokat a szűrőgombokról és a csomagkártyákról. Utóbbiak hover esetén kapnak egy lágy `shadow-lg` kiemelést.
+- **Technikai javítás:** A szűrősáv `pt-1` felső paddingot kapott, megakadályozva a szegélyek levágását (clipping) oldalváltáskor.
+
 ## [0.10.0] - 2026-02-14
 
 ### Tesztelhetőség és Dokumentáció

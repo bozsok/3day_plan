@@ -1,4 +1,4 @@
-# Projekt ID Térkép - Ellenőrző Lista (v0.10.0)
+# Projekt ID Térkép - Ellenőrző Lista (v0.10.1)
 
 Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosítóját (ID), a megjelenés sorrendjében és logikai egységekbe bontva.
 

@@ -50,13 +50,13 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
             </div>
 
             {/* Szűrők */}
-            <div id="package-selection-filter-bar" className="hidden md:flex flex-wrap gap-4 mb-10 overflow-x-auto pb-4 md:pb-0 scrollbar-hide">
+            <div id="package-selection-filter-bar" className="hidden md:flex flex-wrap gap-4 mb-10 overflow-x-auto pt-1 pb-4 md:pb-0 scrollbar-hide">
                 {filters.map(f => (
                     <button
                         key={f}
                         id={`package-selection-filter-btn-${f.toLowerCase().replace(/\s+/g, '-')}`}
                         onClick={() => setFilter(f)}
-                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-sm border whitespace-nowrap ${filter === f
+                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap ${filter === f
                             ? 'bg-primary text-gray-900 border-primary'
                             : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
                             }`}
@@ -84,7 +84,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                         <div
                             key={pkg.id}
                             id={`package-card-root-${pkg.id}`}
-                            className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
+                            className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
                             onClick={() => {
                                 onSelect(pkg.id);
                                 navigate('/terv/program');

@@ -215,7 +215,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
 
                 {/* NAP FÜLEK */}
-                <div id="program-timeline-tabs-row" className="flex border-b border-gray-100 bg-white lg:pr-40">
+                <div id="program-timeline-tabs-row" className="flex border-b border-gray-200 bg-white lg:pr-40">
                     {[1, 2, 3].map((dayIndex) => {
                         const isActive = activeDay === dayIndex;
                         const idx = dayIndex;
