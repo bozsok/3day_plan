@@ -1,5 +1,6 @@
 import { differenceInCalendarDays, format } from 'date-fns';
 import { hu } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../common/CustomCalendar';
 import { useUser } from '../../context/UserContext';
@@ -8,11 +9,10 @@ import { StepCard } from '../common/StepCard';
 interface DateSelectionProps {
     selected: Date[] | undefined;
     onSelect: (dates: Date[] | undefined) => void;
-    onNext: () => void;
-    onBack: () => void;
 }
 
-export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelectionProps) {
+export function DateSelection({ selected, onSelect }: DateSelectionProps) {
+    const navigate = useNavigate();
     const { user } = useUser();
     const dates = selected ?? [];
 
@@ -29,7 +29,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
 
     const handleNext = () => {
         if (!hasThreeConsecutiveDays || !user) return;
-        onNext();
+        navigate('/terv/helyszin');
     };
 
     const handleCalendarSelect = (newDates: Date[]) => {
@@ -70,7 +70,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
                 <div className="flex gap-4 items-center">
                     <button
                         className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
-                        onClick={onBack}
+                        onClick={() => navigate('/')}
                         title="Vissza"
                     >
                         <ChevronLeft size={24} />

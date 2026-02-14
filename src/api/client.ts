@@ -26,6 +26,7 @@ export interface User {
 }
 
 // PHP Backend URL
+// A HashRouter mellett a relatív útvonal (mostantól fixen a gyökérhez képest) stabil marad.
 const API_URL = import.meta.env.PROD ? 'server/api' : '/api';
 const EXT = import.meta.env.PROD ? '.php' : '';
 

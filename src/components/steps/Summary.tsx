@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import { hu } from 'date-fns/locale';
 import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
@@ -17,10 +18,10 @@ interface SummaryData {
 interface SummaryProps {
     onContinue?: () => void;
     onRegionSelect?: (regionId: string) => void;
-    onBack?: () => void;
 }
 
-export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
+export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
+    const navigate = useNavigate();
     const { user, logout } = useUser();
     const [data, setData] = useState<SummaryData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -104,18 +105,16 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
     return (
         <StepCard>
             {/* Vissza gomb - Abszolút pozicionálás */}
-            {onBack && (
-                <button
-                    onClick={onBack}
-                    className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
+            <button
+                onClick={() => navigate('/terv/program')}
+                className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
+            >
+                <div
+                    className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                 >
-                    <div
-                        className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
-                    >
-                        <ChevronLeft size={24} />
-                    </div>
-                </button>
-            )}
+                    <ChevronLeft size={24} />
+                </div>
+            </button>
 
             <div className="text-center mb-12 relative">
                 {/* Header Action Button */}
@@ -194,7 +193,10 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
                             return (
                                 <div
                                     key={item.regionId}
-                                    onClick={() => onRegionSelect?.(item.regionId)}
+                                    onClick={() => {
+                                        onRegionSelect?.(item.regionId);
+                                        navigate('/terv/csomagok');
+                                    }}
                                     className={`relative p-4 rounded-xl border transition-all cursor-pointer group ${idx === 0 ? 'bg-white border-yellow-200 shadow-md transform hover:scale-105' : 'bg-transparent border-gray-200 hover:bg-white hover:border-gray-300 hover:shadow-sm'}`}
                                 >
                                     <div className="flex justify-between items-center mb-2">
@@ -271,7 +273,10 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
             {onContinue && (
                 <div className="fixed bottom-8 right-8 z-50 animate-bounce-slow">
                     <button
-                        onClick={onContinue}
+                        onClick={() => {
+                            onContinue();
+                            navigate('/terv/idopont');
+                        }}
                         className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 border-4 border-white"
                     >
                         <CalendarIcon size={24} />

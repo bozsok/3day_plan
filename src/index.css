@@ -17,6 +17,11 @@
 /* =============================================
    Global
    ============================================= */
+html {
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+}
+
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }

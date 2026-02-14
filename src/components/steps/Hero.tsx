@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { ArrowRight, Compass, Calendar, MapPin, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { StepCard } from '../common/StepCard';
 
 interface HeroProps {
-    onStart: () => void;
-    onSkip?: () => void;
 }
 
-export function Hero({ onStart, onSkip }: HeroProps) {
+export function Hero({ }: HeroProps) {
+    const navigate = useNavigate();
     const { user, login, isLoading } = useUser();
     const [name, setName] = useState('');
     const [error, setError] = useState('');
@@ -22,7 +22,7 @@ export function Hero({ onStart, onSkip }: HeroProps) {
 
         try {
             await login(name);
-            onStart();
+            navigate('/terv/idopont');
         } catch (err) {
             setError('Hiba történt a bejelentkezéskor. Próbáld újra!');
         }
@@ -30,7 +30,7 @@ export function Hero({ onStart, onSkip }: HeroProps) {
 
     // Ha már be van jelentkezve, csak a tovább gomb látszik (vagy automatikusan továbbvihetnénk)
     const handleContinue = () => {
-        onStart();
+        navigate('/terv/idopont');
     };
 
     return (
@@ -118,14 +118,12 @@ export function Hero({ onStart, onSkip }: HeroProps) {
                                     Tervezés
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
-                                {onSkip && (
-                                    <button
-                                        onClick={onSkip}
-                                        className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 text-gray-600 hover:text-primary-dark font-bold text-lg px-8 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
-                                    >
-                                        Eredmények
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => navigate('/terv/osszegzes')}
+                                    className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 text-gray-600 hover:text-primary-dark font-bold text-lg px-8 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+                                >
+                                    Eredmények
+                                </button>
                             </div>
                         </div>
                     ) : (

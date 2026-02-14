@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { packages } from '../../data/mockData';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
@@ -6,12 +7,11 @@ import { StepCard } from '../common/StepCard';
 interface PackageSelectionProps {
     regionId: string | undefined;
     onSelect: (packageId: string) => void;
-    onBack: () => void;
-    onNext?: () => void;
     selectedPackageId?: string;
 }
 
-export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedPackageId }: PackageSelectionProps) {
+export function PackageSelection({ regionId, onSelect, selectedPackageId }: PackageSelectionProps) {
+    const navigate = useNavigate();
     const [filter, setFilter] = useState('Összes');
 
     // Filter packages by county (passed as regionId prop from App.tsx)
@@ -23,7 +23,7 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
         <StepCard className="animate-fade-in" padding="p-[15px] min-[440px]:p-8 md:p-12">
             {/* Vissza gomb */}
             <button
-                onClick={onBack}
+                onClick={() => navigate('/terv/helyszin')}
                 className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
             >
                 <div
@@ -34,9 +34,9 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
             </button>
 
             {/* Tovább gomb (Csak ha van kiválasztott csomag) */}
-            {selectedPackageId && onNext && (
+            {selectedPackageId && (
                 <button
-                    onClick={onNext}
+                    onClick={() => navigate('/terv/program')}
                     className="absolute top-4 right-4 min-[440px]:top-8 md:top-12 min-[440px]:right-8 md:right-12 group hover:scale-105 transition-transform z-10"
                 >
                     <div
@@ -87,7 +87,7 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                     <div className="text-center py-12 text-gray-400">
                         <p>Ehhez a megyéhez jelenleg nem tartozik elérhető csomag.</p>
                         <button
-                            onClick={onBack}
+                            onClick={() => navigate('/terv/helyszin')}
                             className="mt-4 px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-semibold text-gray-600"
                         >
                             Válassz másik megyét
@@ -98,7 +98,10 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                         <div
                             key={pkg.id}
                             className="group bg-white rounded-2xl min-[440px]:rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
-                            onClick={() => onSelect(pkg.id)}
+                            onClick={() => {
+                                onSelect(pkg.id);
+                                navigate('/terv/program');
+                            }}
                         >
                             {/* Kép */}
                             <div className="md:w-80 h-48 md:h-auto relative shrink-0 overflow-hidden">
@@ -144,6 +147,7 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onSelect(pkg.id);
+                                            navigate('/terv/program');
                                         }}
                                         className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-4 py-2 rounded-xl transition-all text-sm flex items-center gap-2 shadow-sm hover:shadow-md shrink-0 ml-2"
                                     >

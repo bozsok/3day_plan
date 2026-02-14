@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, MapPin, Map } from 'lucide-react';
 import { counties } from '../../data/mockData';
 import { HungaryMap } from '../common/HungaryMap';
@@ -7,11 +8,10 @@ import { StepCard } from '../common/StepCard';
 interface MapSelectionProps {
     selectedRegionId: string | undefined;
     onSelect: (regionId: string) => void;
-    onNext: () => void;
-    onBack: () => void;
 }
 
-export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: MapSelectionProps) {
+export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) {
+    const navigate = useNavigate();
     const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
 
     const selectedCounty = counties.find(c => c.id === selectedRegionId);
@@ -43,14 +43,14 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
                 <div className="flex gap-4 items-center">
                     <button
                         className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
-                        onClick={onBack}
+                        onClick={() => navigate('/terv/idopont')}
                         title="Vissza"
                     >
                         <ChevronLeft size={24} />
                     </button>
                     <button
                         className="group bg-primary hover:bg-primary-dark text-background-dark font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
-                        onClick={onNext}
+                        onClick={() => navigate('/terv/csomagok')}
                         disabled={!selectedRegionId}
                     >
                         Tovább

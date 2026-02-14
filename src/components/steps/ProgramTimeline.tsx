@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { hu } from 'date-fns/locale';
 import { packages, counties } from '../../data/mockData'; // Imported packages and counties
@@ -13,19 +14,18 @@ interface ProgramTimelineProps {
     regionId: string | undefined;
     packageId: string | undefined; // Added packageId
     dates: Date[] | undefined;
-    onBack: () => void;
-    onFinish: () => void;
 }
 
-export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }: ProgramTimelineProps) {
+export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineProps) {
+    const navigate = useNavigate();
     const { user } = useUser();
 
     // Redirect if no package selected (e.g. after refresh/hot-reload)
     useEffect(() => {
         if (!packageId) {
-            onBack();
+            navigate('/terv/csomagok');
         }
-    }, [packageId, onBack]);
+    }, [packageId, navigate]);
 
     const [hasVoted, setHasVoted] = useState(false);
 
@@ -74,7 +74,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             // Based on prompt, we just show the package here.
             await api.votes.cast(user.id, regionId, dateStrings);
 
-            onFinish();
+            navigate('/terv/osszegzes');
         } catch (error) {
             console.error('Hiba szavazáskor:', error);
             setError('Hiba történt a művelet során. Próbáld újra!');
@@ -95,7 +95,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 </p>
                 <button
                     className="px-6 py-3 border border-gray-200 rounded-xl font-semibold text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all"
-                    onClick={onBack}
+                    onClick={() => navigate('/terv/csomagok')}
                 >
                     Vissza a csomagokhoz
                 </button>
@@ -129,7 +129,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
         <div className="relative">
             {/* Vissza gomb - Abszolút pozicionálás, mint a 3. lépésnél */}
             <button
-                onClick={onBack}
+                onClick={() => navigate('/terv/csomagok')}
                 className="absolute top-0 left-0 group hover:scale-105 transition-transform z-10"
             >
                 <div
@@ -142,7 +142,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             {/* Tovább gomb (Csak ha már szavazott) - MOBIL/TABLET ONLY (lg:hidden) */}
             {hasVoted && (
                 <button
-                    onClick={onFinish}
+                    onClick={() => navigate('/terv/osszegzes')}
                     className="absolute top-0 right-0 lg:hidden group hover:scale-105 transition-transform z-10"
                 >
                     <div
@@ -225,7 +225,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             {/* Tovább gomb (Szavazás nélküli tovább lépés, pl csak megnézni az eredményeket) */}
             <button
                 className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full"
-                onClick={onFinish}
+                onClick={() => navigate('/terv/osszegzes')}
                 disabled={isVoting}
             >
                 Eredmények
@@ -254,7 +254,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 {/* DESKTOP FORWARD BUTTON */}
                 {hasVoted && (
                     <button
-                        onClick={onFinish}
+                        onClick={() => navigate('/terv/osszegzes')}
                         className="hidden lg:flex absolute top-8 md:top-12 right-8 md:right-12 group hover:scale-105 transition-transform z-20"
                     >
                         <div

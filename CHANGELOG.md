@@ -2,6 +2,18 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.7.0] - 2026-02-14
+
+### Hozzáadva
+- **React Router integráció**: Valódi útvonalkezelés bevezetése minden tervezési lépéshez (Deep linking támogatás).
+- **Smooth Transitions**: Simább átmenetek a lépések között a `framer-motion` (AnimatePresence) használatával.
+- **Böngésző előzmények**: Működő "Vissza" gomb támogatás a böngészőben.
+
+### Módosítva
+- `App.tsx` refaktorálása: Állapot alapú léptetés helyett útvonal alapú navigáció.
+- Lépéskomponensek frissítése: `onNext`/`onBack` callbackek helyett `useNavigate()` hook alkalmazása.
+- `Card.tsx` frissítése: Animált konténer komponenssé alakítás.
+
 ## [0.6.2] - 2026-02-14
 
 ### Újdonságok és Változások
