@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, ChevronLeft, MapPin, Map } from 'lucide-react';
-import { regions } from '../../data/mockData';
+import { counties } from '../../data/mockData';
 import { HungaryMap } from '../common/HungaryMap';
 
 interface MapSelectionProps {
@@ -13,16 +13,16 @@ interface MapSelectionProps {
 export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: MapSelectionProps) {
     const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
 
-    const selectedRegion = regions.find(r => r.id === selectedRegionId);
-    const hoveredRegion = regions.find(r => r.id === hoveredRegionId);
+    const selectedCounty = counties.find(c => c.id === selectedRegionId);
+    const hoveredCounty = counties.find(c => c.id === hoveredRegionId);
 
     // A tooltip szöveg: hover > kijelölés > semmi
-    const displayRegion = hoveredRegion || selectedRegion;
+    const displayCounty = hoveredCounty || selectedCounty;
 
     return (
-        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
+        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
             {/* Bal oldal */}
-            <div className="flex-1 p-8 md:p-14 lg:p-16 flex flex-col justify-center border-b md:border-b-0 border-gray-100">
+            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left border-b md:border-b-0 border-gray-100">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
@@ -59,12 +59,12 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
             </div>
 
             {/* Jobb oldal — Térkép */}
-            <div className="md:w-5/12 bg-gray-50 p-8 md:p-10 flex flex-col items-center justify-center border-l border-gray-100">
+            <div className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex flex-col items-center justify-center border-l border-gray-100">
                 <div className="w-full">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                             <Map size={20} className="text-primary-dark" />
-                            Magyarország régiói
+                            Tájegységek és megyék
                         </h2>
                     </div>
 
@@ -76,18 +76,18 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
                         onRegionHover={setHoveredRegionId}
                     />
 
-                    {/* Kiválasztott/hovered régió info */}
+                    {/* Kiválasztott/hovered megye info */}
                     <div className="mt-6 pt-6 border-t border-gray-200 flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark shrink-0">
                             <MapPin size={20} />
                         </div>
                         <div className="min-w-0">
                             <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">
-                                {displayRegion ? displayRegion.name : 'Kiválasztott terület'}
+                                {displayCounty ? displayCounty.name : 'Kiválasztott terület'}
                             </p>
                             <p className="text-gray-500 text-[10px] truncate">
-                                {displayRegion
-                                    ? displayRegion.description
+                                {displayCounty
+                                    ? displayCounty.description
                                     : 'Kattints a térképre!'}
                             </p>
                         </div>

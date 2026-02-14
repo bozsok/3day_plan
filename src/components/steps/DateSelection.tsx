@@ -47,9 +47,9 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
 
     return (
         /* === Forrás: 2. kártya / code.html — 1:1 === */
-        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
+        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
             {/* Bal oldal — forrás sor 55 */}
-            <div className="flex-1 p-8 md:p-14 lg:p-16 flex flex-col justify-center">
+            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
@@ -86,7 +86,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
             </div>
 
             {/* Jobb oldal — forrás sor 73: md:w-5/12 bg-gray-50 p-8 md:p-10 flex items-center justify-center border-l border-gray-100 */}
-            <div className="md:w-5/12 bg-gray-50 p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
+            <div className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
                 {/* Belső wrapper — forrás sor 74: w-full max-w-xs */}
                 <div className="w-full max-w-xs">
                     <CustomCalendar

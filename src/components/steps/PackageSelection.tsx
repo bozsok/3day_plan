@@ -6,42 +6,63 @@ interface PackageSelectionProps {
     regionId: string | undefined;
     onSelect: (packageId: string) => void;
     onBack: () => void;
+    onNext?: () => void;
+    selectedPackageId?: string;
 }
 
-export function PackageSelection({ regionId, onSelect, onBack }: PackageSelectionProps) {
+export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedPackageId }: PackageSelectionProps) {
     const [filter, setFilter] = useState('Összes');
 
-    // Filter packages by region and optionally by category (mocked for now)
-    const availablePackages = packages.filter(p => p.regionId === regionId);
+    // Filter packages by county (passed as regionId prop from App.tsx)
+    const availablePackages = packages.filter(p => p.countyId === regionId);
 
     const filters = ['Összes', 'Aktív kikapcsolódás', 'Gasztronómia', 'Családi', 'Romantikus', 'Wellness'];
 
     return (
-        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-12 relative animate-fade-in">
+        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-[15px] min-[440px]:p-8 md:p-12 relative animate-fade-in">
             {/* Vissza gomb */}
             <button
                 onClick={onBack}
-                className="absolute top-8 left-8 group hover:scale-105 transition-transform z-10"
+                className="absolute top-4 left-4 min-[440px]:top-8 min-[440px]:left-8 group hover:scale-105 transition-transform z-10"
             >
                 <div
-                    className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center"
-                    style={{ width: '48px', height: '48px', minWidth: '48px', minHeight: '48px' }}
+                    className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
                 >
                     <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
                 </div>
             </button>
 
+            {/* Tovább gomb (Csak ha van kiválasztott csomag) */}
+            {selectedPackageId && onNext && (
+                <button
+                    onClick={onNext}
+                    className="absolute top-4 right-4 min-[440px]:top-8 min-[440px]:right-8 group hover:scale-105 transition-transform z-10"
+                >
+                    <div
+                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                    >
+                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
+                    </div>
+                </button>
+            )}
+
             <div className="text-center mb-10 mt-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                        3. Lépés: Programcsomagok
+                    </span>
+                </div>
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
                     Válaszd ki a következő kalandod
                 </h1>
                 <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-                    Gondosan összeállított 3 napos útiterv-csomagok ezen a vidéken.
+                    Gondosan összeállított 3 napos útiterv-csomagok ebben a megyében.
                 </p>
             </div>
 
             {/* Szűrők */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
+            <div className="hidden md:flex flex-wrap justify-center gap-3 mb-12">
                 {filters.map(f => (
                     <button
                         key={f}
@@ -60,19 +81,19 @@ export function PackageSelection({ regionId, onSelect, onBack }: PackageSelectio
             <div className="space-y-6">
                 {availablePackages.length === 0 ? (
                     <div className="text-center py-12 text-gray-400">
-                        <p>Ehhez a régióhoz jelenleg nem tartozik elérhető csomag.</p>
+                        <p>Ehhez a megyéhez jelenleg nem tartozik elérhető csomag.</p>
                         <button
                             onClick={onBack}
                             className="mt-4 px-6 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-semibold text-gray-600"
                         >
-                            Válassz másik régiót
+                            Válassz másik megyét
                         </button>
                     </div>
                 ) : (
                     availablePackages.map(pkg => (
                         <div
                             key={pkg.id}
-                            className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
+                            className="group bg-white rounded-2xl min-[440px]:rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
                             onClick={() => onSelect(pkg.id)}
                         >
                             {/* Kép */}

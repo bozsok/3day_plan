@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { packages, regions } from '../../data/mockData'; // Imported packages
+import { packages, counties } from '../../data/mockData'; // Imported packages and counties
 import { useUser } from '../../context/UserContext';
 import { api } from '../../api/client';
 
@@ -24,14 +24,26 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             onBack();
         }
     }, [packageId, onBack]);
+
+    const [hasVoted, setHasVoted] = useState(false);
+
+    // Check if user has already voted for this region
+    useEffect(() => {
+        if (user && regionId) {
+            api.votes.list(user.id).then(votes => {
+                const alreadyVoted = votes.some(v => v.regionId === regionId);
+                setHasVoted(alreadyVoted);
+            }).catch(err => console.error("Failed to check votes:", err));
+        }
+    }, [user, regionId]);
     const [selectedDayIndex, setSelectedDayIndex] = useState(1);
     const [isVoting, setIsVoting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // Find the specific package selected
     const selectedPackage = packages.find(p => p.id === packageId);
-    // Fallback or region info
-    const region = regions.find(r => r.id === regionId);
+    // Fallback or county info (regionId prop contains countyId)
+    const county = counties.find(c => c.id === regionId);
 
     // Szavazás kezelése
     const handleVote = async () => {
@@ -110,98 +122,135 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
         ? `${format(sortedDates[0], 'yyyy. MMMM d.', { locale: hu })} – ${format(sortedDates[sortedDates.length - 1], 'd.', { locale: hu })}`
         : 'Nincs dátum';
 
-    return (
-        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
-            {/* ═══════════ BAL SIDEBAR ═══════════ */}
-            <div className="lg:w-80 p-8 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50/50">
-                <div className="sticky top-8">
-                    {/* Vissza gomb */}
-                    <button
-                        onClick={onBack}
-                        className="mb-6 group flex items-center gap-3 text-gray-500 hover:text-gray-900 transition-colors"
+    // Részegységek definiálása a könnyebb újrahasznosítás/rendezés miatt
+    const HeaderSection = () => (
+        <div className="relative">
+            {/* Vissza gomb - Abszolút pozicionálás, mint a 3. lépésnél */}
+            <button
+                onClick={onBack}
+                className="absolute top-0 left-0 group hover:scale-105 transition-transform z-10"
+            >
+                <div
+                    className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                >
+                    <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
+                </div>
+            </button>
+
+            {/* Tovább gomb (Csak ha már szavazott) */}
+            {hasVoted && (
+                <button
+                    onClick={onFinish}
+                    className="absolute top-0 right-0 group hover:scale-105 transition-transform z-10"
+                >
+                    <div
+                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
                     >
-                        <div
-                            className="bg-white rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center"
-                            style={{ width: '48px', height: '48px', minWidth: '48px', minHeight: '48px' }}
-                        >
-                            <span className="material-icons-outlined text-lg">arrow_back</span>
-                        </div>
-                        <span className="font-semibold text-sm">Vissza a csomagokhoz</span>
-                    </button>
-
-                    {/* Cím */}
-                    <div className="mb-8">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
-                                {region?.name}
-                            </span>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-                            {selectedPackage.title}
-                        </h2>
-                        <p className="text-gray-500 text-sm">
-                            3 napos programterv
-                        </p>
+                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
                     </div>
+                </button>
+            )}
 
-                    {/* Költség */}
-                    <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm mb-6">
-                        <span className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-gray-900">
-                                {selectedPackage.estimatedCost}
-                            </span>
-                            <span className="text-gray-600 font-semibold">Ft</span>
-                        </div>
+            {/* Cím és Címke - Középre rendezve */}
+            <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                        4. Lépés: egyedi program
+                    </span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
+                        {county?.name}
+                    </span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
+                    {selectedPackage.title}
+                </h2>
+                <p className="text-gray-500 text-sm mb-4">
+                    3 napos programterv
+                </p>
+
+                {/* Dátum infó */}
+                <div className="flex items-center gap-3 text-gray-600 bg-blue-50/50 p-3 rounded-2xl border border-blue-100 text-left">
+                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                        <span className="material-icons-outlined text-sm">calendar_today</span>
                     </div>
-
-                    {/* Hibajelzés */}
-                    {error && (
-                        <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Akció gombok */}
-                    <div className="space-y-3 mb-6">
-                        {/* 1. Szavazat (Mindig aktív - Hozzáadás) */}
-                        <button
-                            className={`w-full font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 
-                                bg-primary hover:bg-primary-dark text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
-                            onClick={handleVote}
-                            disabled={isVoting}
-                        >
-                            {isVoting && <span className="animate-spin text-xl">↻</span>}
-                            Szavazok erre!
-                        </button>
-                    </div>
-
-                    {/* Tovább gomb (Szavazás nélküli tovább lépés, pl csak megnézni az eredményeket) */}
-                    <button
-                        className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full shadow-xl"
-                        onClick={onFinish}
-                        disabled={isVoting}
-                    >
-                        Eredmények
-                    </button>
-
-                    {/* Dátum infó */}
-                    <div className="mt-8 pt-8 border-t border-gray-200">
-                        <div className="flex items-center gap-3 text-gray-600 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                {/* Icon removed - Placeholder */}
-                            </div>
-                            <div>
-                                <span className="text-xs text-gray-400 block uppercase tracking-wider">Időpont</span>
-                                <span className="font-medium text-sm">{dateRangeLabel}</span>
-                            </div>
-                        </div>
+                    <div>
+                        <span className="text-[10px] text-gray-400 block uppercase tracking-wider font-bold">Időpont</span>
+                        <span className="font-medium text-sm text-blue-900">{dateRangeLabel}</span>
                     </div>
                 </div>
             </div>
+        </div>
+    );
 
-            {/* ═══════════ JOBB OLDAL: TARTALOM ═══════════ */}
-            <div className="flex-1 flex flex-col">
+    const CostAndActionsSection = () => (
+        <>
+            {/* Költség */}
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6 mt-4 lg:mt-6">
+                <span className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-gray-900">
+                        {selectedPackage.estimatedCost}
+                    </span>
+                    <span className="text-gray-600 font-semibold">Ft</span>
+                </div>
+            </div>
+
+            {/* Hibajelzés */}
+            {error && (
+                <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-200">
+                    {error}
+                </div>
+            )}
+
+            {/* Akció gombok */}
+            <div className="space-y-3 mb-6">
+                {/* 1. Szavazat (Mindig aktív - Hozzáadás) */}
+                <button
+                    className={`w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 
+                        bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]`}
+                    onClick={handleVote}
+                    disabled={isVoting}
+                >
+                    {isVoting && <span className="animate-spin text-xl">↻</span>}
+                    Szavazok erre!
+                </button>
+            </div>
+
+            {/* Tovább gomb (Szavazás nélküli tovább lépés, pl csak megnézni az eredményeket) */}
+            <button
+                className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full"
+                onClick={onFinish}
+                disabled={isVoting}
+            >
+                Eredmények
+                <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+
+        </>
+    );
+
+    return (
+        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
+
+            {/* ═══════════ MOBIL NÉZET: FELSŐ RÉSZ (Cím + Dátum) ═══════════ */}
+            <div className="lg:hidden p-[15px] min-[440px]:p-8 border-b border-gray-100 bg-gray-50/50">
+                <HeaderSection />
+            </div>
+
+            {/* ═══════════ DESKTOP SIDEBAR (Minden egyben) ═══════════ */}
+            <div className="hidden lg:block lg:w-80 p-8 border-r border-gray-100 bg-gray-50/50">
+                <div className="sticky top-8">
+                    <HeaderSection />
+                    <CostAndActionsSection />
+                </div>
+            </div>
+
+            {/* ═══════════ JOBB OLDAL: TARTALOM (Timeline) ═══════════ */}
+            <div className="flex-1 flex flex-col min-h-[500px]">
                 {/* Nap fülek */}
                 <div className="flex border-b border-gray-100 bg-white">
                     {dayTabs.map(tab => {
@@ -270,6 +319,11 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* ═══════════ MOBIL NÉZET: ALSÓ RÉSZ (Költség + Gombok) ═══════════ */}
+            <div className="lg:hidden p-[15px] min-[440px]:p-8 border-t border-gray-100 bg-gray-50/50">
+                <CostAndActionsSection />
+            </div>
+        </div >
     );
 }

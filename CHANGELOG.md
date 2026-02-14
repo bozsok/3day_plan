@@ -2,6 +2,19 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.6.0] - 2026-02-14
+
+### Újdonságok és Változások
+- **UI Egységesítés (Mobil Nézet):**
+    - Minden főbb lépés (Hero, Dátum, Térkép, Csomagok, Timeline, Összegzés) egységes **`15px` belső margót (padding)** kapott 440px alatti felbontáson.
+    - Az összes kártya és modális ablak lekerekítése egységesen **`16px` (rounded-2xl)** lett mobil nézeten, míg nagyobb képernyőn megmaradt az erősebb ív.
+    - A "Mikor menjünk?" és "Hova menjünk?" szavazatszámláló badge-ek mérete és stílusa pixelre pontosan egységesítve lett (`h-6`, `inline-flex`).
+- **Navigáció:**
+    - **Tovább gomb:** A 3. (Csomagok) és 4. (Idővonal) lépéshez is bekerült egy jobb felső "Tovább" nyíl, ami megkönnyíti a haladást, ha már van kiválasztott csomag vagy leadott szavazat.
+    - **Vissza gomb:** Az Összegző képernyő (5. lépés) bal felső sarkába bekerült egy "Vissza" gomb, amivel közvetlenül a Csomagválasztóhoz lehet ugrani.
+- **Szövegezés és Stílus:**
+    - A "Mikor menjünk?" győztes kártyájáról eltávolításra került a fix nagyítás (`scale-105`), így az már nem lóg bele a keretbe mobil nézeten.
+
 ## [0.5.6] - 2026-02-13
 
 ### Javítások

@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserContext';
 import { X, Trash2, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { regions } from '../../data/mockData';
+import { counties } from '../../data/mockData';
 
 interface VoteManagementModalProps {
     isOpen: boolean;
@@ -66,7 +66,7 @@ export function VoteManagementModal({ isOpen, onClose, onVoteDeleted }: VoteMana
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in">
+            <div className="bg-white rounded-2xl min-[440px]:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in">
 
                 {/* Header */}
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -98,7 +98,7 @@ export function VoteManagementModal({ isOpen, onClose, onVoteDeleted }: VoteMana
                     ) : (
                         <div className="space-y-4">
                             {votes.map((vote) => {
-                                const regionName = regions.find(r => r.id === vote.regionId)?.name ?? vote.regionId;
+                                const regionName = counties.find(r => r.id === vote.regionId)?.name ?? vote.regionId;
                                 const sortedDates = [...vote.dates].sort();
                                 const start = sortedDates[0];
                                 const end = sortedDates[sortedDates.length - 1];

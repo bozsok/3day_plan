@@ -22,9 +22,10 @@ body {
 }
 
 /* =============================================
-   SVG Térkép régiók
+   SVG Térkép régiók és megyék
    ============================================= */
-.region-path {
+.region-path,
+.county-path {
     fill: #e2e8f0;
     stroke: #cbd5e1;
     stroke-width: 1;
@@ -33,12 +34,22 @@ body {
 }
 
 .region-path:hover,
-.region-path.hovered {
+.region-path.hovered,
+.county-path:hover,
+.county-path.hovered {
     fill: #cbd5e1;
     stroke: #94a3b8;
 }
 
-.region-path.selected {
+/* Halvány tájegység kiemelés */
+.county-path.region-hover {
+    fill: #cdd1d7;
+    /* Sötétebb szürkés árnyalat */
+    stroke: #94a3b8;
+}
+
+.region-path.selected,
+.county-path.selected {
     fill: #13ec13;
     stroke: #0fb80f;
 }

@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
-import { regions } from '../../data/mockData';
+import { counties } from '../../data/mockData';
 import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2 } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
 
@@ -16,9 +16,10 @@ interface SummaryData {
 interface SummaryProps {
     onContinue?: () => void;
     onRegionSelect?: (regionId: string) => void;
+    onBack?: () => void;
 }
 
-export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
+export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
     const { user, logout } = useUser();
     const [data, setData] = useState<SummaryData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -100,7 +101,21 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     if (!data) return null;
 
     return (
-        <div className="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-8 md:p-14 lg:p-16 relative">
+        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 relative">
+            {/* Vissza gomb - Abszolút pozicionálás */}
+            {onBack && (
+                <button
+                    onClick={onBack}
+                    className="absolute top-4 left-4 min-[440px]:top-8 min-[440px]:left-8 group hover:scale-105 transition-transform z-10"
+                >
+                    <div
+                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                    >
+                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
+                    </div>
+                </button>
+            )}
+
             <div className="text-center mb-12 relative">
                 {/* Header Action Button */}
                 <button
@@ -131,7 +146,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
 
                 {/* 1. Dátum Intervallumok */}
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100">
+                <div className="bg-gray-50 rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8 border border-gray-100">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
                             <CalendarIcon size={20} />
@@ -141,12 +156,12 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
                     <div className="space-y-4">
                         {(data.topIntervals || []).map((item, idx) => (
-                            <div key={idx} className={`p-4 rounded-xl border ${idx === 0 ? 'bg-white border-blue-200 shadow-md transform scale-105' : 'bg-transparent border-gray-200'}`}>
+                            <div key={idx} className={`p-4 rounded-xl border ${idx === 0 ? 'bg-white border-blue-200 shadow-md' : 'bg-transparent border-gray-200'}`}>
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="font-bold text-gray-900">
                                         {format(new Date(item.start), 'MMM d.', { locale: hu })} - {format(new Date(item.end), 'MMM d.', { locale: hu })}
                                     </span>
-                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">
+                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap inline-flex items-center justify-center h-6">
                                         {item.count} szavazat
                                     </span>
                                 </div>
@@ -164,7 +179,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                 </div>
 
                 {/* 2. Szavazási Rangsor (Kattintható) */}
-                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-100">
+                <div className="bg-gray-50 rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8 border border-gray-100">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center">
                             <Trophy size={20} />
@@ -174,7 +189,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
                     <div className="space-y-4">
                         {data.voteRanking.map((item, idx) => {
-                            const regionName = regions.find(r => r.id === item.regionId)?.name ?? item.regionId;
+                            const regionName = counties.find(r => r.id === item.regionId)?.name ?? item.regionId;
                             return (
                                 <div
                                     key={item.regionId}
@@ -186,7 +201,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                                             {idx === 0 && '👑'} {regionName}
                                             <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400" />
                                         </span>
-                                        <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+                                        <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap inline-flex items-center justify-center h-6">
                                             {item.count} szavazat
                                         </span>
                                     </div>
@@ -209,7 +224,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             <div className="mt-12 space-y-8">
                 {/* 3.1 Aktív Szavazók */}
                 {data.userStatuses.some(u => u.datesCount > 0 || u.votesCount > 0) && (
-                    <div className="bg-gray-900 text-white rounded-3xl p-8">
+                    <div className="bg-gray-900 text-white rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 rounded-xl bg-gray-800 text-green-400 flex items-center justify-center">
                                 <Users size={20} />
@@ -232,7 +247,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
                 {/* 3.2 Még nem szavaztak */}
                 {data.userStatuses.some(u => u.datesCount === 0 && u.votesCount === 0) && (
-                    <div className="bg-white border border-gray-200 rounded-3xl p-8">
+                    <div className="bg-white border border-gray-200 rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
                                 <Users size={20} />

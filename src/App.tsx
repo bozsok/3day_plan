@@ -62,7 +62,9 @@ function App() {
               setSelectedPackageId(pkgId);
               nextStep();
             }}
+            onNext={nextStep}
             onBack={prevStep}
+            selectedPackageId={selectedPackageId}
           />
         </Card>
 
@@ -88,6 +90,7 @@ function App() {
               setSelectedRegion(regionId);
               setStep(3); // Go to Package Selection instead of Timeline directly
             }}
+            onBack={() => setStep(3)}
           />
         </Card>
       </MainLayout>
