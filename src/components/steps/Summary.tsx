@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { hu } from 'date-fns/locale';
@@ -23,12 +24,18 @@ interface SummaryProps {
 export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     const navigate = useNavigate();
     const { user, logout } = useUser();
-    const [data, setData] = useState<SummaryData | null>(null);
-    const [loading, setLoading] = useState(true);
     const [showVoteModal, setShowVoteModal] = useState(false);
     const [adminMode, setAdminMode] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
     const [adminStatus, setAdminStatus] = useState<string | null>(null);
+
+    // TanStack Query: Összegzés adatok lekérése és polling
+    const { data, isLoading } = useQuery<SummaryData>({
+        queryKey: ['summary'],
+        queryFn: api.summary.get,
+        refetchInterval: 12000,
+        staleTime: 5000,
+    });
 
 
 
@@ -58,8 +65,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     };
 
     const handleAdminDeleteUser = async (id: number) => {
-
-
         try {
             await api.admin.deleteUser(id);
             setAdminStatus(`✅ Felhasználó (ID: ${id}) törölve!`);
@@ -68,35 +73,15 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                 logout();
             }
 
-
-            fetchSummary();
-            // Clear status after 3 seconds
-            setTimeout(() => setAdminStatus(null), 3000);
+            // Kézi frissítés már nem szükséges a polling miatt, 
+            // de az azonnali visszajelzésért majd hozzáadunk egy invalidálást a mutációhoz.
+            setAdminStatus(null);
         } catch (e) {
             setAdminStatus('❌ Hiba a törlés során!');
         }
     };
 
-    const fetchSummary = async () => {
-        try {
-            const res = await api.summary.get();
-            // @ts-ignore
-            setData(res);
-        } catch (error) {
-            console.error('Hiba az összegzés betöltésekor:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSummary();
-        // Reduced polling frequency to prevent server congestion
-        const interval = setInterval(fetchSummary, 12000);
-        return () => clearInterval(interval);
-    }, []);
-
-    if (loading && !data) {
+    if (isLoading && !data) {
         return <div className="p-10 text-center text-gray-500">Adatok betöltése...</div>;
     }
 
@@ -289,7 +274,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             <VoteManagementModal
                 isOpen={showVoteModal}
                 onClose={() => setShowVoteModal(false)}
-                onVoteDeleted={fetchSummary}
             />
 
             {/* ADMIN PANEL OVERLAY */}

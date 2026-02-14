@@ -2,6 +2,18 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.8.0] - 2026-02-14
+
+### Hozzáadva
+- **TanStack Query (React Query) integráció**: Modern adatkezelési rendszer bevezetése.
+- **Intelligens Polling**: Az Összegzés oldal 12 másodpercenként frissül a háttérben, de leáll, ha a fül nem aktív, kímélve a szervert.
+- **Azonnali Cache Frissítés**: Szavazás leadása vagy törlése után az alkalmazás azonnal frissíti a belső gyorsítótárát, így az eredmények várakozás nélkül megjelennek.
+
+### Módosítva
+- `Summary.tsx`: Manuális `setInterval` lecserélve a tiszta `useQuery` hookra.
+- `ProgramTimeline.tsx`: Szavazási folyamat refaktorálása `useMutation` használatával.
+- Hálózati stabilitás javítása: automatikus újrapróbálkozás (retry) hálózati hiba esetén.
+
 ## [0.7.1] - 2026-02-14
 
 ### Hozzáadva

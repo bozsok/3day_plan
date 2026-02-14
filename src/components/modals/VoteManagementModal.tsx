@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { api, type VoteBlock } from '../../api/client';
 import { useUser } from '../../context/UserContext';
 import { X, Trash2, Calendar, MapPin, AlertCircle } from 'lucide-react';
@@ -9,11 +10,11 @@ import { counties } from '../../data/mockData';
 interface VoteManagementModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onVoteDeleted: () => void; // Callback to refresh summary
 }
 
-export function VoteManagementModal({ isOpen, onClose, onVoteDeleted }: VoteManagementModalProps) {
+export function VoteManagementModal({ isOpen, onClose }: VoteManagementModalProps) {
     const { user } = useUser();
+    const queryClient = useQueryClient();
     const [votes, setVotes] = useState<VoteBlock[]>([]);
     const [loading, setLoading] = useState(false);
     const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -52,8 +53,9 @@ export function VoteManagementModal({ isOpen, onClose, onVoteDeleted }: VoteMana
             await api.votes.revoke(user.id, blockId);
             // Remove from local list immediately
             setVotes(prev => prev.filter(v => v.id !== blockId));
-            // Notify parent to refresh counts
-            onVoteDeleted();
+
+            // Invalidate summary query to refresh other components
+            queryClient.invalidateQueries({ queryKey: ['summary'] });
         } catch (err) {
             console.error('Failed to delete vote:', err);
             setError('Hiba történt a törléskor.');

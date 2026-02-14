@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { hu } from 'date-fns/locale';
-import { packages, counties } from '../../data/mockData'; // Imported packages and counties
+import { packages, counties } from '../../data/mockData';
 import { useUser } from '../../context/UserContext';
-import { api } from '../../api/client';
-
+import { api, type VoteBlock } from '../../api/client';
 import { useEffect } from 'react';
 import { StepCard } from '../common/StepCard';
 
@@ -19,6 +19,7 @@ interface ProgramTimelineProps {
 export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineProps) {
     const navigate = useNavigate();
     const { user } = useUser();
+    const queryClient = useQueryClient();
 
     // Redirect if no package selected (e.g. after refresh/hot-reload)
     useEffect(() => {
@@ -27,19 +28,16 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         }
     }, [packageId, navigate]);
 
-    const [hasVoted, setHasVoted] = useState(false);
+    // TanStack Query: A felhasználó összes szavazatának lekérése
+    const { data: userVotes = [] } = useQuery<VoteBlock[]>({
+        queryKey: ['userVotes', user?.id],
+        queryFn: () => user ? api.votes.list(user.id) : Promise.resolve([]),
+        enabled: !!user,
+    });
 
-    // Check if user has already voted for this region
-    useEffect(() => {
-        if (user && regionId) {
-            api.votes.list(user.id).then(votes => {
-                const alreadyVoted = votes.some(v => v.regionId === regionId);
-                setHasVoted(alreadyVoted);
-            }).catch(err => console.error("Failed to check votes:", err));
-        }
-    }, [user, regionId]);
+    const hasAnyVote = userVotes.length > 0;
+
     const [selectedDayIndex, setSelectedDayIndex] = useState(1);
-    const [isVoting, setIsVoting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // Find the specific package selected
@@ -48,39 +46,37 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
     const county = counties.find(c => c.id === regionId);
 
     // Szavazás kezelése
-    const handleVote = async () => {
-        if (!user || !regionId || isVoting) return;
-        setError(null);
-
-        setIsVoting(true);
-        try {
-            // 1. Dátumok mentése
+    // Szavazás kezelése TanStack Mutation-nel
+    const voteMutation = useMutation({
+        mutationFn: async () => {
+            if (!user || !regionId) return;
             const dateStrings = dates && dates.length > 0 ? dates.map(d => format(d, 'yyyy-MM-dd')) : [];
 
             if (dateStrings.length > 0) {
                 await api.dates.save(user.id, dateStrings, regionId);
             }
 
-            // 2. Szavazás (Blokk létrehozása 3 dátummal)
             if (dateStrings.length !== 3) {
-                setError("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
-                return;
+                throw new Error("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
             }
 
-            // Note: Currently voting is per REGION in the backend (mock). 
-            // Ideally we should vote for a PACKAGE ID if we want granular votes.
-            // For now, adhering to existing API (regionId), assuming 1 vote per region logic mostly.
-            // If the user wants to vote for specific package, backend needs update. 
-            // Based on prompt, we just show the package here.
-            await api.votes.cast(user.id, regionId, dateStrings);
-
+            return await api.votes.cast(user.id, regionId, dateStrings);
+        },
+        onSuccess: () => {
+            // Frissítsük a cache-t, hogy az összesítés azonnal jó legyen
+            queryClient.invalidateQueries({ queryKey: ['summary'] });
             navigate('/terv/osszegzes');
-        } catch (error) {
+        },
+        onError: (error: Error) => {
             console.error('Hiba szavazáskor:', error);
-            setError('Hiba történt a művelet során. Próbáld újra!');
-        } finally {
-            setIsVoting(false);
+            setError(error.message || 'Hiba történt a művelet során. Próbáld újra!');
         }
+    });
+
+    const handleVote = () => {
+        if (!user || !regionId || voteMutation.isPending) return;
+        setError(null);
+        voteMutation.mutate();
     };
 
     const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
@@ -140,7 +136,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             </button>
 
             {/* Tovább gomb (Csak ha már szavazott) - MOBIL/TABLET ONLY (lg:hidden) */}
-            {hasVoted && (
+            {hasAnyVote && (
                 <button
                     onClick={() => navigate('/terv/osszegzes')}
                     className="absolute top-0 right-0 lg:hidden group hover:scale-105 transition-transform z-10"
@@ -215,9 +211,9 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                     className={`w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 
                         bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]`}
                     onClick={handleVote}
-                    disabled={isVoting}
+                    disabled={voteMutation.isPending}
                 >
-                    {isVoting && <span className="animate-spin text-xl">↻</span>}
+                    {voteMutation.isPending && <span className="animate-spin text-xl">↻</span>}
                     Szavazok erre!
                 </button>
             </div>
@@ -226,7 +222,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             <button
                 className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full"
                 onClick={() => navigate('/terv/osszegzes')}
-                disabled={isVoting}
+                disabled={voteMutation.isPending}
             >
                 Eredmények
                 <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
@@ -251,8 +247,8 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
 
             {/* ═══════════ JOBB OLDAL: TARTALOM (Timeline) ═══════════ */}
             <div className="flex-1 flex flex-col min-h-[500px] relative">
-                {/* DESKTOP FORWARD BUTTON */}
-                {hasVoted && (
+                {/* DESKTOP FORWARD BUTTON (Csak ha már van legalább egy szavazat) */}
+                {hasAnyVote && (
                     <button
                         onClick={() => navigate('/terv/osszegzes')}
                         className="hidden lg:flex absolute top-8 md:top-12 right-8 md:right-12 group hover:scale-105 transition-transform z-20"
