@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { packages } from '../../data/mockData';
+import { NavButton } from '../common/NavButton';
+import { StepHeader } from '../common/StepHeader';
 import { ArrowRight, ChevronLeft } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
 
@@ -22,40 +24,26 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
     return (
         <StepCard className="animate-fade-in" padding="p-[15px] min-[440px]:p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10">
-                <div className="flex-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
-                        <span className="w-2 h-2 rounded-full bg-primary" />
-                        <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                            3. Lépés: Csomagok
-                        </span>
-                    </div>
-
-                    <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
-                        Válaszd ki a <span className="text-primary-dark">kalandod</span>!
-                    </h1>
-
-                    <p className="text-gray-600 text-lg leading-relaxed max-w-2xl">
-                        Válassz egyet az előre összeállított, izgalmas programcsomagjaink közül.
-                    </p>
-                </div>
+                <StepHeader
+                    step="3. Lépés: Csomagok"
+                    title={<>Válaszd ki a <span className="text-primary-dark">kalandod</span>!</>}
+                    description="Válassz egyet az előre összeállított, izgalmas programcsomagjaink közül."
+                />
 
                 <div className="flex gap-4 shrink-0">
-                    <button
-                        className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
+                    <NavButton
+                        variant="outline"
+                        icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/terv/helyszin')}
                         title="Vissza"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
-                    {selectedPackageId && (
-                        <button
-                            className="p-4 rounded-2xl bg-primary hover:bg-primary-dark text-gray-900 transition-all shadow-lg hover:shadow-primary/30"
-                            onClick={() => navigate('/terv/program')}
-                            title="Tovább"
-                        >
-                            <ArrowRight size={24} />
-                        </button>
-                    )}
+                    />
+                    <NavButton
+                        variant="primary"
+                        icon={<ArrowRight size={24} />}
+                        onClick={() => navigate('/terv/program')}
+                        disabled={!selectedPackageId}
+                        title="Tovább"
+                    />
                 </div>
             </div>
 

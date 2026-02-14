@@ -2,14 +2,77 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.9.10] - 2026-02-14
+
+### Vizuális Finomítások
+- **DateSelection info panel:** A naptár alatti információs doboz mostantól csak akkor kap zöld hátteret és keretet, ha a teljes 3 napos szakasz (péntek-vasárnap) kiválasztásra került. Félkész kijelölés esetén a panel keret és háttér nélkül jelenik meg.
+
+## [0.9.9] - 2026-02-14
+
+### Új funkciók
+- **Visszavonható megye-kijelölés:** A térképen mostantól visszavonható a választás. Ha egy már kijelölt megyére kattintunk újra, a kijelölés megszűnik (toggle funkció).
+- **Dinamikus információs panel:** A kijelölés visszavonásakor az információs doboz automatikusan visszavált keret és háttér nélküli állapotba.
+
+## [0.9.8] - 2026-02-14
+
+### Javítások
+- **MapSelection jelölő stílus korrekció:** Visszaállítottuk a zöld hátteret a MapPin ikon mögé az információs panelen, így a marker akkor is konzisztens marad, ha a külső keret épp nem látható (hover állapot).
+
+## [0.9.7] - 2026-02-14
+
+### Vizuális Finomítások
+- **MapSelection info panel:** A térkép alatti információs doboz (megye neve és leírása) mostantól csak akkor kap zöld hátteret és keretet, ha konkrét megye-kijelölés történt. Nézelődés (hover) közben az információk keret nélkül, tisztán jelennek meg.
+- **InfoPill bővítés:** Az `InfoPill` komponens új `none` variánst kapott, amely lehetővé teszi a háttér és keret nélküli, mégis strukturált megjelenítést.
+
+## [0.9.6] - 2026-02-14
+
+### Javítások
+- **Summary fejléc végleges javítása:** A "Közös tervezés" felirat visszakapta a teljes értékű reszponzív méretezést (`text-3xl md:text-5xl`) és a `font-extrabold` vastagságot.
+- **Intelligens StepHeader stílus-egyesítés:** A komponens most már dinamikusan injektálja az alapértelmezett méret- és betűstílusokat, ha a hívó fél nem definiálja felül őket. Ez megakadályozza, hogy extra osztályok (pl. animációk) hozzáadásakor "elveszzen" a fejléc alapvető kinézete.
+
+## [0.9.5] - 2026-02-14
+
+### Újdonságok és Javítások
+- **Tervezési állapot perzisztálása:** A választott dátumok, megye és csomag mostantól mentésre kerül a böngésző helyi tárolójába (`localStorage`). Így oldalfrissítés után sem vesznek el az adatok, és elkerülhető a "Nincs dátum" hiba a 4. lépésben.
+- **Summary fejléc fix:** Az Összegzés oldal címe visszakapta a többi fő oldallal megegyező reszponzív méretezést (`text-3xl md:text-5xl font-extrabold`).
+- **Biztonsági átirányítás:** A 4. lépés (ProgramTimeline) mostantól automatikusan visszairányít az 1. lépésre, ha valamilyen hiba folytán hiányoznának a dátumok.
+
+## [0.9.4] - 2026-02-14
+
+### Javítások
+- **Eltartási hiba javítása (4. Lépés):** Finomhangoltuk a helyszín neve és a programterv felirat közötti távolságot (visszaállítva az eredeti `mb-2` értékre).
+- **StepHeader intelligensebb margókezelés:** A komponens mostantól csak akkor kényszerít alapértelmezett margót/sorközt, ha a hívó fél nem definiál egyedit, így elkerülhetőek a váratlan elcsúszások.
+
+## [0.9.3] - 2026-02-14
+
+### Javítások
+- **ProgramTimeline (4. Lépés) stílus korrekció:** Visszaállítva a fejléc (helyszín neve és "3 napos programterv" felirat) eredeti mérete és igazítása, miközben a kód már az új `StepHeader` komponenst használja.
+- **StepHeader fejlesztés:** A komponens mostantól rugalmasabban kezeli az egyedi betűméreteket és stílusokat (pl. `descriptionClassName` támogatása).
+
+## [0.9.2] - 2026-02-14
+
+### Újdonságok és Változások
+- **Teljeskörű Atomic Design Overhaul:**
+    - **Új alapkomponensek:** Létrejött a `StepLabel`, `StepHeader` és `InfoPill` komponens az ismétlődő UI-elemek (fejlécek, információs panelek) egységesítésére.
+    - **Kód tisztítás:** Az összes tervezési lépésnél (1-4) és az összegzésnél lecseréltük a manuális Tailwind-blokkokat az új közös komponensekre.
+    - **Mobil navigáció fix:** A `ProgramTimeline` oldalon a mobil nézet navigációs gombjai is megkapták a `NavButton` egységesített implementációját.
+    - **Konzisztens stílusok:** Garantált a pixel-pontos egyezőség a betűméretek, sorközök és színek tekintetében az egész alkalmazásban.
+
+## [0.9.1] - 2026-02-14
+
+### Javítások
+- **Navigációs gombok (NavButton) finomhangolása:**
+    - **Árnyék kezelése:** Kijavítva a hiba, ami miatt az inaktív (disabled) gombok alatt is látszódott az árnyék. Mostantól inaktív állapotban a gombok "laposak" (`shadow-none`), összhangban a rendszer többi elemével.
+    - **Láthatóság (Step 3):** A 3. lépésben (Csomagválasztás) a "Tovább" gomb mostantól mindig látható, és csak akkor válik aktívvá, ha a felhasználó választott egy csomagot. Ez biztosítja a konzisztens navigációs élményt.
+
 ## [0.9.0] - 2026-02-14
 
 ### Újdonságok és Változások
 - **Atomic Design Refaktorálás (Strukturális fejlesztések):**
-    - **Új alapkomponensek:** Kiszervézésre kerültek a `NavButton` és `StepHeader` komponensek, amelyek egységesítik az összes lépés fejlécét és navigációját.
-    - **`Summary.tsx` dekompozíció:** A bonyolult összegző oldal kisebb, önálló modulokra lett bontva (`RankingSection`, `RankingItem`, `DesignerStatus`), javítva a kód olvashatóságát.
+    - **`NavButton` alapkomponens:** Létrejött a valódi közös navigációs gomb komponens, amely fix **56x56 px** méretet és egységes interakciókat biztosít az összes lépésnél (1-4) és az összegzésnél.
+    - **Konzisztencia:** Minden helyi gomb-implementációt lecseréltünk a `NavButton`-ra, megszüntetve a vizuális eltéréseket.
+    - **`Summary.tsx` dekompozíció:** A bonyolult összegző oldal kisebb, önálló modulokra lett bontva (`RankingSection`, `RankingItem`, `DesignerStatus`).
     - **`ProgramTimeline.tsx` dekompozíció:** Az idővonal logikája különálló komponensekbe került (`TimelineTabs`, `TimelineItem`, `SidebarInfo`, `SidebarActions`).
-    - **Konzisztencia:** Minden komponens átállt a közös navigációs és fejléc alapokra.
 - **UI Ponthű Helyreállítás (Layout Restoration):**
     - A 4. lépés (ProgramTimeline) és a korábbi lépések (1-3) vizuális elrendezése teljesen helyre lett állítva a dizájn referencia alapján.
     - **Reszponzív navigáció:** A navigációs gombok (Vissza/Tovább) mobilnézetben (< 768px) a jobb felső sarokba kerültek, 440px alatt pedig a "3 napos programterv" felirat alá rendeződnek, elkerülve a tartalom kitakarását. A gombok pozíciója (top/right) mostantól minden felbontáson pontosan megegyezik a 3. lépés margóival (32px / 48px).

@@ -1,6 +1,9 @@
 import { differenceInCalendarDays, format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { NavButton } from '../common/NavButton';
+import { StepHeader } from '../common/StepHeader';
+import { InfoPill } from '../common/InfoPill';
 import { ArrowRight, ChevronLeft, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../common/CustomCalendar';
 import { useUser } from '../../context/UserContext';
@@ -50,30 +53,19 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
         <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
             {/* Bal oldal */}
             <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                        1. Lépés: Időpont
-                    </span>
-                </div>
-
-                <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
-                    Válaszd ki az <br />
-                    <span className="text-primary-dark">időpontot</span>
-                </h1>
-
-                <p className="text-gray-600 text-lg mb-10 leading-relaxed max-w-md">
-                    Jelöld ki azt a 3 napos hétvégét (péntek-vasárnap), amikor utazni szeretnél.
-                </p>
+                <StepHeader
+                    step="1. Lépés: Időpont"
+                    title={<>Válaszd ki az <br /><span className="text-primary-dark">időpontot</span></>}
+                    description="Jelöld ki azt a 3 napos hétvégét (péntek-vasárnap), amikor utazni szeretnél."
+                />
 
                 <div className="flex gap-4 items-center">
-                    <button
-                        className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
+                    <NavButton
+                        variant="outline"
+                        icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/')}
                         title="Vissza"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
+                    />
                     <button
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={handleNext}
@@ -95,15 +87,12 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
 
                     {/* Info box */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark">
-                                <Calendar size={20} />
-                            </div>
-                            <div className="text-left">
-                                <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">Kijelölt időszak</p>
-                                <p className="text-gray-500 text-[10px]">{formattedRange}</p>
-                            </div>
-                        </div>
+                        <InfoPill
+                            variant={hasThreeConsecutiveDays ? 'primary' : 'none'}
+                            icon={<Calendar size={20} />}
+                            label="Kijelölt időszak"
+                            value={formattedRange}
+                        />
 
                         {/* Figyelmeztetés ha nem Péntek-Vasárnap */}
                         {isConsecutive(dates) && dates.length > 0 && dates[0].getDay() !== 5 && (

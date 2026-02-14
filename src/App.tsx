@@ -10,13 +10,47 @@ import { Summary } from './components/steps/Summary';
 import { PackageSelection } from './components/steps/PackageSelection';
 import { StepIndicator } from './components/common/StepIndicator';
 import { Card } from './components/common/Card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function App() {
   const location = useLocation();
-  const [selectedDates, setSelectedDates] = useState<Date[] | undefined>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>();
-  const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>();
+
+  // Állapotok betöltése localStorage-ból inicializáláskor
+  const [selectedDates, setSelectedDates] = useState<Date[] | undefined>(() => {
+    const saved = localStorage.getItem('3nap_selected_dates');
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed.map(d => new Date(d)) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [selectedRegion, setSelectedRegion] = useState<string | undefined>(() => {
+    return localStorage.getItem('3nap_selected_region') || undefined;
+  });
+
+  const [selectedPackageId, setSelectedPackageId] = useState<string | undefined>(() => {
+    return localStorage.getItem('3nap_selected_package') || undefined;
+  });
+
+  // Állapotok mentése localStorage-ba változáskor
+  useEffect(() => {
+    if (selectedDates) {
+      localStorage.setItem('3nap_selected_dates', JSON.stringify(selectedDates));
+    }
+    if (selectedRegion) {
+      localStorage.setItem('3nap_selected_region', selectedRegion);
+    } else {
+      localStorage.removeItem('3nap_selected_region');
+    }
+    if (selectedPackageId) {
+      localStorage.setItem('3nap_selected_package', selectedPackageId);
+    } else {
+      localStorage.removeItem('3nap_selected_package');
+    }
+  }, [selectedDates, selectedRegion, selectedPackageId]);
 
   const getStepNumber = (pathname: string) => {
     switch (pathname) {
@@ -91,7 +125,14 @@ function App() {
                 } />
                 <Route path="/terv/osszegzes" element={
                   <Card>
-                    <Summary onContinue={() => setSelectedDates([])} onRegionSelect={setSelectedRegion} />
+                    <Summary onContinue={() => {
+                      setSelectedDates([]);
+                      setSelectedRegion(undefined);
+                      setSelectedPackageId(undefined);
+                      localStorage.removeItem('3nap_selected_dates');
+                      localStorage.removeItem('3nap_selected_region');
+                      localStorage.removeItem('3nap_selected_package');
+                    }} onRegionSelect={setSelectedRegion} />
                   </Card>
                 } />
                 <Route path="*" element={<Navigate to="/" replace />} />

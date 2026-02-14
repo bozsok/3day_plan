@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { NavButton } from '../common/NavButton';
+import { StepHeader } from '../common/StepHeader';
+import { InfoPill } from '../common/InfoPill';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { hu } from 'date-fns/locale';
 import { packages, counties } from '../../data/mockData';
@@ -62,6 +65,13 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         }
     });
 
+    // Vissza irányítás ha nincs dátum (pl. frissítésnél ha elveszne a perzisztencia)
+    useEffect(() => {
+        if (!dates || dates.length === 0) {
+            navigate('/terv/idopont');
+        }
+    }, [dates, navigate]);
+
     const handleVote = () => {
         if (!user || !regionId || voteMutation.isPending) return;
         setError(null);
@@ -79,59 +89,47 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
 
     const SidebarInfo = (
         <div className="flex flex-col relative w-full">
-            {/* Lépés címke (Zöld kapszula) */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit md:mx-auto lg:mx-0">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                    4. Lépés: Programok
-                </span>
-            </div>
-
-            {/* Megye neve */}
-            <div className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
-                <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
-                    {county?.name}
-                </span>
-            </div>
-
-            {/* Helyszín/csomag neve */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-2 leading-tight text-left md:text-center lg:text-left">
-                {selectedPackage.title}
-            </h1>
-
-            {/* Programterv felirat */}
-            <p className="text-gray-500 text-sm mb-6 text-left md:text-center lg:text-left">3 napos programterv</p>
+            {/* Fejléc */}
+            <StepHeader
+                step="4. Lépés: Programok"
+                title={<>
+                    <div className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
+                        <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
+                            {county?.name}
+                        </span>
+                    </div>
+                    {selectedPackage.title}
+                </>}
+                description="3 napos programterv"
+                titleClassName="text-2xl font-bold text-gray-900 mb-2 text-left md:text-center lg:text-left"
+                descriptionClassName="text-gray-500 text-sm text-left md:text-center lg:text-left mb-6"
+            />
 
             {/* Navigációs gombok - Mobil (< 440px) - A felirat alatt */}
             <div className="flex min-[441px]:hidden gap-4 mb-6">
-                <button
-                    className="w-14 flex items-center justify-center h-14 rounded-2xl border border-gray-200 text-gray-400 active:scale-95 transition-all bg-white"
+                <NavButton
+                    variant="outline"
+                    icon={<ChevronLeft size={24} />}
                     onClick={() => navigate('/terv/csomagok')}
-                >
-                    <ChevronLeft size={24} />
-                </button>
-                <button
+                    title="Vissza"
+                />
+                <NavButton
+                    variant="primary"
+                    icon={<ArrowRight size={24} />}
                     onClick={() => navigate('/terv/osszegzes')}
                     disabled={!hasAnyVote}
-                    className={`w-14 flex items-center justify-center h-14 rounded-2xl transition-all shadow-lg active:scale-95 ${hasAnyVote
-                        ? 'bg-primary text-gray-900 hover:bg-primary-dark shadow-primary/30'
-                        : 'bg-gray-100 text-gray-300 shadow-none opacity-50'
-                        }`}
-                >
-                    <ArrowRight size={24} />
-                </button>
+                    title="Tovább"
+                />
             </div>
 
             {/* Időpont elem */}
-            <div className="flex items-center gap-3 text-gray-600 bg-blue-50/50 p-3 rounded-2xl border border-blue-100 text-left">
-                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                    <span className="material-icons-outlined text-sm">calendar_today</span>
-                </div>
-                <div>
-                    <span className="text-[10px] text-gray-400 block uppercase tracking-wider font-bold">Időpont</span>
-                    <span className="font-medium text-sm text-blue-900">{dateRangeLabel}</span>
-                </div>
-            </div>
+            <InfoPill
+                variant="blue"
+                icon={<span className="material-icons-outlined text-sm">calendar_today</span>}
+                label="Időpont"
+                value={dateRangeLabel}
+                className="mt-2"
+            />
         </div>
     );
 
@@ -184,31 +182,20 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative flex flex-col lg:flex-row">
             {/* GLOBÁLIS NAVIGÁCIÓS GOMBOK (Desktop és Tablet > 440px) */}
             <div className="hidden min-[441px]:flex gap-4 absolute top-8 right-8 md:top-12 md:right-12 z-30">
-                {/* Vissza gomb */}
-                <button
-                    className="group hover:scale-105 transition-transform"
+                <NavButton
+                    variant="outline"
+                    icon={<ChevronLeft size={24} />}
                     onClick={() => navigate('/terv/csomagok')}
                     title="Vissza"
-                >
-                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all bg-white">
-                        <ChevronLeft size={24} />
-                    </div>
-                </button>
+                />
 
-                {/* Tovább gomb (Zöld) */}
-                <button
+                <NavButton
+                    variant="primary"
+                    icon={<ArrowRight size={24} />}
                     onClick={() => navigate('/terv/osszegzes')}
                     disabled={!hasAnyVote}
-                    className={`group transition-all ${hasAnyVote ? 'hover:scale-105 cursor-pointer' : 'cursor-not-allowed'}`}
                     title="Tovább az összegzéshez"
-                >
-                    <div className={`flex items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-lg ${hasAnyVote
-                        ? 'bg-primary text-gray-900 hover:bg-primary-dark shadow-primary/30'
-                        : 'bg-gray-100 text-gray-300 shadow-none opacity-50'
-                        }`}>
-                        <ArrowRight size={24} />
-                    </div>
-                </button>
+                />
             </div>
             {/* 1. BAL OLDAL (SIDEBAR) */}
             <div className="hidden lg:flex lg:w-80 p-8 md:p-12 border-r border-gray-100 bg-gray-50/50 flex flex-col justify-start items-start gap-8">

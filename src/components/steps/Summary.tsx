@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { hu } from 'date-fns/locale';
+import { NavButton } from '../common/NavButton';
+import { StepHeader } from '../common/StepHeader';
 import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
@@ -21,7 +23,7 @@ interface SummaryData {
 
 interface SummaryProps {
     onContinue?: () => void;
-    onRegionSelect?: (regionId: string) => void;
+    onRegionSelect?: (regionId: string | undefined) => void;
 }
 
 export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
@@ -84,31 +86,20 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     return (
         <StepCard>
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12">
-                <div className="flex-1">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                        <span className="w-2 h-2 rounded-full bg-primary" />
-                        <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">Élő Eredmények</span>
-                    </div>
-
-                    <h1
-                        onClick={handleTitleClick}
-                        className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4 select-none cursor-default active:scale-95 transition-transform"
-                    >
-                        Közös <span className="text-primary-dark">tervezés</span>
-                    </h1>
-                    <p className="text-gray-600 text-lg leading-relaxed max-w-2xl">
-                        Itt láthatod a csapat összesített döntéseit valós időben.
-                    </p>
-                </div>
+                <StepHeader
+                    step="Élő Eredmények"
+                    title={<>Közös <span className="text-primary-dark" onClick={handleTitleClick}>tervezés</span></>}
+                    description="Itt láthatod a csapat összesített döntéseit valós időben."
+                    titleClassName="select-none cursor-default active:scale-95 transition-transform"
+                />
 
                 <div className="flex gap-4 shrink-0">
-                    <button
-                        className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
+                    <NavButton
+                        variant="outline"
+                        icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/terv/program')}
                         title="Vissza"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
+                    />
                     <button
                         onClick={() => setShowVoteModal(true)}
                         className="flex items-center gap-2 px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-2xl text-sm font-bold transition-all shadow-sm"
