@@ -2,6 +2,17 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.7.1] - 2026-02-14
+
+### Hozzáadva
+- **Dinamikus Layout Összehúzás**: Az idővonal helye automatikusan eltűnik a kezdőlapon és az összegzésnél, több helyet hagyva a tartalomnak.
+- **Scrollbar Stabilitás**: Bevezetésre került a `scrollbar-gutter: stable`, amely megakadályozza a tartalom vízszintes ugrálását az áttűnések alatt.
+
+### Módosítva
+- **HashRouter migráció**: Átállás `HashRouter`-re a PHP alapú tárhelyekkel való teljes kompatibilitás érdekében.
+- **Stabil Cross-fade**: Az oldalak közötti áttűnés most már tökéletesen simultán (popLayout + absolute exit), kiküszöbölve a kártyák egymás alá csúszását.
+- **Layout finomhangolás**: A felső margó (padding-top) csökkentése (16px mobil / 32px desktop) a hatékonyabb helykihasználásért.
+
 ## [0.7.0] - 2026-02-14
 
 ### Hozzáadva

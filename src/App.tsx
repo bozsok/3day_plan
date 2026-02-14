@@ -35,22 +35,20 @@ function App() {
   return (
     <UserProvider>
       <MainLayout>
-        {/* StepIndicator – stabil fejléc helyfoglalással az ugrálás ellen */}
-        <div className="w-full flex justify-center mb-8 h-[50px] relative">
-          <AnimatePresence>
-            {step > 0 && step < 5 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="absolute inset-0 flex justify-center"
-              >
-                <StepIndicator currentStep={step} totalSteps={4} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Dinamikus idővonal konténer – összehúzódik, ha nincs rá szükség (Step 0 és 5) */}
+        <motion.div
+          animate={{
+            height: (step > 0 && step < 5) ? 50 : 0,
+            marginBottom: (step > 0 && step < 5) ? 32 : 0,
+            opacity: (step > 0 && step < 5) ? 1 : 0
+          }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          className="w-full flex justify-center relative overflow-hidden"
+        >
+          <div className="absolute inset-0 flex justify-center items-center">
+            <StepIndicator currentStep={step} totalSteps={4} />
+          </div>
+        </motion.div>
 
         <div className="w-full relative">
           <AnimatePresence mode="popLayout" initial={false}>
