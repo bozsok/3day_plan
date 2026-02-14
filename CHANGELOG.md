@@ -2,6 +2,21 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.6.2] - 2026-02-14
+
+### Újdonságok és Változások
+- **Navigációs gombok egységesítése:**
+    - Az összes lépésnél (3-5. lépés is) a korábban kör alakú (`rounded-full`) navigációs nyíl gombok mostantól **lekerekített négyzet** (`rounded-2xl`) alakúak, igazodva az 1-2. lépés stílusához és a kártyák formavilágához.
+    - A gombok mérete desktopnézetben (`md`) 48 px-ről **56 px-re** (`w-14 h-14`) nőtt, az ikonméret pedig 24 px-re (`text-2xl`), így minden navigációs elem mérete és formája tökéletesen megegyezik az egész folyamat során.
+    - Eltávolítottam a gombokról az üvegstílust (`backdrop-blur`) és az árnyékot, helyette az 1-2. lépésben megszokott **átlátszó háttér + szürke szegély** (`border-gray-200`) designt kapták, és az ikonokat is Lucide-alapú chevronokra cseréltem a teljes vizuális azonosság érdekében.
+- **UI-finomhangolás:**
+    - A 4. lépésnél (ProgramTimeline) a "Lépés" címke és a régió neve közötti távolság desktopnézetben (`lg`) **50 px-re** nőtt a szellősebb elrendezés érdekében.
+- **Globális padding-szinkronizálás (48 px):**
+    - A nyitóoldal (Hero), az 1-2. lépés (Dátum, Térkép) és az **Összegzés** (Eredmények) oldal belső margója is egységesen **48 px** (`md:p-12`) lett, megszüntetve a korábbi 56/64 px-es eltéréseket.
+    - A `StepCard` alapértelmezett értéke mostantól mindenhol a 48 px-es rácsot követi `md` nézet felett.
+- **UI-finomhangolás:**
+    - A nyitóoldali (Hero) főcím betűmérete desktopnézetben (`md`) 60 px-ről **48 px-re** (`text-5xl`) csökkent a kiegyensúlyozottabb megjelenés érdekében.
+
 ## [0.6.1] - 2026-02-14
 
 ### Újdonságok és Változások

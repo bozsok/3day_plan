@@ -34,7 +34,7 @@ export function Hero({ onStart, onSkip }: HeroProps) {
     };
 
     return (
-        <StepCard className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12 lg:p-14">
+        <StepCard className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12">
             {/* Dekorációs háttérelemek */}
             <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50" />
             <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl opacity-50" />
@@ -49,7 +49,7 @@ export function Hero({ onStart, onSkip }: HeroProps) {
                     </div>
                 )}
 
-                <h1 className="max-[371px]:text-3xl text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+                <h1 className="max-[371px]:text-3xl text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
                     {user ? (
                         <>
                             Tervezd meg a tökéletes <br />

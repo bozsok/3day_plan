@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { packages } from '../../data/mockData';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
 
 interface PackageSelectionProps {
@@ -27,9 +27,9 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                 className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
             >
                 <div
-                    className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                    className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                 >
-                    <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
+                    <ChevronLeft size={24} />
                 </div>
             </button>
 
@@ -40,9 +40,9 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                     className="absolute top-4 right-4 min-[440px]:top-8 md:top-12 min-[440px]:right-8 md:right-12 group hover:scale-105 transition-transform z-10"
                 >
                     <div
-                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                        className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                     >
-                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
+                        <ChevronRight size={24} />
                     </div>
                 </button>
             )}
@@ -52,7 +52,7 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
             <div className="absolute top-4 min-[440px]:top-8 md:top-12 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 z-10 whitespace-nowrap">
                 <span className="w-2 h-2 rounded-full bg-primary" />
                 <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                    3. Lépés: Programcsomagok
+                    3. Lépés: Csomagok
                 </span>
             </div>
 

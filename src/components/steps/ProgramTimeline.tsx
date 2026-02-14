@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { hu } from 'date-fns/locale';
 import { packages, counties } from '../../data/mockData'; // Imported packages and counties
 import { useUser } from '../../context/UserContext';
@@ -132,9 +133,9 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 className="absolute top-0 left-0 group hover:scale-105 transition-transform z-10"
             >
                 <div
-                    className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                    className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                 >
-                    <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
+                    <ChevronLeft size={24} />
                 </div>
             </button>
 
@@ -145,19 +146,19 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                     className="absolute top-0 right-0 lg:hidden group hover:scale-105 transition-transform z-10"
                 >
                     <div
-                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                        className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                     >
-                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
+                        <ChevronRight size={24} />
                     </div>
                 </button>
             )}
 
             {/* Cím és Címke - Középre rendezve */}
             <div className="text-center mb-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4 lg:mb-[30px]">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                        4. Lépés: egyedi program
+                        4. Lépés: Programok
                     </span>
                 </div>
 
@@ -257,9 +258,9 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                         className="hidden lg:flex absolute top-8 md:top-12 right-8 md:right-12 group hover:scale-105 transition-transform z-20"
                     >
                         <div
-                            className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-12 h-12"
+                            className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                         >
-                            <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
+                            <ChevronRight size={24} />
                         </div>
                     </button>
                 )}

@@ -5,7 +5,7 @@ import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
 import { counties } from '../../data/mockData';
-import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2 } from 'lucide-react';
+import { Trophy, Calendar as CalendarIcon, Users, ArrowRight, ExternalLink, Settings2, ChevronLeft } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
 
 interface SummaryData {
@@ -110,9 +110,9 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
                     className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
                 >
                     <div
-                        className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
+                        className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
                     >
-                        <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_back</span>
+                        <ChevronLeft size={24} />
                     </div>
                 </button>
             )}
