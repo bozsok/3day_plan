@@ -135,20 +135,22 @@ export function CustomCalendar({ selected, onSelect }: CustomCalendarProps) {
     const today = new Date();
 
     return (
-        <div className="w-full">
+        <div id="calendar-root" className="w-full">
             {/* Hónap fejléc — forrás: sor 75-84 */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-gray-900">
+            <div id="calendar-nav-header" className="flex items-center justify-between mb-6">
+                <h2 id="calendar-view-month" className="text-lg font-bold text-gray-900">
                     {year}. {MONTH_NAMES[month]}
                 </h2>
-                <div className="flex gap-2">
+                <div id="calendar-nav-buttons" className="flex gap-2">
                     <button
+                        id="calendar-prev-month-btn"
                         className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
                         onClick={prevMonth}
                     >
                         <ChevronLeft size={20} className="text-gray-600" />
                     </button>
                     <button
+                        id="calendar-next-month-btn"
                         className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors"
                         onClick={nextMonth}
                     >
@@ -157,8 +159,8 @@ export function CustomCalendar({ selected, onSelect }: CustomCalendarProps) {
                 </div>
             </div>
 
-            {/* Napfejlécek — forrás: calendar-grid mb-2, text-center text-[10px] ... */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            {/* Napfejlécések — forrás: calendar-grid mb-2, text-center text-[10px] ... */}
+            <div id="calendar-day-headers-grid" className="grid grid-cols-7 gap-1 mb-2">
                 {DAY_HEADERS.map((d, i) => (
                     <div
                         key={d}
@@ -171,7 +173,7 @@ export function CustomCalendar({ selected, onSelect }: CustomCalendarProps) {
             </div>
 
             {/* Naptár rács — forrás: calendar-grid (grid repeat(7, 1fr)) */}
-            <div className="grid grid-cols-7 gap-1">
+            <div id="calendar-days-grid" className="grid grid-cols-7 gap-1">
                 {calendarDays.map(({ date, isCurrentMonth }, idx) => {
                     const pos = getSelectionPosition(date);
                     const isToday = isSameDay(date, today) && isCurrentMonth;
@@ -185,6 +187,7 @@ export function CustomCalendar({ selected, onSelect }: CustomCalendarProps) {
                     return (
                         <button
                             key={idx}
+                            id={`calendar-day-btn-${idx}`}
                             onClick={() => handleDayClick(date)}
                             className={`
                                 aspect-square flex items-center justify-center text-sm cursor-pointer transition-all

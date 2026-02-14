@@ -84,23 +84,25 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     if (!data) return null;
 
     return (
-        <StepCard>
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12">
+        <StepCard id="summary-step-card">
+            <div id="summary-header-row" className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12">
                 <StepHeader
                     step="Élő Eredmények"
-                    title={<>Közös <span className="text-primary-dark" onClick={handleTitleClick}>tervezés</span></>}
+                    title={<>Közös <span id="summary-secret-admin-trigger" className="text-primary-dark" onClick={handleTitleClick}>tervezés</span></>}
                     description="Itt láthatod a csapat összesített döntéseit valós időben."
                     titleClassName="select-none cursor-default active:scale-95 transition-transform"
                 />
 
-                <div className="flex gap-4 shrink-0">
+                <div id="summary-nav-controls" className="flex gap-4 shrink-0">
                     <NavButton
+                        id="summary-back-btn"
                         variant="outline"
                         icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/terv/program')}
                         title="Vissza"
                     />
                     <button
+                        id="summary-manage-votes-btn"
                         onClick={() => setShowVoteModal(true)}
                         className="flex items-center gap-2 px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-2xl text-sm font-bold transition-all shadow-sm"
                     >
@@ -110,9 +112,10 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+            <div id="summary-ranking-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
                 {/* 1. Dátum Intervallumok */}
                 <RankingSection
+                    id="summary-ranking-dates"
                     title="Mikor menjünk?"
                     icon={<CalendarIcon size={20} />}
                     iconBg="bg-blue-100"
@@ -134,6 +137,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
                 {/* 2. Szavazási Rangsor (Kattintható) */}
                 <RankingSection
+                    id="summary-ranking-regions"
                     title="Hova menjünk?"
                     icon={<Trophy size={20} />}
                     iconBg="bg-yellow-100"
@@ -159,12 +163,13 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             </div>
 
             {/* 3. Felhasználók állapota (Csoportosítva) */}
-            <DesignerStatus users={data.userStatuses} />
+            <DesignerStatus id="summary-designer-status" users={data.userStatuses} />
 
             {/* Lebegő akció gomb: Tovább tervezek */}
             {onContinue && (
-                <div className="fixed bottom-8 right-8 z-50 animate-bounce-slow">
+                <div id="summary-fab-wrapper" className="fixed bottom-8 right-8 z-50 animate-bounce-slow">
                     <button
+                        id="summary-continue-btn"
                         onClick={() => {
                             onContinue();
                             navigate('/terv/idopont');
@@ -185,13 +190,14 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
             {/* ADMIN PANEL OVERLAY */}
             {adminMode && (
-                <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-red-600 flex items-center gap-2">
+                <div id="summary-admin-overlay" className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+                    <div id="summary-admin-panel" className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
+                        <div id="summary-admin-header" className="flex justify-between items-center mb-6">
+                            <h2 id="summary-admin-title" className="text-2xl font-bold text-red-600 flex items-center gap-2">
                                 🛠️ RENDSZERGAZDA
                             </h2>
                             <button
+                                id="summary-admin-close-btn"
                                 onClick={() => { setAdminMode(false); setAdminStatus(null); }}
                                 className="text-gray-500 hover:text-gray-900 font-bold"
                             >
@@ -200,26 +206,28 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                         </div>
 
                         {adminStatus && (
-                            <div className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg text-center font-bold text-gray-800">
+                            <div id="summary-admin-status-msg" className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg text-center font-bold text-gray-800">
                                 {adminStatus}
                             </div>
                         )}
 
-                        <div className="space-y-4">
+                        <div id="summary-admin-actions" className="space-y-4">
                             <button
+                                id="summary-admin-reset-btn"
                                 onClick={handleAdminReset}
                                 className="w-full font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all bg-red-600 hover:bg-red-700 text-white hover:scale-105"
                             >
                                 ☢️ ADATBÁZIS TÖRLÉS
                             </button>
 
-                            <div className="border-t border-gray-200 pt-4 mt-4">
+                            <div id="summary-admin-user-list" className="border-t border-gray-200 pt-4 mt-4">
                                 <h3 className="font-bold text-gray-700 mb-2">Felhasználók törlése:</h3>
                                 <div className="max-h-60 overflow-y-auto space-y-2">
                                     {data?.userStatuses.map(u => (
                                         <div key={u.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-200">
                                             <span className="font-medium text-gray-800">{u.name} (ID: {u.id})</span>
                                             <button
+                                                id={`summary-admin-delete-user-btn-${u.id}`}
                                                 onClick={() => handleAdminDeleteUser(u.id)}
                                                 className="px-3 py-1 rounded text-xs font-bold transition-colors bg-white text-red-500 hover:bg-red-50 border border-red-200"
                                             >

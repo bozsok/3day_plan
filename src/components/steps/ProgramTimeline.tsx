@@ -88,12 +88,12 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         : 'Nincs dátum';
 
     const SidebarInfo = (
-        <div className="flex flex-col relative w-full">
+        <div id="program-timeline-sidebar-info" className="flex flex-col relative w-full">
             {/* Fejléc */}
             <StepHeader
                 step="4. Lépés: Programok"
                 title={<>
-                    <div className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
+                    <div id="program-timeline-county-badge-wrapper" className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
                         <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
                             {county?.name}
                         </span>
@@ -106,7 +106,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             />
 
             {/* Navigációs gombok - Mobil (< 440px) - A felirat alatt */}
-            <div className="flex min-[441px]:hidden gap-4 mb-6">
+            <div id="program-timeline-mobile-nav" className="flex min-[441px]:hidden gap-4 mb-6">
                 <NavButton
                     variant="outline"
                     icon={<ChevronLeft size={24} />}
@@ -134,26 +134,27 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
     );
 
     const SidebarActions = (
-        <div className="flex flex-col">
+        <div id="program-timeline-sidebar-actions" className="flex flex-col">
             {/* Várható összköltség elem */}
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6 mt-4 lg:mt-0">
-                <span className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
-                <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-gray-900">{selectedPackage.estimatedCost}</span>
-                    <span className="text-gray-600 font-semibold">Ft</span>
+            <div id="program-timeline-cost-box" className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6 mt-4 lg:mt-0">
+                <span id="program-timeline-cost-label" className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
+                <div id="program-timeline-cost-amount-wrapper" className="flex items-baseline gap-2">
+                    <span id="program-timeline-cost-value" className="text-3xl font-bold text-gray-900">{selectedPackage.estimatedCost}</span>
+                    <span id="program-timeline-cost-currency" className="text-gray-600 font-semibold">Ft</span>
                 </div>
             </div>
 
             {/* Hibaüzenet */}
             {error && (
-                <div className="mb-4 p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100 font-bold text-center">
+                <div id="program-timeline-error-box" className="mb-4 p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100 font-bold text-center">
                     {error}
                 </div>
             )}
 
             {/* Akció gombok */}
-            <div className="space-y-3 mb-4">
+            <div id="program-timeline-actions-wrapper" className="space-y-3 mb-4">
                 <button
+                    id="program-timeline-vote-btn"
                     onClick={handleVote}
                     disabled={voteMutation.isPending}
                     className="w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
@@ -162,6 +163,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </button>
 
                 <button
+                    id="program-timeline-results-btn"
                     onClick={() => navigate('/terv/osszegzes')}
                     className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full"
                 >
@@ -172,17 +174,18 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </button>
             </div>
 
-            <p className="mt-2 text-[11px] text-gray-400 text-center leading-relaxed px-4">
+            <p id="program-timeline-vote-disclaimer" className="mt-2 text-[11px] text-gray-400 text-center leading-relaxed px-4">
                 A szavazatoddal rögzíted a választott megyét és időpontot is.
             </p>
         </div>
     );
 
     return (
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative flex flex-col lg:flex-row">
+        <div id="program-timeline-root" className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative flex flex-col lg:flex-row">
             {/* GLOBÁLIS NAVIGÁCIÓS GOMBOK (Desktop és Tablet > 440px) */}
-            <div className="hidden min-[441px]:flex gap-4 absolute top-8 right-8 md:top-12 md:right-12 z-30">
+            <div id="program-timeline-global-nav" className="hidden min-[441px]:flex gap-4 absolute top-8 right-8 md:top-12 md:right-12 z-30">
                 <NavButton
+                    id="program-timeline-back-btn"
                     variant="outline"
                     icon={<ChevronLeft size={24} />}
                     onClick={() => navigate('/terv/csomagok')}
@@ -190,6 +193,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 />
 
                 <NavButton
+                    id="program-timeline-next-btn"
                     variant="primary"
                     icon={<ArrowRight size={24} />}
                     onClick={() => navigate('/terv/osszegzes')}
@@ -198,37 +202,39 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 />
             </div>
             {/* 1. BAL OLDAL (SIDEBAR) */}
-            <div className="hidden lg:flex lg:w-80 p-8 md:p-12 border-r border-gray-100 bg-gray-50/50 flex flex-col justify-start items-start gap-8">
+            <div id="program-timeline-sidebar" className="hidden lg:flex lg:w-80 p-8 md:p-12 border-r border-gray-100 bg-gray-50/50 flex flex-col justify-start items-start gap-8">
                 {SidebarInfo}
                 {SidebarActions}
             </div>
 
             {/* 2. JOBB OLDAL (CONTENT) */}
-            <div className="flex-1 flex flex-col relative">
+            <div id="program-timeline-content" className="flex-1 flex flex-col relative">
                 {/* MOBIL FEJLÉC (csak lg alatt) */}
-                <div className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
+                <div id="program-timeline-mobile-header" className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
                     {SidebarInfo}
                 </div>
 
                 {/* NAP FÜLEK */}
-                <div className="flex border-b border-gray-100 bg-white lg:pr-40">
+                <div id="program-timeline-tabs-row" className="flex border-b border-gray-100 bg-white lg:pr-40">
                     {[1, 2, 3].map((dayIndex) => {
                         const isActive = activeDay === dayIndex;
+                        const idx = dayIndex;
                         const dayName = (dayNames[dayIndex - 1] || `${dayIndex}. nap`).toUpperCase();
                         return (
                             <button
                                 key={dayIndex}
+                                id={`program-day-tab-btn-${idx}`}
                                 onClick={() => setActiveDay(dayIndex)}
                                 className={`flex-1 py-6 px-4 text-center border-b-4 transition-all ${isActive
                                     ? 'border-primary bg-primary/5 text-gray-900 font-bold'
                                     : 'border-transparent text-gray-400'
                                     }`}
                             >
-                                <span className={`block text-xs uppercase tracking-widest mb-1 ${isActive ? 'text-primary font-bold' : 'text-gray-400'
+                                <span id={`program-day-tab-name-${idx}`} className={`block text-xs uppercase tracking-widest mb-1 ${isActive ? 'text-primary font-bold' : 'text-gray-400'
                                     }`}>
                                     {dayName}
                                 </span>
-                                <span className="text-base font-black">
+                                <span id={`program-day-tab-number-${idx}`} className="text-base font-black">
                                     {dayIndex}. Nap
                                 </span>
                             </button>
@@ -237,23 +243,23 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
 
                 {/* TIMELINE TARTALOM */}
-                <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 lg:p-12 overflow-y-auto bg-white">
-                    <div className="max-w-2xl mx-auto lg:mx-0">
+                <div id="program-timeline-items-scroll" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 lg:p-12 overflow-y-auto bg-white">
+                    <div id="program-timeline-items-wrapper" className="max-w-2xl mx-auto lg:mx-0">
                         {selectedPackage.days.find(d => d.dayIndex === activeDay)?.items.map((item, idx, arr) => (
-                            <div key={item.id} className="flex gap-6 md:gap-10 group">
+                            <div key={item.id} id={`program-timeline-item-${item.id}`} className="flex gap-6 md:gap-10 group">
                                 <div className="flex flex-col items-center shrink-0">
-                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-primary transition-transform duration-300 group-hover:scale-110">
+                                    <div id="program-timeline-item-icon-box" className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-primary transition-transform duration-300 group-hover:scale-110">
                                         <span className="material-icons-outlined text-3xl md:text-4xl">{item.icon}</span>
                                     </div>
                                     {idx !== arr.length - 1 && (
-                                        <div className="w-0.5 h-full bg-gray-100/50 my-3" />
+                                        <div id="program-timeline-item-connector" className="w-0.5 h-full bg-gray-100/50 my-3" />
                                     )}
                                 </div>
-                                <div className="pb-10 md:pb-14 pt-2 md:pt-3">
-                                    <span className="text-[10px] md:text-[11px] font-black text-primary-dark uppercase tracking-[0.3em] mb-2 md:mb-3 block">
+                                <div id="program-timeline-item-content" className="pb-10 md:pb-14 pt-2 md:pt-3">
+                                    <span id="program-timeline-item-time" className="text-[10px] md:text-[11px] font-black text-primary-dark uppercase tracking-[0.3em] mb-2 md:mb-3 block">
                                         {item.time}
                                     </span>
-                                    <p className="text-gray-900 text-lg md:text-2xl font-black leading-relaxed">
+                                    <p id="program-timeline-item-description" className="text-gray-900 text-lg md:text-2xl font-black leading-relaxed">
                                         {item.description}
                                     </p>
                                 </div>
@@ -263,7 +269,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
 
                 {/* MOBIL LÁBLÉC (csak lg alatt) */}
-                <div className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-t border-gray-100 bg-white">
+                <div id="program-timeline-mobile-footer" className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-t border-gray-100 bg-white">
                     {SidebarActions}
                 </div>
             </div>

@@ -32,9 +32,9 @@ export function RankingItem({
         }`;
 
     return (
-        <div className={containerClasses} onClick={onClick}>
-            <div className="flex justify-between items-center mb-2">
-                <span className="font-bold text-gray-900 flex items-center gap-2">
+        <div id="ranking-item-root" className={containerClasses} onClick={onClick}>
+            <div id="ranking-item-header" className="flex justify-between items-center mb-2">
+                <span id="ranking-item-title" className="font-bold text-gray-900 flex items-center gap-2">
                     {isFirst && isRegion && '👑 '}
                     {icon}
                     {title}
@@ -42,14 +42,14 @@ export function RankingItem({
                         <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400" />
                     )}
                 </span>
-                <span className={badgeClasses}>
+                <span id="ranking-item-vote-badge" className={badgeClasses}>
                     {count} szavazat
                 </span>
             </div>
 
-            <div className="flex flex-wrap gap-1">
+            <div id="ranking-item-users-list" className="flex flex-wrap gap-1">
                 {users.map((u, idx) => (
-                    <span key={`${u}-${idx}`} className="text-[10px] px-2 py-1 bg-gray-200 text-gray-600 rounded-md">
+                    <span key={`${u}-${idx}`} id={`ranking-item-user-tag-${idx}`} className="text-[10px] px-2 py-1 bg-gray-200 text-gray-600 rounded-md">
                         {u}
                     </span>
                 ))}

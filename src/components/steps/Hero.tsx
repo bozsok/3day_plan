@@ -28,32 +28,31 @@ export function Hero({ }: HeroProps) {
         }
     };
 
-    // Ha már be van jelentkezve, csak a tovább gomb látszik (vagy automatikusan továbbvihetnénk)
     const handleContinue = () => {
         navigate('/terv/idopont');
     };
 
     return (
-        <StepCard className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12">
+        <StepCard id="hero-root-card" className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12">
             {/* Dekorációs háttérelemek */}
-            <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50" />
-            <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl opacity-50" />
+            <div id="hero-bg-blob-top" className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50" />
+            <div id="hero-bg-blob-bottom" className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl opacity-50" />
 
-            <div className="relative z-10 max-w-3xl mx-auto">
+            <div id="hero-content-wrapper" className="relative z-10 max-w-3xl mx-auto">
                 {user && (
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-8">
-                        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                    <div id="hero-status-badge" className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-8">
+                        <span id="hero-status-pulse" className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        <span id="hero-status-text" className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
                             Hosszú Hétvége Tervező
                         </span>
                     </div>
                 )}
 
-                <h1 className="max-[371px]:text-3xl text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+                <h1 id="hero-main-title" className="max-[371px]:text-3xl text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
                     {user ? (
                         <>
                             Tervezd meg a tökéletes <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-emerald-400">
+                            <span id="hero-title-gradient-text" className="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-emerald-400">
                                 három napot.
                             </span>
                             🌲
@@ -61,14 +60,14 @@ export function Hero({ }: HeroProps) {
                     ) : (
                         <>
                             Szia! <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-emerald-400">
+                            <span id="hero-title-gradient-text" className="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-emerald-400">
                                 Én egy hosszú hétvége tervező vagyok.
                             </span>
                         </>
                     )}
                 </h1>
 
-                <p className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+                <p id="hero-description-text" className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
                     Néhány lépés, és máris készen állnak a 3 napos programok.
                     {!user && (
                         <span className="italic">
@@ -79,20 +78,20 @@ export function Hero({ }: HeroProps) {
                 </p>
 
                 {/* Feature Icons */}
-                <div className="hidden md:flex justify-center gap-8 md:gap-16 mb-12 text-gray-400">
-                    <div className="flex flex-col items-center gap-2 group">
+                <div id="hero-features-container" className="hidden md:flex justify-center gap-8 md:gap-16 mb-12 text-gray-400">
+                    <div id="feature-timing-box" className="flex flex-col items-center gap-2 group">
                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
                             <Calendar size={24} />
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-wider">Időzítés</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 group">
+                    <div id="feature-region-box" className="flex flex-col items-center gap-2 group">
                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
                             <Compass size={24} />
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-wider">Tájegység</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 group">
+                    <div id="feature-program-box" className="flex flex-col items-center gap-2 group">
                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
                             <MapPin size={24} />
                         </div>
@@ -101,17 +100,18 @@ export function Hero({ }: HeroProps) {
                 </div>
 
                 {/* Login Form / Welcome */}
-                <div className="max-w-md mx-auto">
+                <div id="hero-auth-container" className="max-w-md mx-auto">
                     {user ? (
-                        <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        <div id="hero-auth-logged-in" className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                            <h3 id="welcome-user-title" className="text-xl font-bold text-gray-900 mb-2">
                                 Szia, {user.name}! 👋
                             </h3>
-                            <p className="text-gray-600 mb-6 text-sm">
+                            <p id="welcome-user-subtitle" className="text-gray-600 mb-6 text-sm">
                                 Folytasd a tervezést ott, ahol abbahagytad.
                             </p>
                             <div className="flex flex-col gap-3">
                                 <button
+                                    id="action-start-plan-button"
                                     onClick={handleContinue}
                                     className="w-full bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 group"
                                 >
@@ -119,6 +119,7 @@ export function Hero({ }: HeroProps) {
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                                 <button
+                                    id="action-view-results-button"
                                     onClick={() => navigate('/terv/osszegzes')}
                                     className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 text-gray-600 hover:text-primary-dark font-bold text-lg px-8 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                                 >
@@ -127,12 +128,13 @@ export function Hero({ }: HeroProps) {
                             </div>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="bg-white p-2 rounded-2xl shadow-lg border border-gray-100 flex flex-col md:flex-row gap-2">
-                            <div className="flex-1 relative">
-                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                        <form id="login-form-wrapper" onSubmit={handleSubmit} className="bg-white p-2 rounded-2xl shadow-lg border border-gray-100 flex flex-col md:flex-row gap-2">
+                            <div id="login-input-container" className="flex-1 relative">
+                                <div id="login-input-icon" className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                                     <Users size={20} />
                                 </div>
                                 <input
+                                    id="login-name-input"
                                     type="text"
                                     placeholder="Hogy hívnak?"
                                     className="w-full pl-11 pr-4 py-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary/50 font-medium text-gray-900 placeholder:text-gray-400 h-full"
@@ -145,6 +147,7 @@ export function Hero({ }: HeroProps) {
                                 />
                             </div>
                             <button
+                                id="login-submit-button"
                                 type="submit"
                                 disabled={isLoading}
                                 className="bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-xl transition-all shadow-md hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
@@ -156,7 +159,7 @@ export function Hero({ }: HeroProps) {
                     )}
 
                     {error && (
-                        <p className="mt-3 text-red-500 text-sm font-medium animate-pulse">
+                        <p id="hero-error-message" className="mt-3 text-red-500 text-sm font-medium animate-pulse">
                             {error}
                         </p>
                     )}

@@ -7,20 +7,22 @@ interface StepCardProps {
     noPadding?: boolean;
     /** Egyedi padding felülbíráláshoz */
     padding?: string;
+    /** Egyedi ID azonosító */
+    id?: string;
 }
 
 /**
  * Egységesített kártya komponens az összes lépéshez.
  * Tartalmazza az árnyékot, lekerekítést, szegélyt és reszponzív viselkedést.
  */
-export function StepCard({ children, className = '', noPadding = false, padding }: StepCardProps) {
+export function StepCard({ children, className = '', noPadding = false, padding, id }: StepCardProps) {
     const baseClasses = "bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative";
 
     // Alapértelmezett padding, ha nincs kikapcsolva és nincs egyedi megadva
     const paddingClasses = padding ? padding : (noPadding ? "" : "p-[15px] min-[440px]:p-8 md:p-12");
 
     return (
-        <div className={`${baseClasses} ${paddingClasses} ${className}`}>
+        <div id={id} className={`${baseClasses} ${paddingClasses} ${className}`}>
             {children}
         </div>
     );

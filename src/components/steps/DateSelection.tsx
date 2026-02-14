@@ -50,43 +50,45 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
         : 'Válassz dátumot';
 
     return (
-        <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
+        <StepCard id="date-selection-step-card" noPadding className="flex flex-col md:flex-row items-stretch">
             {/* Bal oldal */}
-            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
+            <div id="date-selection-content-left" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <StepHeader
                     step="1. Lépés: Időpont"
                     title={<>Válaszd ki az <br /><span className="text-primary-dark">időpontot</span></>}
                     description="Jelöld ki azt a 3 napos hétvégét (péntek-vasárnap), amikor utazni szeretnél."
                 />
 
-                <div className="flex gap-4 items-center">
+                <div id="date-selection-nav-container" className="flex gap-4 items-center">
                     <NavButton
+                        id="date-selection-back-btn"
                         variant="outline"
                         icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/')}
                         title="Vissza"
                     />
                     <button
+                        id="date-selection-next-btn"
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={handleNext}
                         disabled={!hasThreeConsecutiveDays}
                     >
                         Tovább
-                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight id="date-selection-next-icon" size={20} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
             </div>
 
             {/* Jobb oldal */}
-            <div className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
-                <div className="w-full max-w-xs">
+            <div id="date-selection-content-right" className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
+                <div id="calendar-wrapper-box" className="w-full max-w-xs">
                     <CustomCalendar
                         selected={dates}
                         onSelect={handleCalendarSelect}
                     />
 
                     {/* Info box */}
-                    <div className="mt-8 pt-6 border-t border-gray-200">
+                    <div id="calendar-info-box" className="mt-8 pt-6 border-t border-gray-200">
                         <InfoPill
                             variant={hasThreeConsecutiveDays ? 'primary' : 'none'}
                             icon={<Calendar size={20} />}

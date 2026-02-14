@@ -198,6 +198,7 @@ export function HungaryMap({ selectedRegionId, hoveredRegionId, onRegionClick, o
 
     return (
         <div
+            id="hungary-map-root"
             ref={containerRef}
             onClick={handleClick}
             onMouseOver={handleMouseOver}

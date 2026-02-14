@@ -31,15 +31,15 @@ export function StepHeader({
     const finalDescClassName = descriptionClassName || "text-gray-600 text-lg leading-relaxed max-w-2xl";
 
     return (
-        <div className={`flex-1 ${className}`}>
+        <div id="step-header-container" className={`flex-1 ${className}`}>
             {step && <StepLabel>{step}</StepLabel>}
 
-            <h1 className={finalTitleClassName}>
+            <h1 id="step-header-title" className={finalTitleClassName}>
                 {title}
             </h1>
 
             {description && (
-                <p className={finalDescClassName}>
+                <p id="step-header-description" className={finalDescClassName}>
                     {description}
                 </p>
             )}

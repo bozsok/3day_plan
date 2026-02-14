@@ -30,13 +30,13 @@ export function InfoPill({
     };
 
     return (
-        <div className={`flex items-center gap-3 p-3 rounded-2xl border ${variants[variant]} ${className}`}>
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconBg[variant]}`}>
+        <div id="info-pill-root" className={`flex items-center gap-3 p-3 rounded-2xl border ${variants[variant]} ${className}`}>
+            <div id="info-pill-icon-box" className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconBg[variant]}`}>
                 {icon}
             </div>
-            <div className="min-w-0 text-left">
-                <p className="text-[10px] text-gray-400 uppercase tracking-tight font-bold">{label}</p>
-                <div className="font-medium text-sm truncate leading-tight">
+            <div id="info-pill-content" className="min-w-0 text-left">
+                <p id="info-pill-label" className="text-[10px] text-gray-400 uppercase tracking-tight font-bold">{label}</p>
+                <div id="info-pill-value" className="font-medium text-sm truncate leading-tight">
                     {value}
                 </div>
             </div>

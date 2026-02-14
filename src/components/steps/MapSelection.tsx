@@ -24,23 +24,25 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
     const displayCounty = hoveredCounty || selectedCounty;
 
     return (
-        <StepCard noPadding className="flex flex-col md:flex-row items-stretch overflow-hidden">
+        <StepCard id="region-selection-step-card" noPadding className="flex flex-col md:flex-row items-stretch overflow-hidden">
             {/* Bal oldal */}
-            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
+            <div id="region-selection-content-left" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <StepHeader
                     step="2. Lépés: Úti cél"
                     title={<>Válaszd ki az <br /><span className="text-primary-dark">úti célt</span></>}
                     description="Kattints arra a régióra a térképen, ahol szívesen eltöltenéd a hétvégét."
                 />
 
-                <div className="flex gap-4 items-center">
+                <div id="region-selection-nav-container" className="flex gap-4 items-center">
                     <NavButton
+                        id="region-selection-back-btn"
                         variant="outline"
                         icon={<ChevronLeft size={24} />}
                         onClick={() => navigate('/terv/idopont')}
                         title="Vissza"
                     />
                     <button
+                        id="region-selection-next-btn"
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={() => navigate('/terv/csomagok')}
                         disabled={!selectedRegionId}
@@ -52,10 +54,10 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
             </div>
 
             {/* Jobb oldal — Térkép */}
-            <div className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex flex-col items-center justify-center border-l border-gray-100">
-                <div className="w-full">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <div id="region-selection-content-right" className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
+                <div id="region-selection-map-wrapper" className="w-full">
+                    <div id="region-selection-map-header" className="flex items-center justify-between mb-6">
+                        <h2 id="region-selection-map-title" className="text-lg font-bold text-gray-900 flex items-center gap-2">
                             <MapIcon size={20} className="text-primary-dark" />
                             Tájegységek és megyék
                         </h2>
@@ -77,7 +79,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                     />
 
                     {/* Kiválasztott/hovered megye info */}
-                    <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div id="region-info-box" className="mt-6 pt-6 border-t border-gray-200">
                         <InfoPill
                             variant={selectedRegionId ? 'primary' : 'none'}
                             icon={<MapPin size={20} />}

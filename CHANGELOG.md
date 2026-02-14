@@ -2,6 +2,13 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.10.0] - 2026-02-14
+
+### Tesztelhetőség és Dokumentáció
+- **Egyedi elem-azonosítók (ID):** Teljeskörűen implementálva lett minden vizuális és interaktív elemhez az egyedi `id` attribútum az automatizált és manuális tesztelés megkönnyítése érdekében.
+- **ID Térkép Dokumentáció:** Elkészült az `element_id_map.md` fájl, amely strukturáltan tartalmazza az alkalmazás összes elemének azonosítóját a projekt átláthatósága és könnyebb CI/CD integrálhatósága végett.
+- **Standardizált azonosító-nevezéktan:** Minden komponens (Hero, Dátumválasztó, Térkép, Csomagok, Idővonal, Összegzés) következetes és logikus ID-kat kapott.
+
 ## [0.9.10] - 2026-02-14
 
 ### Vizuális Finomítások

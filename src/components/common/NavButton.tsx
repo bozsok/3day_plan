@@ -15,8 +15,9 @@ export function NavButton({
     onClick,
     disabled = false,
     title,
-    className = ""
-}: NavButtonProps) {
+    className = "",
+    id
+}: NavButtonProps & { id?: string }) {
     const baseStyles = "flex items-center justify-center w-14 h-14 rounded-2xl transition-all duration-200 active:scale-95";
 
     const variants = {
@@ -28,6 +29,7 @@ export function NavButton({
 
     return (
         <button
+            id={id}
             onClick={onClick}
             disabled={disabled}
             title={title}

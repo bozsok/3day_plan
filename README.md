@@ -16,7 +16,9 @@ A tervezés nálunk egy játékos, folyékony folyamat, ahol az oldalak között
 
 ## Modern Felhasználói Élmény
 
-Az alkalmazás legújabb verziója (v0.9+) a vizuális tökéletességre és a technikai stabilitásra fókuszál:
+Az alkalmazás legújabb verziója (v0.10+) a vizuális tökéletességre, a technikai stabilitásra és a tesztelhetőségre fókuszál:
+
+- **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az `element_id_map.md` fájlban. Ez lehetővé teszi a könnyű automatizált tesztelést és az elemek pontos beazonosítását.
 
 - **Folyékony navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz. A böngésző "Vissza" gombja is pontosan úgy működik, ahogy elvárod.
 - **Intelligens Adatkezelés:** A **TanStack Query** biztosítja, hogy minden szavazat és dátumválasztás azonnal és hibabiztosan célba érjen. A rendszer a háttérben folyamatosan szinkronizál, így mindig a legfrissebb eredményeket látod te és a barátaid is.

@@ -6,7 +6,7 @@ interface CardProps {
 
 export function Card({ children }: CardProps) {
     return (
-        <div className="w-full">
+        <div id="static-page-card-holder" className="w-full">
             {children}
         </div>
     );

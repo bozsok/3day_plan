@@ -71,22 +71,24 @@ function App() {
       <MainLayout>
         {/* Dinamikus idővonal konténer – összehúzódik, ha nincs rá szükség (Step 0 és 5) */}
         <motion.div
+          id="step-indicator-animation-wrapper"
           animate={{
             height: (step > 0 && step < 5) ? 50 : 0,
             marginBottom: (step > 0 && step < 5) ? 32 : 0,
             opacity: (step > 0 && step < 5) ? 1 : 0
           }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="w-full flex justify-center relative overflow-hidden"
+          className="w-full flex justify-center relative overflow-hidden will-change-[height,opacity]"
         >
-          <div className="absolute inset-0 flex justify-center items-center">
+          <div id="step-indicator-centering-box" className="absolute inset-0 flex justify-center items-center">
             <StepIndicator currentStep={step} totalSteps={4} />
           </div>
         </motion.div>
 
-        <div className="w-full relative">
+        <div id="main-content-router-wrapper" className="w-full relative">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
+              id="page-transition-layer"
               key={location.pathname}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -99,7 +101,7 @@ function App() {
                 zIndex: 0
               }}
               transition={{ duration: 0.3, ease: "linear" }}
-              className="w-full"
+              className="w-full transform-gpu will-change-[opacity]"
             >
               <Routes location={location}>
                 <Route path="/" element={<Card><Hero /></Card>} />
