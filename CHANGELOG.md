@@ -2,6 +2,26 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.9.0] - 2026-02-14
+
+### Újdonságok és Változások
+- **Atomic Design Refaktorálás (Strukturális fejlesztések):**
+    - **Új alapkomponensek:** Kiszervézésre kerültek a `NavButton` és `StepHeader` komponensek, amelyek egységesítik az összes lépés fejlécét és navigációját.
+    - **`Summary.tsx` dekompozíció:** A bonyolult összegző oldal kisebb, önálló modulokra lett bontva (`RankingSection`, `RankingItem`, `DesignerStatus`), javítva a kód olvashatóságát.
+    - **`ProgramTimeline.tsx` dekompozíció:** Az idővonal logikája különálló komponensekbe került (`TimelineTabs`, `TimelineItem`, `SidebarInfo`, `SidebarActions`).
+    - **Konzisztencia:** Minden komponens átállt a közös navigációs és fejléc alapokra.
+- **UI Ponthű Helyreállítás (Layout Restoration):**
+    - A 4. lépés (ProgramTimeline) és a korábbi lépések (1-3) vizuális elrendezése teljesen helyre lett állítva a dizájn referencia alapján.
+    - **Reszponzív navigáció:** A navigációs gombok (Vissza/Tovább) mobilnézetben (< 768px) a jobb felső sarokba kerültek, 440px alatt pedig a "3 napos programterv" felirat alá rendeződnek, elkerülve a tartalom kitakarását. A gombok pozíciója (top/right) mostantól minden felbontáson pontosan megegyezik a 3. lépés margóival (32px / 48px).
+    - **Desktop navigáció:** 1024px felett a gombok szorosan egymás mellett maradnak a jobb felső sarokban, a nap-választó tabok pedig kiegészültek egy biztonsági oldaltávolsággal (`lg:pr-40`), hogy ne legyen átfedés.
+- **Vizuális Finomhangolás:**
+    - **Step Label szinkronizálás:** A 4. lépés címkéje (StepLabel) mostantól minden paraméterében (szín, padding, betűméret) megegyezik a 3. lépésben használttal.
+    - **Méretek és színek:** A navigációs nyíl gombok mindenhol teljes méretűek (56px) lettek, a "Tovább" gomb pedig egységesen zöld (`bg-primary`) színt kapott.
+    - **Fejléc igazítása:** Az 1-2. lépés (Dátum, Térkép) fejléce mobilnézetben (< 440px) balra zárt elrendezést kapott.
+    - **Padding és Grid egységesítés:** A 4. lépés belső margói (paddings) mostantól pontosan a 48 px-es rácsot követikasztali nézetben (`lg:p-12`), és a felesleges minimum magasságok eltávolításra kerültek.
+- **Stabilitás:**
+    - Az oldalsáv (Sidebar) asztali nézetben felülre került (`justify-start`), biztosítva a kompaktabb és átláthatóbb megjelenést.
+
 ## [0.8.0] - 2026-02-14
 
 ### Hozzáadva

@@ -2,66 +2,48 @@
 
 Üdvözöllek a Hosszú Hétvége Tervezőben!
 
-Ez az alkalmazás azoknak készült, akik szeretnének kiszakadni a hétköznapok mókuskerekéből, és egy tartalmas, előre megszervezett háromnapos kikapcsolódásra vágynak Magyarország legszebb tájain.
+Ez az alkalmazás azoknak készült, akik szeretnének kiszakadni a hétköznapok mókuskerekéből, és egy tartalmas, előre megszervezett háromnapos kikapcsolódásra vágynak Magyarország legszebb tájain. A projekt mára egy kiforrott, modern és vizuálisan lenyűgöző platformmá fejlődött, amely a legújabb webes technológiákra építve teszi élménnyé a közös tervezést.
 
-A célunk egyszerű: levenni a tervezés terhét a válladról. Nem kell órákat töltened azzal, hogy látnivalókat vadászol, éttermeket keresel vagy túraútvonalakat böngészel. Mi csomagba rendeztük az élményeket.
+A célunk egyszerű: levenni a tervezés terhét a válladról. Nem kell órákat töltened azzal, hogy látnivalókat vadászol, éttermeket keresel vagy túraútvonalakat böngészel. Mi precízen összeállított csomagokba rendeztük az élményeket, amelyeket most már minden eszközön kristálytisztán és villámgyorsan érhetsz el.
 
 ## Hogyan működik?
 
-A tervezés nálunk egy játékos, háromlépéses folyamat:
+A tervezés nálunk egy játékos, folyékony folyamat, ahol az oldalak közötti navigáció szinte észrevétlen:
 
-1.  **Időzítés**: Válaszd ki a naptárban azt a három egymást követő napot (péntek–szombat–vasárnap), amikor utazni szeretnél.
-2.  **Tájegység**: Egy interaktív SVG-térképen (SimpleMaps `hu.svg`) böngészhetsz Magyarország hét turisztikai régiója között — a kurzorral rámutatva kiemeled, kattintással kiválasztod.
-3.  **Programterv**: Részletes, napokra bontott idővonal a kiválasztott régió látnivalóival, étkezéseivel és aktív programjaival — összegzéssel, becsült költséggel.
+1.  **Időzítés**: Válaszd ki a naptárban azt a három egymást követő napot (péntek–szombat–vasárnap), amikor utazni szeretnél. A felület azonnal menti és szinkronizálja a választásodat.
+2.  **Tájegység**: Egy interaktív SVG-térképen böngészhetsz Magyarország megyéi és turisztikai régiói között — a kurzorral rámutatva kiemeled, kattintással kiválasztod. A térkép mostantól még részletesebb és pontosabb.
+3.  **Programterv**: Részletes, napokra bontott idővonal a kiválasztott régió látnivalóival. Itt már nemcsak nézelődhetsz, hanem szavazhatsz is a kedvenc terveidre, miközben a költségek alakulását is nyomon követheted.
+
+## Modern Felhasználói Élmény
+
+Az alkalmazás legújabb verziója (v0.9+) a vizuális tökéletességre és a technikai stabilitásra fókuszál:
+
+- **Folyékony navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz. A böngésző "Vissza" gombja is pontosan úgy működik, ahogy elvárod.
+- **Intelligens Adatkezelés:** A **TanStack Query** biztosítja, hogy minden szavazat és dátumválasztás azonnal és hibabiztosan célba érjen. A rendszer a háttérben folyamatosan szinkronizál, így mindig a legfrissebb eredményeket látod te és a barátaid is.
+- **Ponthű Design:** A felületvisszaállítása során minden lekerekítés, margó és gombméret a helyére került. Legyen szó asztali monitorról vagy egy apró mobilról, a design konzisztens és prémium érzetet nyújt.
+- **Atomic Design alapok:** A motorháztető alatt az alkalmazást jól elkülönített, moduláris egységekre bontottuk, ami villámgyors működést és könnyű bővíthetőséget garantál.
 
 ## Technológiai háttér
 
 ### Frontend
-- **React 19** + **TypeScript** — komponensalapú architektúra
+- **React 19** + **TypeScript** — a legmodernebb komponensalapú architektúra
+- **React Router 7** — stabil, URL alapú útvonalkezelés
+- **TanStack Query** — robusztus szerver állapotkezelés és polling
+- **Framer Motion** — magas minőségű UI animációk és áttűnések
 - **Tailwind CSS v4** — utility-first stílusozás, egyedi `@theme` konfiguráció
-- **Vite** — gyors fejlesztői szerver és optimalizált production build
-- **Saját naptárkomponens** — CSS Grid alapú, magyar lokalizációval
-- **Interaktív SVG-térkép** — dinamikus `hu.svg` betöltés, hét NUTS2 régió, Budapest-jelölő
+- **Interaktív SVG-térkép** — dinamikus `hu.svg` betöltés megyékkel és turisztikai régiókkal
 
-### Backend (v0.5+)
-- **Node.js + Express** — REST API-kiszolgáló
-- **SQLite (@sql.js)** — hordozható, fájlalapú adatbázis (`data/app.db`)
-- **Többfelhasználós támogatás** — egyedi felhasználó-azonosítás és szavazás
-- **Valós idejű szinkronizálás** — dátumok és szavazatok azonnali mentése
+### Backend
+- **PHP 8 / Node.js Express** — rugalmasan választható szerveroldali implementáció
+- **SQLite** — megbízható, hordozható adatbázis
+- **Többfelhasználós támogatás** — valós idejű közös tervezés és szavazatszámlálás
 
-## Fejlesztés
+## Fejlesztés és Futtatás
 
-A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is:
-
-### 1. Backend indítása
-```bash
-cd server
-npm install     # Függőségek telepítése (csak egyszer)
-npm run dev     # Backend szerver indítása (port: 3001)
-```
-
-### 2. Frontend indítása (új terminálban)
-```bash
-# Gyökérkönyvtárban
-npm install     # Függőségek telepítése (csak egyszer)
-npm run dev     # Frontend szerver indítása (port: 5173 - proxy: 3001)
-```
-
-## Funkciók
-- **Közös tervezés:** Oszd meg az oldalt barátaiddal, és tervezzetek együtt!
-- **Dátumegyeztetés:** Mindenki megjelölheti a neki megfelelő hétvégéket, a rendszer pedig összegzi a legnépszerűbb időpontot.
-- **Régió Szavazás:** Szavazzatok a kedvenc úti célokra! Egy felhasználó **több régióra** és egy régión belül **több időpontra** is leadhat szavazatot.
-- **Több Időpont:** Rugalmas tervezés: jelöld meg az összes hétvégét, amikor ráérsz, a rendszer pedig összesíti a legjobb átfedéseket.
+A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is. Részletes útmutatót az egyes mappákban (`server`, `root`) található fájlokban találsz.
 
 ## Adminisztráció 🛠️
 
-A rendszer tartalmaz egy rejtett adminisztrációs felületet karbantartási célokra:
-
-1.  **Elérés:** Navigálj az **Összegzés** (4. lépés) oldalra.
-2.  **Titkos Kapcsoló:** Kattints **5-ször gyorsan** a fejlécben található "Közös Tervezés" címre.
-3.  **Funkciók:**
-    - **Adatbázis-visszaállítás (reset – „atomcsapás”):** Egyetlen gombnyomással töröl minden adatot (felhasználók, szavazatok, dátumok), és kiléptet minden klienst. Hasznos újratervezés indításakor.
-    - **Felhasználótörlés:** Egyesével törölhetők a beragadt vagy duplikált felhasználók.
-    - **Figyelem:** A műveletek azonnal végrehajtódnak, megerősítő kérdés (alert) nélkül!
+A rendszer tartalmaz egy rejtett adminisztrációs felületet a szervezők számára. Az **Összegzés** oldalon a "Közös Tervezés" címre való **5 gyors kattintással** érhető el a vezérlőpult, ahol az adatbázis tisztítása vagy egyes felhasználók kezelése végezhető el.
 
 Jó tervezést és még jobb kikapcsolódást kívánunk!

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ChevronLeft, MapPin, Map } from 'lucide-react';
+import { ArrowRight, ChevronLeft, MapPin, Map as MapIcon } from 'lucide-react';
 import { counties } from '../../data/mockData';
 import { HungaryMap } from '../common/HungaryMap';
 import { StepCard } from '../common/StepCard';
@@ -21,9 +21,9 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
     const displayCounty = hoveredCounty || selectedCounty;
 
     return (
-        <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
+        <StepCard noPadding className="flex flex-col md:flex-row items-stretch overflow-hidden">
             {/* Bal oldal */}
-            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left border-b md:border-b-0 border-gray-100">
+            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
@@ -49,7 +49,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                         <ChevronLeft size={24} />
                     </button>
                     <button
-                        className="group bg-primary hover:bg-primary-dark text-background-dark font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                        className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={() => navigate('/terv/csomagok')}
                         disabled={!selectedRegionId}
                     >
@@ -64,7 +64,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                 <div className="w-full">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <Map size={20} className="text-primary-dark" />
+                            <MapIcon size={20} className="text-primary-dark" />
                             Tájegységek és megyék
                         </h2>
                     </div>
@@ -82,7 +82,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                         <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark shrink-0">
                             <MapPin size={20} />
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 text-left">
                             <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">
                                 {displayCounty ? displayCounty.name : 'Kiválasztott terület'}
                             </p>

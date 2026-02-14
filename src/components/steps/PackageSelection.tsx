@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { packages } from '../../data/mockData';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
 
 interface PackageSelectionProps {
@@ -21,57 +21,51 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
 
     return (
         <StepCard className="animate-fade-in" padding="p-[15px] min-[440px]:p-8 md:p-12">
-            {/* Vissza gomb */}
-            <button
-                onClick={() => navigate('/terv/helyszin')}
-                className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
-            >
-                <div
-                    className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
-                >
-                    <ChevronLeft size={24} />
-                </div>
-            </button>
-
-            {/* Tovább gomb (Csak ha van kiválasztott csomag) */}
-            {selectedPackageId && (
-                <button
-                    onClick={() => navigate('/terv/program')}
-                    className="absolute top-4 right-4 min-[440px]:top-8 md:top-12 min-[440px]:right-8 md:right-12 group hover:scale-105 transition-transform z-10"
-                >
-                    <div
-                        className="flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12 md:w-14 md:h-14 rounded-2xl border border-gray-200 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 transition-all"
-                    >
-                        <ChevronRight size={24} />
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10">
+                <div className="flex-1">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
+                        <span className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                            3. Lépés: Csomagok
+                        </span>
                     </div>
-                </button>
-            )}
 
+                    <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+                        Válaszd ki a <span className="text-primary-dark">kalandod</span>!
+                    </h1>
 
-            {/* Címke - Abszolút pozicionálás minden nézeten */}
-            <div className="absolute top-4 min-[440px]:top-8 md:top-12 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 z-10 whitespace-nowrap">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                    3. Lépés: Csomagok
-                </span>
-            </div>
+                    <p className="text-gray-600 text-lg leading-relaxed max-w-2xl">
+                        Válassz egyet az előre összeállított, izgalmas programcsomagjaink közül.
+                    </p>
+                </div>
 
-            <div className="text-center mb-10 mt-20">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                    Válaszd ki a <span className="text-primary-dark">kalandod</span>
-                </h1>
-                <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-                    Gondosan összeállított 3 napos útiterv-csomagok ebben a megyében.
-                </p>
+                <div className="flex gap-4 shrink-0">
+                    <button
+                        className="p-4 rounded-2xl border border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all"
+                        onClick={() => navigate('/terv/helyszin')}
+                        title="Vissza"
+                    >
+                        <ChevronLeft size={24} />
+                    </button>
+                    {selectedPackageId && (
+                        <button
+                            className="p-4 rounded-2xl bg-primary hover:bg-primary-dark text-gray-900 transition-all shadow-lg hover:shadow-primary/30"
+                            onClick={() => navigate('/terv/program')}
+                            title="Tovább"
+                        >
+                            <ArrowRight size={24} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Szűrők */}
-            <div className="hidden md:flex flex-wrap justify-center gap-3 mb-12">
+            <div className="hidden md:flex flex-wrap gap-4 mb-10 overflow-x-auto pb-4 md:pb-0 scrollbar-hide">
                 {filters.map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-sm border ${filter === f
+                        className={`px-6 py-2 rounded-full text-sm font-semibold transition-all shadow-sm border whitespace-nowrap ${filter === f
                             ? 'bg-primary text-gray-900 border-primary'
                             : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
                             }`}
@@ -97,7 +91,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                     availablePackages.map(pkg => (
                         <div
                             key={pkg.id}
-                            className="group bg-white rounded-2xl min-[440px]:rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
+                            className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
                             onClick={() => {
                                 onSelect(pkg.id);
                                 navigate('/terv/program');
@@ -130,7 +124,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                 </div>
 
                                 <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
-                                    <div className="flex gap-1.5">
+                                    <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                                         {pkg.tags.map((tag, idx) => (
                                             <div key={idx} className="flex items-center gap-1 text-gray-500 shrink-0">
                                                 <span className="material-icons-outlined text-primary text-xl">

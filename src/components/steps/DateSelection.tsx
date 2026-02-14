@@ -47,10 +47,9 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
         : 'Válassz dátumot';
 
     return (
-        /* === Forrás: 2. kártya / code.html — 1:1 === */
         <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
-            {/* Bal oldal — forrás sor 55 */}
-            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left">
+            {/* Bal oldal */}
+            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
@@ -76,7 +75,7 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
                         <ChevronLeft size={24} />
                     </button>
                     <button
-                        className="group bg-primary hover:bg-primary-dark text-background-dark font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
+                        className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={handleNext}
                         disabled={!hasThreeConsecutiveDays}
                     >
@@ -86,9 +85,8 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
                 </div>
             </div>
 
-            {/* Jobb oldal — forrás sor 73: md:w-5/12 bg-gray-50 p-8 md:p-10 flex items-center justify-center border-l border-gray-100 */}
+            {/* Jobb oldal */}
             <div className="md:w-5/12 bg-gray-50 p-[15px] min-[440px]:p-8 md:p-10 flex items-center justify-center border-l border-gray-100">
-                {/* Belső wrapper — forrás sor 74: w-full max-w-xs */}
                 <div className="w-full max-w-xs">
                     <CustomCalendar
                         selected={dates}
@@ -101,7 +99,7 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
                             <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary-dark">
                                 <Calendar size={20} />
                             </div>
-                            <div>
+                            <div className="text-left">
                                 <p className="text-gray-900 text-xs font-bold uppercase tracking-tight">Kijelölt időszak</p>
                                 <p className="text-gray-500 text-[10px]">{formattedRange}</p>
                             </div>
@@ -109,7 +107,7 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
 
                         {/* Figyelmeztetés ha nem Péntek-Vasárnap */}
                         {isConsecutive(dates) && dates.length > 0 && dates[0].getDay() !== 5 && (
-                            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-medium flex items-center gap-2">
+                            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-medium flex items-center gap-2 text-left">
                                 <span className="text-lg">⚠️</span>
                                 Csak Péntek-Vasárnap hétvége választható!
                             </div>

@@ -16,14 +16,14 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                 return (
                     <div key={stepNumber} className="flex items-center gap-2">
                         <div
-                            className={`w-8 h-8 rounded-full border-2 flex justify-center items-center font-semibold text-sm transition-all duration-300 ${isActive
-                                    ? 'border-primary bg-primary text-white'
-                                    : isCompleted
-                                        ? 'border-primary text-primary bg-white'
-                                        : 'border-gray-200 text-gray-400 bg-white'
+                            className={`w-8 h-8 rounded-full flex justify-center items-center font-bold text-sm transition-all duration-300 ${isActive
+                                ? 'bg-primary text-white shadow-sm'
+                                : isCompleted
+                                    ? 'border-2 border-primary bg-white text-primary'
+                                    : 'border-2 border-gray-100 text-gray-400 bg-white'
                                 }`}
                         >
-                            {isCompleted ? <Check size={16} /> : stepNumber}
+                            {isCompleted ? <Check size={18} strokeWidth={3} /> : stepNumber}
                         </div>
                         {stepNumber < totalSteps && (
                             <div
