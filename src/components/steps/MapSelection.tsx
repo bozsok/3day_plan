@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, ChevronLeft, MapPin, Map } from 'lucide-react';
 import { counties } from '../../data/mockData';
 import { HungaryMap } from '../common/HungaryMap';
+import { StepCard } from '../common/StepCard';
 
 interface MapSelectionProps {
     selectedRegionId: string | undefined;
@@ -20,7 +21,7 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
     const displayCounty = hoveredCounty || selectedCounty;
 
     return (
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
+        <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
             {/* Bal oldal */}
             <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left border-b md:border-b-0 border-gray-100">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
@@ -94,6 +95,6 @@ export function MapSelection({ selectedRegionId, onSelect, onNext, onBack }: Map
                     </div>
                 </div>
             </div>
-        </div>
+        </StepCard>
     );
 }

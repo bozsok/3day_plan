@@ -3,6 +3,7 @@ import { hu } from 'date-fns/locale';
 import { ArrowRight, ChevronLeft, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../common/CustomCalendar';
 import { useUser } from '../../context/UserContext';
+import { StepCard } from '../common/StepCard';
 
 interface DateSelectionProps {
     selected: Date[] | undefined;
@@ -47,7 +48,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
 
     return (
         /* === Forrás: 2. kártya / code.html — 1:1 === */
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row items-stretch">
+        <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
             {/* Bal oldal — forrás sor 55 */}
             <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
@@ -116,6 +117,6 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
                     </div>
                 </div>
             </div>
-        </div>
+        </StepCard>
     );
 }

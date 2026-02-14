@@ -11,9 +11,16 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
     - A "Mikor menjünk?" és "Hova menjünk?" szavazatszámláló badge-ek mérete és stílusa pixelre pontosan egységesítve lett (`h-6`, `inline-flex`).
 - **Navigáció:**
     - **Tovább gomb:** A 3. (Csomagok) és 4. (Idővonal) lépéshez is bekerült egy jobb felső "Tovább" nyíl, ami megkönnyíti a haladást, ha már van kiválasztott csomag vagy leadott szavazat.
+    - **Desktop Pozíció:** Az Idővonal (4. lépés) "Tovább" gombja desktop nézetben átkerült a jobb oldali tartalom jobb felső sarkába (`top-8 right-8`), tökéletesen illeszkedve a "Vissza" gomb elhelyezkedéséhez.
     - **Vissza gomb:** Az Összegző képernyő (5. lépés) bal felső sarkába bekerült egy "Vissza" gomb, amivel közvetlenül a Csomagválasztóhoz lehet ugrani.
 - **Szövegezés és Stílus:**
     - A "Mikor menjünk?" győztes kártyájáról eltávolításra került a fix nagyítás (`scale-105`), így az már nem lóg bele a keretbe mobil nézeten.
+    - **Kezdőképernyő Padding:** Finomhangoltuk a Hero szekció belső margóit tableten (40px) és desktopon (56px) a jobb térkihasználás érdekében.
+    - **Csomagválasztó:** A "Válaszd ki a kalandod" címben a *kalandod* szó mostantól zöld (`text-primary-dark`) kiemelést kapott.
+    - **Címke Pozíció:** A 3. lépés (Csomagválasztó) címkéje **minden nézeten** (mobilon is) kiemelésre került a flow-ból és abszolút pozicionálást kapott. A pozíciója mostantól reszponzívan követi a gombokat és a kártya belső margóját: mobilon `top-4`, 440px felett `top-8`, 768px felett pedig `top-12`. Így a felső éleik pontosan egyvonalba kerültek a tartalommal és az oldalsó margókkal is (`md:left-12`), és nem törik a szöveg (`whitespace-nowrap`).
+- **Kód Refaktorálás:**
+    - Bevezetésre került a közös **`StepCard`** komponens (`src/components/common/StepCard.tsx`), amely egységesíti az összes főbb lépés keret-stílusát (árnyék, lekerekítés, szegély, reszponzív belső margó).
+    - Minden fő komponens (`Hero`, `DateSelection`, `MapSelection`, `PackageSelection`, `ProgramTimeline`, `Summary`) átállt a `StepCard` használatára, jelentősen csökkentve a kódismétlést és javítva a karbantarthatóságot.
 
 ## [0.5.6] - 2026-02-13
 

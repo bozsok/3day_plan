@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
+import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
 import { counties } from '../../data/mockData';
@@ -101,7 +102,7 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
     if (!data) return null;
 
     return (
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 relative">
+        <StepCard>
             {/* Vissza gomb - Abszolút pozicionálás */}
             {onBack && (
                 <button
@@ -336,6 +337,6 @@ export function Summary({ onContinue, onRegionSelect, onBack }: SummaryProps) {
                     </div>
                 </div>
             )}
-        </div>
+        </StepCard>
     );
 }

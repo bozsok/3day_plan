@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { packages } from '../../data/mockData';
 import { ArrowRight } from 'lucide-react';
+import { StepCard } from '../common/StepCard';
 
 interface PackageSelectionProps {
     regionId: string | undefined;
@@ -19,11 +20,11 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
     const filters = ['Összes', 'Aktív kikapcsolódás', 'Gasztronómia', 'Családi', 'Romantikus', 'Wellness'];
 
     return (
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 p-[15px] min-[440px]:p-8 md:p-12 relative animate-fade-in">
+        <StepCard className="animate-fade-in" padding="p-[15px] min-[440px]:p-8 md:p-12">
             {/* Vissza gomb */}
             <button
                 onClick={onBack}
-                className="absolute top-4 left-4 min-[440px]:top-8 min-[440px]:left-8 group hover:scale-105 transition-transform z-10"
+                className="absolute top-4 left-4 min-[440px]:top-8 md:top-12 min-[440px]:left-8 md:left-12 group hover:scale-105 transition-transform z-10"
             >
                 <div
                     className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
@@ -36,7 +37,7 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
             {selectedPackageId && onNext && (
                 <button
                     onClick={onNext}
-                    className="absolute top-4 right-4 min-[440px]:top-8 min-[440px]:right-8 group hover:scale-105 transition-transform z-10"
+                    className="absolute top-4 right-4 min-[440px]:top-8 md:top-12 min-[440px]:right-8 md:right-12 group hover:scale-105 transition-transform z-10"
                 >
                     <div
                         className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
@@ -46,15 +47,18 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                 </button>
             )}
 
-            <div className="text-center mb-10 mt-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
-                        3. Lépés: Programcsomagok
-                    </span>
-                </div>
+
+            {/* Címke - Abszolút pozicionálás minden nézeten */}
+            <div className="absolute top-4 min-[440px]:top-8 md:top-12 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 z-10 whitespace-nowrap">
+                <span className="w-2 h-2 rounded-full bg-primary" />
+                <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                    3. Lépés: Programcsomagok
+                </span>
+            </div>
+
+            <div className="text-center mb-10 mt-20">
                 <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                    Válaszd ki a következő kalandod
+                    Válaszd ki a <span className="text-primary-dark">kalandod</span>
                 </h1>
                 <p className="text-gray-500 text-lg max-w-2xl mx-auto">
                     Gondosan összeállított 3 napos útiterv-csomagok ebben a megyében.
@@ -152,6 +156,6 @@ export function PackageSelection({ regionId, onSelect, onBack, onNext, selectedP
                     ))
                 )}
             </div>
-        </div>
+        </StepCard>
     );
 }

@@ -6,6 +6,7 @@ import { useUser } from '../../context/UserContext';
 import { api } from '../../api/client';
 
 import { useEffect } from 'react';
+import { StepCard } from '../common/StepCard';
 
 interface ProgramTimelineProps {
     regionId: string | undefined;
@@ -137,11 +138,11 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 </div>
             </button>
 
-            {/* Tovább gomb (Csak ha már szavazott) */}
+            {/* Tovább gomb (Csak ha már szavazott) - MOBIL/TABLET ONLY (lg:hidden) */}
             {hasVoted && (
                 <button
                     onClick={onFinish}
-                    className="absolute top-0 right-0 group hover:scale-105 transition-transform z-10"
+                    className="absolute top-0 right-0 lg:hidden group hover:scale-105 transition-transform z-10"
                 >
                     <div
                         className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-10 h-10 min-[440px]:w-12 min-[440px]:h-12"
@@ -234,7 +235,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
     );
 
     return (
-        <div className="bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
+        <StepCard noPadding className="flex flex-col lg:flex-row">
 
             {/* ═══════════ MOBIL NÉZET: FELSŐ RÉSZ (Cím + Dátum) ═══════════ */}
             <div className="lg:hidden p-[15px] min-[440px]:p-8 border-b border-gray-100 bg-gray-50/50">
@@ -250,7 +251,20 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             </div>
 
             {/* ═══════════ JOBB OLDAL: TARTALOM (Timeline) ═══════════ */}
-            <div className="flex-1 flex flex-col min-h-[500px]">
+            <div className="flex-1 flex flex-col min-h-[500px] relative">
+                {/* DESKTOP FORWARD BUTTON */}
+                {hasVoted && (
+                    <button
+                        onClick={onFinish}
+                        className="hidden lg:flex absolute top-8 right-8 group hover:scale-105 transition-transform z-20"
+                    >
+                        <div
+                            className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-12 h-12"
+                        >
+                            <span className="material-icons-outlined text-gray-600 group-hover:text-gray-900 text-lg">arrow_forward</span>
+                        </div>
+                    </button>
+                )}
                 {/* Nap fülek */}
                 <div className="flex border-b border-gray-100 bg-white">
                     {dayTabs.map(tab => {
@@ -324,6 +338,6 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             <div className="lg:hidden p-[15px] min-[440px]:p-8 border-t border-gray-100 bg-gray-50/50">
                 <CostAndActionsSection />
             </div>
-        </div >
+        </StepCard>
     );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Compass, Calendar, MapPin, Users } from 'lucide-react';
 import { useUser } from '../../context/UserContext';
+import { StepCard } from '../common/StepCard';
 
 interface HeroProps {
     onStart: () => void;
@@ -33,7 +34,7 @@ export function Hero({ onStart, onSkip }: HeroProps) {
     };
 
     return (
-        <div className="relative overflow-hidden bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl border border-gray-100 p-[15px] min-[440px]:p-8 md:p-14 lg:p-20 text-center">
+        <StepCard className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-10 lg:p-14">
             {/* Dekorációs háttérelemek */}
             <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50" />
             <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl opacity-50" />
@@ -163,6 +164,6 @@ export function Hero({ onStart, onSkip }: HeroProps) {
                     )}
                 </div>
             </div>
-        </div>
+        </StepCard>
     );
 }
