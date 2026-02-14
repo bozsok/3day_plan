@@ -17,7 +17,7 @@ export function StepCard({ children, className = '', noPadding = false, padding 
     const baseClasses = "bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative";
 
     // Alapértelmezett padding, ha nincs kikapcsolva és nincs egyedi megadva
-    const paddingClasses = padding ? padding : (noPadding ? "" : "p-[15px] min-[440px]:p-8 md:p-14 lg:p-16");
+    const paddingClasses = padding ? padding : (noPadding ? "" : "p-[15px] min-[440px]:p-8 md:p-12 lg:p-16");
 
     return (
         <div className={`${baseClasses} ${paddingClasses} ${className}`}>

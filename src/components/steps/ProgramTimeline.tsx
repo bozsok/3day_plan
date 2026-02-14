@@ -238,16 +238,14 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
         <StepCard noPadding className="flex flex-col lg:flex-row">
 
             {/* ═══════════ MOBIL NÉZET: FELSŐ RÉSZ (Cím + Dátum) ═══════════ */}
-            <div className="lg:hidden p-[15px] min-[440px]:p-8 border-b border-gray-100 bg-gray-50/50">
+            <div className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-b border-gray-100 bg-gray-50/50">
                 <HeaderSection />
             </div>
 
             {/* ═══════════ DESKTOP SIDEBAR (Minden egyben) ═══════════ */}
-            <div className="hidden lg:block lg:w-80 p-8 border-r border-gray-100 bg-gray-50/50">
-                <div className="sticky top-8">
-                    <HeaderSection />
-                    <CostAndActionsSection />
-                </div>
+            <div className="hidden lg:flex lg:w-80 p-8 md:p-12 border-r border-gray-100 bg-gray-50/50 flex-col justify-center">
+                <HeaderSection />
+                <CostAndActionsSection />
             </div>
 
             {/* ═══════════ JOBB OLDAL: TARTALOM (Timeline) ═══════════ */}
@@ -256,7 +254,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 {hasVoted && (
                     <button
                         onClick={onFinish}
-                        className="hidden lg:flex absolute top-8 right-8 group hover:scale-105 transition-transform z-20"
+                        className="hidden lg:flex absolute top-8 md:top-12 right-8 md:right-12 group hover:scale-105 transition-transform z-20"
                     >
                         <div
                             className="bg-white/80 backdrop-blur-sm rounded-full shadow-sm group-hover:shadow border border-gray-200 group-hover:border-gray-300 transition-all flex items-center justify-center w-12 h-12"
@@ -289,7 +287,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
                 </div>
 
                 {/* Timeline tartalom */}
-                <div className="p-8 lg:p-12 bg-white">
+                <div className="p-8 md:p-12 bg-white">
                     <div className="relative timeline-line space-y-12">
                         {currentDayProgram?.items.map(item => (
                             <div key={item.id} className="relative z-10 flex gap-8 items-start">
@@ -335,7 +333,7 @@ export function ProgramTimeline({ regionId, packageId, dates, onBack, onFinish }
             </div>
 
             {/* ═══════════ MOBIL NÉZET: ALSÓ RÉSZ (Költség + Gombok) ═══════════ */}
-            <div className="lg:hidden p-[15px] min-[440px]:p-8 border-t border-gray-100 bg-gray-50/50">
+            <div className="lg:hidden p-[15px] min-[440px]:p-8 md:p-12 border-t border-gray-100 bg-gray-50/50">
                 <CostAndActionsSection />
             </div>
         </StepCard>

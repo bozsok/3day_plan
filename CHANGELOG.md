@@ -2,34 +2,39 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.6.1] - 2026-02-14
+
+### Újdonságok és Változások
+- **UI-standardizálás (globális padding):**
+    - Minden főbb lépés (Hero, Dátum, Térkép, Csomagok, Timeline, Összegzés) egységes **`48px` (p-12)** belső margót kapott 768px (`md`) feletti felbontáson.
+    - Az abszolút pozicionált gombok és címkék (vissza- és továbbgomb, lépésjelzők) szintén követik a 48 px-es eltolást (`top-12`, `left-12`) `md` nézet felett a tökéletes igazodás érdekében, biztosítva a sortörésmentességet (`whitespace-nowrap`).
+- **Kódrefaktorálás:**
+    - Bevezetésre került a közös **StepCard-komponens** (`src/components/common/StepCard.tsx`), amely egységesíti az összes főbb lépés keretstílusát (árnyék, lekerekítés, szegély, reszponzív belső margó).
+    - Minden fő komponens átállt a `StepCard` használatára, jelentősen csökkentve a kódismétlést.
+- **UI-finomhangolás:**
+    - A 4. lépésnél (ProgramTimeline) a bal oldali információs sáv desktopnézetben (`lg`) mostantól függőlegesen középre van igazítva a fehér kártyán belül.
+
 ## [0.6.0] - 2026-02-14
 
 ### Újdonságok és Változások
-- **UI Egységesítés (Mobil Nézet):**
-    - Minden főbb lépés (Hero, Dátum, Térkép, Csomagok, Timeline, Összegzés) egységes **`15px` belső margót (padding)** kapott 440px alatti felbontáson.
-    - Az összes kártya és modális ablak lekerekítése egységesen **`16px` (rounded-2xl)** lett mobil nézeten, míg nagyobb képernyőn megmaradt az erősebb ív.
-    - A "Mikor menjünk?" és "Hova menjünk?" szavazatszámláló badge-ek mérete és stílusa pixelre pontosan egységesítve lett (`h-6`, `inline-flex`).
+- **UI-egységesítés (mobilnézet):**
+    - Minden főbb lépés egységes **15 px-es belső margót** kapott 440 px alatti felbontáson.
+    - Az összes kártya és modális ablak lekerekítése egységesen **16 px-es (rounded-2xl)** lett mobilnézeten.
 - **Navigáció:**
-    - **Tovább gomb:** A 3. (Csomagok) és 4. (Idővonal) lépéshez is bekerült egy jobb felső "Tovább" nyíl, ami megkönnyíti a haladást, ha már van kiválasztott csomag vagy leadott szavazat.
-    - **Desktop Pozíció:** Az Idővonal (4. lépés) "Tovább" gombja desktop nézetben átkerült a jobb oldali tartalom jobb felső sarkába (`top-8 right-8`), tökéletesen illeszkedve a "Vissza" gomb elhelyezkedéséhez.
-    - **Vissza gomb:** Az Összegző képernyő (5. lépés) bal felső sarkába bekerült egy "Vissza" gomb, amivel közvetlenül a Csomagválasztóhoz lehet ugrani.
-- **Szövegezés és Stílus:**
-    - A "Mikor menjünk?" győztes kártyájáról eltávolításra került a fix nagyítás (`scale-105`), így az már nem lóg bele a keretbe mobil nézeten.
-    - **Kezdőképernyő Padding:** Finomhangoltuk a Hero szekció belső margóit tableten (40px) és desktopon (56px) a jobb térkihasználás érdekében.
-    - **Csomagválasztó:** A "Válaszd ki a kalandod" címben a *kalandod* szó mostantól zöld (`text-primary-dark`) kiemelést kapott.
-    - **Címke Pozíció:** A 3. lépés (Csomagválasztó) címkéje **minden nézeten** (mobilon is) kiemelésre került a flow-ból és abszolút pozicionálást kapott. A pozíciója mostantól reszponzívan követi a gombokat és a kártya belső margóját: mobilon `top-4`, 440px felett `top-8`, 768px felett pedig `top-12`. Így a felső éleik pontosan egyvonalba kerültek a tartalommal és az oldalsó margókkal is (`md:left-12`), és nem törik a szöveg (`whitespace-nowrap`).
-- **Kód Refaktorálás:**
-    - Bevezetésre került a közös **`StepCard`** komponens (`src/components/common/StepCard.tsx`), amely egységesíti az összes főbb lépés keret-stílusát (árnyék, lekerekítés, szegély, reszponzív belső margó).
-    - Minden fő komponens (`Hero`, `DateSelection`, `MapSelection`, `PackageSelection`, `ProgramTimeline`, `Summary`) átállt a `StepCard` használatára, jelentősen csökkentve a kódismétlést és javítva a karbantarthatóságot.
+    - **Tovább gomb:** A 3. és 4. lépéshez is bekerült egy jobb felső "Tovább" nyíl a könnyebb haladás érdekében.
+    - **Vissza gomb:** Az Összegző képernyőre is bekerült egy visszalépési lehetőség.
+- **Stílus:**
+    - **Csomagválasztó:** A "kalandod" szó zöld kiemelést kapott.
+    - A szavazatszámláló badge-ek mérete és stílusa egységesítésre került.
 
 ## [0.5.6] - 2026-02-13
 
 ### Javítások
-- **HTTP/2 Protokoll Hiba Elhárítása (CRITICAL):**
-    - Sikerült elhárítani a szerver oldali `net::ERR_HTTP2_PROTOCOL_ERROR` hibát, amely terhelés alatt jelentkezett.
-    - **Ok:** "Race Condition" lépett fel a fájl zárolása során: a kliens túl gyakran kérte le az adatokat (5mp), miközben valaki éppen írta az adatbázist. A szerver ilyenkor "beragadt" vagy üres fájlt próbált olvasni.
-    - **Megoldás 1 (Backend):** A `summary.php` mostantól **Non-Blocking (Nem blokkoló)** fájl zárolást használ visszavonulási (retry) mechanizmussal. Ha a fájl éppen írás alatt van, a script nem fagy le, hanem vár kicsit, vagy végső esetben üres adatot küld vissza összeomlás helyett.
-    - **Megoldás 2 (Frontend):** Az automatikus frissítés (polling) gyakoriságát **12 másodpercre** csökkentettük (5mp helyett), drasztikusan csökkentve a szerver terhelését.
+- **HTTP/2 protokollhiba elhárítása (KRITIKUS):**
+    - Sikerült elhárítani a szerveroldali `net::ERR_HTTP2_PROTOCOL_ERROR` hibát, amely terhelés alatt jelentkezett.
+    - **Ok:** „race condition” lépett fel a fájl zárolása során: a kliens túl gyakran kérte le az adatokat (5 mp), miközben valaki éppen írta az adatbázist. A szerver ilyenkor „beragadt”, vagy üres fájlt próbált olvasni.
+    - **Megoldás 1 (backend):** A `summary.php` mostantól **non-blocking** (nem blokkoló) fájlzárolást használ visszavonulási (retry) mechanizmussal. Ha a fájl éppen írás alatt van, a szkript nem fagy le, hanem vár kicsit, vagy végső esetben üres adatot küld vissza összeomlás helyett.
+    - **Megoldás 2 (frontend):** Az automatikus frissítés (polling) gyakoriságát **12 másodpercre** csökkentettük (5 mp helyett), drasztikusan csökkentve a szerver terhelését.
 - **API Stabilitás:**
     - Minden PHP végpont (`dates.php`, `votes.php`, `users.php`, `admin.php`) átírásra került "self-contained" (önálló) struktúrára, megszüntetve a külső fájlfüggőségeket (`require`), amelyek instabilitást okozhattak egyes szervereken.
     - "Soft Failure" mód bevezetése: A szerver kritikus hiba esetén is `200 OK` státuszt küld (JSON error üzenettel), hogy elkerülje a szigorúbb protokoll-szintű blokkolást.

@@ -50,7 +50,7 @@ export function DateSelection({ selected, onSelect, onNext, onBack }: DateSelect
         /* === Forrás: 2. kártya / code.html — 1:1 === */
         <StepCard noPadding className="flex flex-col md:flex-row items-stretch">
             {/* Bal oldal — forrás sor 55 */}
-            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-14 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left">
+            <div className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 lg:p-16 flex flex-col justify-center items-center min-[440px]:items-start text-center min-[440px]:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6 w-fit">
                     <span className="w-2 h-2 rounded-full bg-primary" />
                     <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
