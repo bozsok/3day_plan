@@ -22,14 +22,14 @@ export function Hero({ }: HeroProps) {
 
         try {
             await login(name);
-            navigate('/terv/idopont');
+            navigate('/terv/helyszin');
         } catch (err) {
             setError('Hiba történt a bejelentkezéskor. Próbáld újra!');
         }
     };
 
     const handleContinue = () => {
-        navigate('/terv/idopont');
+        navigate('/terv/helyszin');
     };
 
     return (

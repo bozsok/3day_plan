@@ -15,7 +15,7 @@ export function RankingSection({
     id
 }: RankingSectionProps & { id?: string }) {
     return (
-        <div id={id} className="bg-white rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8 border border-gray-100 shadow-sm">
+        <div id={id} className="bg-transparent">
             <div id="ranking-section-header" className="flex items-center gap-3 mb-6">
                 <div id="ranking-section-icon-box" className="w-10 h-10 rounded-full bg-primary text-zinc-900 flex items-center justify-center shadow-lg shadow-primary/20">
                     {icon}
@@ -23,9 +23,9 @@ export function RankingSection({
                 <h2 id="ranking-section-title" className="text-xl font-bold text-gray-900">{title}</h2>
             </div>
 
-            <div id="ranking-section-items-list" className="space-y-4">
+            <div id="ranking-section-items-scroller" className="flex overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 gap-6 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                 {isEmpty ? (
-                    <p className="text-gray-400 text-sm">{emptyText}</p>
+                    <p className="text-gray-400 text-sm italic w-full text-center py-8">{emptyText}</p>
                 ) : (
                     children
                 )}

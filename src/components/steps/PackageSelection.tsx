@@ -28,7 +28,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
         <StepCard id="package-selection-step-card" className="animate-fade-in" padding="p-[15px] min-[440px]:p-8 md:p-12">
             <div id="package-selection-header-row" className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10">
                 <StepHeader
-                    step="3. Lépés: Csomagok"
+                    step="2. Lépés: Csomagok"
                     title={<>Válaszd ki a <span className="text-primary-dark">kalandod</span>!</>}
                     description="Válassz egyet az előre összeállított, izgalmas programcsomagok közül."
                 />

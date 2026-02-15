@@ -88,10 +88,6 @@ router.get('/', (_req, res) => {
     const userStatuses = userRows.map(row => ({
         id: row.id,
         name: row.name,
-        createdAt: row.created_at,
-        datesCount: row.dates_count,
-        votesCount: row.votes_count,
-        isComplete: row.dates_count >= 3 && row.votes_count >= 1,
     }));
 
     // 4. Live Haladás adatok (Progress)
@@ -103,19 +99,77 @@ router.get('/', (_req, res) => {
 
     const userProgress: Record<number, any> = {};
     for (const p of progressRows) {
+        let ongoingDates = [];
+        try {
+            if (p.dates) {
+                ongoingDates = JSON.parse(p.dates);
+            }
+        } catch (e) {
+            console.error('Json parse error in userProgress dates:', e);
+        }
+
         userProgress[p.user_id] = {
             hasDates: p.has_dates === 1,
+            dates: ongoingDates, // Új mező
             regionId: p.region_id,
             packageId: p.package_id,
             lastActive: p.last_active
         };
     }
 
+    // 5. Részletes Szavazatok (ÚJ) - A táblázathoz
+    let detailedVotes: any[] = [];
+    try {
+        const detailedVotesRows = queryAll(`
+            SELECT 
+                vb.id,
+                vb.user_id, 
+                u.name, 
+                vb.dates, 
+                vb.region_id, 
+                vb.package_id, 
+                strftime('%s', vb.created_at) as created_at_unix
+            FROM vote_blocks vb 
+            JOIN users u ON vb.user_id = u.id 
+            ORDER BY vb.created_at DESC
+        `);
+
+        detailedVotes = detailedVotesRows.map(row => {
+            let datesParsed = [];
+            try {
+                datesParsed = JSON.parse(row.dates || '[]');
+            } catch (e) {
+                console.error('Json parse error in detailed votes:', e);
+            }
+
+            // Dátum formázása
+            const dateStr = datesParsed.length > 0 ? `${datesParsed[0]}` : '';
+            const endDateStr = datesParsed.length > 0 ? datesParsed[datesParsed.length - 1] : '';
+
+            return {
+                id: row.id,
+                userId: row.user_id,
+                userName: row.name,
+                dates: datesParsed,
+                startDate: dateStr,
+                endDate: endDateStr,
+                regionId: row.region_id,
+                packageId: row.package_id,
+                timestamp: row.created_at_unix ? Number(row.created_at_unix) : Math.floor(Date.now() / 1000)
+            };
+        });
+    } catch (err) {
+        console.error('Error fetching detailed votes (schema mismatch?):', err);
+        // Fallback: üres tömb, hogy ne haljon meg az oldal
+        detailedVotes = [];
+    }
+
     res.json({
         topIntervals,
         voteRanking,
         userStatuses,
-        userProgress
+        userProgress,
+        detailedVotes
     });
 });
 

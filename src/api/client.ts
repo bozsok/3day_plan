@@ -77,11 +77,11 @@ export const api = {
     },
     votes: {
         // ÚJ: 3 napos blokk létrehozása
-        cast: async (userId: number, regionId: string, dates: string[]) => {
+        cast: async (userId: number, regionId: string, dates: string[], packageId?: string) => {
             const res = await fetch(`${API_URL}/votes${EXT}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, regionId, dates }),
+                body: JSON.stringify({ userId, regionId, dates, packageId }),
             });
             if (!res.ok) throw new Error('Vote failed');
             return res.json();
@@ -110,7 +110,7 @@ export const api = {
         }
     },
     progress: {
-        update: async (userId: number, data: { hasDates?: boolean, regionId?: string | null, packageId?: string | null }) => {
+        update: async (userId: number, data: { hasDates?: boolean, regionId?: string | null, packageId?: string | null, dates?: string[] }) => {
             const res = await fetch(`${API_URL}/progress${EXT}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

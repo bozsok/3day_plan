@@ -8,18 +8,19 @@ import { StepHeader } from '../common/StepHeader';
 import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
-import { counties } from '../../data/mockData';
+import { counties, packages } from '../../data/mockData';
 import { Trophy, Calendar as CalendarIcon, ArrowRight, Settings2, ChevronLeft } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
 import { RankingSection } from '../summary/RankingSection';
-import { RankingItem } from '../summary/RankingItem';
+import { RankingCard } from '../summary/RankingCard';
 import { DesignerStatus } from '../summary/DesignerStatus';
 
 interface SummaryData {
     topIntervals: { start: string; end: string; count: number; users: string[] }[];
     voteRanking: { regionId: string; count: number; voters: string[] }[];
-    userStatuses: { id: number; name: string; isComplete: boolean; datesCount: number; votesCount: number }[];
+    userStatuses: { id: number; name: string }[];
     userProgress: Record<number, { hasDates: boolean, regionId: string | null, packageId: string | null, lastActive: number }>;
+    detailedVotes: { id: number; userId: number; userName: string; dates: string[]; regionId?: string; packageId?: string; timestamp: number }[];
 }
 
 interface SummaryProps {
@@ -39,7 +40,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     const { data, isLoading } = useQuery<SummaryData>({
         queryKey: ['summary'],
         queryFn: api.summary.get,
-        refetchInterval: 12000,
+        refetchInterval: 2000,
         staleTime: 5000,
     });
 
@@ -110,11 +111,33 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                         <Settings2 size={18} />
                         <span>Szavazataim</span>
                     </button>
+
+                    {onContinue && (
+                        <button
+                            id="summary-continue-header-btn"
+                            onClick={async () => {
+                                if (user) {
+                                    try {
+                                        await api.progress.clear(user.id);
+                                    } catch (e) {
+                                        console.error('Hiba a piszkozat törlésekor:', e);
+                                    }
+                                }
+                                onContinue?.();
+                                navigate('/terv/helyszin');
+                            }}
+                            className="flex items-center gap-2 px-6 py-4 bg-primary hover:bg-primary-dark text-gray-900 rounded-2xl text-sm font-bold transition-all shadow-sm hover:scale-105"
+                        >
+                            <CalendarIcon size={18} />
+                            <span>Tovább tervezek</span>
+                            <ArrowRight size={18} />
+                        </button>
+                    )}
                 </div>
             </div>
 
-            <div id="summary-ranking-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-                {/* 1. Dátum Intervallumok */}
+            <div id="summary-ranking-container" className="flex flex-col gap-12 mb-12">
+                {/* 1. Dátum Intervallumok (Mikor menjünk?) - LEGFONTOSABB */}
                 <RankingSection
                     id="summary-ranking-dates"
                     title="Mikor menjünk?"
@@ -123,8 +146,9 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     isEmpty={(data.topIntervals || []).length === 0}
                 >
                     {(data.topIntervals || []).map((item, idx) => (
-                        <RankingItem
+                        <RankingCard
                             key={idx}
+                            variant="date"
                             title={`${format(new Date(item.start), 'MMM d.', { locale: hu })} - ${format(new Date(item.end), 'MMM d.', { locale: hu })}`}
                             count={item.count}
                             users={item.users}
@@ -133,7 +157,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     ))}
                 </RankingSection>
 
-                {/* 2. Szavazási Rangsor (Kattintható) */}
+                {/* 2. Helyszín Rangsor (Hova menjünk?) */}
                 <RankingSection
                     id="summary-ranking-regions"
                     title="Hova menjünk?"
@@ -141,50 +165,41 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     emptyText="Még nem érkezett szavazat egyetlen régióra sem."
                     isEmpty={data.voteRanking.length === 0}
                 >
-                    {data.voteRanking.map((item, idx) => (
-                        <RankingItem
-                            key={item.regionId}
-                            title={counties.find(r => r.id === item.regionId)?.name ?? item.regionId}
-                            count={item.count}
-                            users={item.voters}
-                            isFirst={idx === 0}
-                            onClick={() => {
-                                onRegionSelect?.(item.regionId);
-                                navigate('/terv/csomagok');
-                            }}
-                        />
-                    ))}
+                    {data.voteRanking.map((item, idx) => {
+                        const regionName = counties.find(r => r.id === item.regionId)?.name ?? item.regionId;
+                        // Kép keresése a csomagok között erre a régióra
+                        const regionImage = packages.find(p => p.countyId === item.regionId || p.id === item.regionId)?.imageUrl
+                            || `https://placehold.co/600x400/EEE/31343C/png?text=${encodeURIComponent(regionName)}`;
+
+                        return (
+                            <RankingCard
+                                key={item.regionId}
+                                variant="location"
+                                title={regionName}
+                                count={item.count}
+                                users={item.voters}
+                                imageUrl={regionImage}
+                                isFirst={idx === 0}
+                                onClick={() => {
+                                    onRegionSelect?.(item.regionId);
+                                    navigate('/terv/csomagok');
+                                }}
+                            />
+                        );
+                    })}
                 </RankingSection>
             </div>
 
             {/* 3. Felhasználók állapota (Csoportosítva) */}
-            <DesignerStatus id="summary-designer-status" users={data.userStatuses} userProgress={data.userProgress} />
+            <DesignerStatus
+                id="summary-designer-status"
+                users={data.userStatuses}
+                userProgress={data.userProgress}
+                detailedVotes={data.detailedVotes || []}
+            />
 
             {/* Lebegő akció gomb: Tovább tervezek */}
-            {onContinue && (
-                <div id="summary-fab-wrapper" className="fixed bottom-8 right-8 z-50 animate-bounce-slow">
-                    <button
-                        id="summary-continue-btn"
-                        onClick={async () => {
-                            // Piszkozat törlése a szerveren (Tiszta lap az új tervezéshez)
-                            if (user) {
-                                try {
-                                    await api.progress.clear(user.id);
-                                } catch (e) {
-                                    console.error('Hiba a piszkozat törlésekor:', e);
-                                }
-                            }
-                            onContinue?.(); // Opcionális hívás
-                            navigate('/terv/idopont');
-                        }}
-                        className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-4 py-3 md:px-8 md:py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 border-4 border-white whitespace-nowrap"
-                    >
-                        <CalendarIcon size={24} />
-                        Tovább tervezek
-                        <ArrowRight size={20} />
-                    </button>
-                </div>
-            )}
+
 
             <VoteManagementModal
                 isOpen={showVoteModal}

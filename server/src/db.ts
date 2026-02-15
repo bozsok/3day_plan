@@ -48,6 +48,7 @@ export async function initDatabase(): Promise<Database> {
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             region_id  TEXT NOT NULL,
+            package_id TEXT, -- Új oszlop a csomaghoz
             dates      TEXT NOT NULL, -- JSON string a dátumok tömbjéről
             created_at TEXT DEFAULT (datetime('now'))
         );
@@ -64,6 +65,33 @@ export async function initDatabase(): Promise<Database> {
     `);
 
     db.run('PRAGMA foreign_keys = ON');
+
+    // --- AUTOMATIKUS MIGRÁCIÓ (Meglévő adatbázisok frissítése) ---
+
+    // 1. vote_blocks: package_id hozzáadása
+    try {
+        const columns = db.exec("PRAGMA table_info(vote_blocks)")[0].values;
+        // columns: [cid, name, type, notnull, dflt_value, pk]
+        const hasPackageId = columns.some((col: any) => col[1] === 'package_id');
+        if (!hasPackageId) {
+            console.log('Migráció: vote_blocks tábla bővítése package_id oszloppal...');
+            db.run("ALTER TABLE vote_blocks ADD COLUMN package_id TEXT");
+        }
+    } catch (e) {
+        console.error('Hiba a vote_blocks migrációnál:', e);
+    }
+
+    // 2. user_progress: dates (JSON) hozzáadása
+    try {
+        const columns = db.exec("PRAGMA table_info(user_progress)")[0].values;
+        const hasDates = columns.some((col: any) => col[1] === 'dates');
+        if (!hasDates) {
+            console.log('Migráció: user_progress tábla bővítése dates oszloppal...');
+            db.run("ALTER TABLE user_progress ADD COLUMN dates TEXT");
+        }
+    } catch (e) {
+        console.error('Hiba a user_progress migrációnál:', e);
+    }
 
     // Automatikus mentés leálláskor
     saveDatabase();

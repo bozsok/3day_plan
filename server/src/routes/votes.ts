@@ -33,7 +33,7 @@ function queryAll(sql: string, params: any[] = []): any[] {
 
 /** POST /api/votes — Új szavazási blokk létrehozása */
 router.post('/', (req, res) => {
-    const { userId, regionId, dates } = req.body;
+    const { userId, regionId, dates, packageId } = req.body; // packageId hozzáadva
     if (!userId || !regionId || !Array.isArray(dates) || dates.length !== 3) {
         res.status(400).json({ error: 'userId, regionId és pontosan 3 dátum kötelező.' });
         return;
@@ -45,17 +45,30 @@ router.post('/', (req, res) => {
     const sortedDates = [...dates].sort();
     const datesJson = JSON.stringify(sortedDates);
 
-    // 1. Ellenőrzés: Van-e már PONTOSAN ILYEN szavazata (user + region + dates)?
-    const existing = queryOne('SELECT id FROM vote_blocks WHERE user_id = ? AND region_id = ? AND dates = ?', [uid, regionId, datesJson]);
+    // 1. Ellenőrzés: Van-e már PONTOSAN ILYEN szavazata (user + region + dates + package)?
+    // Ha a csomag változik, az új szavazatnak számít a részletes nézetben?
+    // A logika szerint: "A felhasználó a dátum után helyszínt is választ... Csomag: amelyiket éppen kiválasztotta".
+    // Ha módosítja a csomagot, az lehet UPDATE vagy új INSERT.
+    // Mivel a "Detailed Votes" előzményeket is mutathat, de a Summary csak a legutolsót kéne, hogy számolja...
+    // Jelenleg a rendszer enged több szavazatot. Maradjunk az INSERT-nél, ha eltér.
+
+    const existing = queryOne(
+        'SELECT id FROM vote_blocks WHERE user_id = ? AND region_id = ? AND dates = ? AND (package_id = ? OR (? IS NULL AND package_id IS NULL))',
+        [uid, regionId, datesJson, packageId || null, packageId || null]
+    );
 
     let blockId;
 
     if (existing) {
-        // Már létezik ez a konkrét szavazat -> Nem csinálunk semmit (Idempotencia), csak visszaadjuk
+        // Már létezik ez a konkrét szavazat -> Nem csinálunk semmit
         blockId = existing.id;
     } else {
-        // Még nem létezik ez a dátum-kombináció ennél a régiónál -> Létrehozzuk (ÚJ szavazat)
-        db.run('INSERT INTO vote_blocks (user_id, region_id, dates) VALUES (?, ?, ?)', [uid, regionId, datesJson]);
+        // Még nem létezik -> Létrehozzuk (ÚJ szavazat)
+        const createdAt = new Date().toISOString();
+        db.run(
+            'INSERT INTO vote_blocks (user_id, region_id, package_id, dates, created_at) VALUES (?, ?, ?, ?, ?)',
+            [uid, regionId, packageId || null, datesJson, createdAt]
+        );
         const newBlock = queryOne('SELECT id FROM vote_blocks WHERE user_id = ? ORDER BY id DESC LIMIT 1', [uid]);
         blockId = newBlock.id;
     }
@@ -63,7 +76,10 @@ router.post('/', (req, res) => {
     saveDatabase();
 
     // Visszaadjuk a blokkot
-    const resultBlock = queryOne('SELECT id, region_id as regionId, dates, created_at as createdAt FROM vote_blocks WHERE id = ?', [blockId]);
+    const resultBlock = queryOne(
+        'SELECT id, region_id as regionId, package_id as packageId, dates, created_at as createdAt FROM vote_blocks WHERE id = ?',
+        [blockId]
+    );
 
     if (resultBlock) {
         resultBlock.dates = JSON.parse(resultBlock.dates);

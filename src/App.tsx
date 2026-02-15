@@ -10,16 +10,15 @@ import { ProgramTimeline } from './components/steps/ProgramTimeline';
 import { Summary } from './components/steps/Summary';
 import { PackageSelection } from './components/steps/PackageSelection';
 import { StepIndicator } from './components/common/StepIndicator';
-import { Card } from './components/common/Card';
 import { useState, useEffect } from 'react';
 
 const getStepNumber = (pathname: string) => {
   switch (pathname) {
     case '/': return 0;
-    case '/terv/idopont': return 1;
-    case '/terv/helyszin': return 2;
-    case '/terv/csomagok': return 3;
-    case '/terv/program': return 4;
+    case '/terv/helyszin': return 1;
+    case '/terv/csomagok': return 2;
+    case '/terv/program': return 3;
+    case '/terv/idopont': return 4;
     case '/terv/osszegzes': return 5;
     default: return 0;
   }
@@ -46,15 +45,13 @@ function ProgressSync() {
     // Ha visszalépünk legalább egy szintet
     if (currentStep < prevStep) {
       if (currentStep === 0) {
-        // Visszamentünk a főoldalra -> akár törölhetjük az egész progress-t, vagy csak a dátumot
-        // De mivel a user "eljut a nyitóképernyőre", valószínűleg restartolta a folyamatot fejben.
         api.progress.update(user.id, { hasDates: false, regionId: null, packageId: null }).catch(() => { });
       } else if (currentStep === 1) {
-        // Visszamentünk a dátumválasztóhoz -> töröljük a mögötte lévőket
-        api.progress.update(user.id, { regionId: null, packageId: null }).catch(() => { });
+        // Visszamentünk a régióhoz -> töröljük a mögötte lévőket
+        api.progress.update(user.id, { packageId: null, hasDates: false }).catch(() => { });
       } else if (currentStep === 2) {
-        // Visszamentünk a régióhoz -> töröljük a csomagot
-        api.progress.update(user.id, { packageId: null }).catch(() => { });
+        // Visszamentünk a csomaghoz -> töröljük a dátumot
+        api.progress.update(user.id, { hasDates: false }).catch(() => { });
       }
     }
 
@@ -104,6 +101,15 @@ function App() {
     }
   }, [selectedDates, selectedRegion, selectedPackageId]);
 
+  const resetSelection = () => {
+    setSelectedDates([]);
+    setSelectedRegion(undefined);
+    setSelectedPackageId(undefined);
+    localStorage.removeItem('3nap_selected_dates');
+    localStorage.removeItem('3nap_selected_region');
+    localStorage.removeItem('3nap_selected_package');
+  };
+
   const step = getStepNumber(location.pathname);
 
   return (
@@ -146,38 +152,23 @@ function App() {
                 className="w-full transform-gpu will-change-[opacity]"
               >
                 <Routes location={location}>
-                  <Route path="/" element={<Card><Hero /></Card>} />
-                  <Route path="/terv/idopont" element={
-                    <Card>
-                      <DateSelection selected={selectedDates} onSelect={setSelectedDates} />
-                    </Card>
-                  } />
+                  <Route path="/" element={<Hero />} />
                   <Route path="/terv/helyszin" element={
-                    <Card>
-                      <MapSelection selectedRegionId={selectedRegion} onSelect={setSelectedRegion} />
-                    </Card>
+                    <MapSelection selectedRegionId={selectedRegion} onSelect={setSelectedRegion} />
                   } />
                   <Route path="/terv/csomagok" element={
-                    <Card>
-                      <PackageSelection regionId={selectedRegion} onSelect={setSelectedPackageId} selectedPackageId={selectedPackageId} />
-                    </Card>
+                    <PackageSelection regionId={selectedRegion} onSelect={setSelectedPackageId} selectedPackageId={selectedPackageId} />
                   } />
                   <Route path="/terv/program" element={
-                    <Card>
-                      <ProgramTimeline regionId={selectedRegion} packageId={selectedPackageId} dates={selectedDates} />
-                    </Card>
+                    <ProgramTimeline regionId={selectedRegion} packageId={selectedPackageId} dates={selectedDates} />
+                  } />
+                  <Route path="/terv/idopont" element={
+                    <DateSelection selected={selectedDates} onSelect={setSelectedDates} onVoteSuccess={resetSelection} regionId={selectedRegion} packageId={selectedPackageId} />
                   } />
                   <Route path="/terv/osszegzes" element={
-                    <Card>
-                      <Summary onContinue={() => {
-                        setSelectedDates([]);
-                        setSelectedRegion(undefined);
-                        setSelectedPackageId(undefined);
-                        localStorage.removeItem('3nap_selected_dates');
-                        localStorage.removeItem('3nap_selected_region');
-                        localStorage.removeItem('3nap_selected_package');
-                      }} onRegionSelect={setSelectedRegion} />
-                    </Card>
+                    <Summary onContinue={() => {
+                      resetSelection();
+                    }} onRegionSelect={setSelectedRegion} />
                   } />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

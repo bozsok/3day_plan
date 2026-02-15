@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { InfoPill } from '../common/InfoPill';
-import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { hu } from 'date-fns/locale';
 import { packages, counties } from '../../data/mockData';
 import { useUser } from '../../context/UserContext';
@@ -20,10 +20,8 @@ interface ProgramTimelineProps {
 export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineProps) {
     const navigate = useNavigate();
     const { user } = useUser();
-    const queryClient = useQueryClient();
 
     const [activeDay, setActiveDay] = useState(1);
-    const [error, setError] = useState<string | null>(null);
 
     // Redirect if no package selected
     useEffect(() => {
@@ -44,62 +42,28 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
 
     const hasAnyVote = userVotes.length > 0;
 
-    const voteMutation = useMutation({
-        mutationFn: async () => {
-            if (!user || !regionId) return;
-            const dateStrings = dates && dates.length > 0 ? dates.map(d => format(d, 'yyyy-MM-dd')) : [];
-
-            if (dateStrings.length !== 3) {
-                throw new Error("Hiba: Pontosan 3 napot kell kiválasztani a szavazáshoz!");
-            }
-
-            await api.dates.save(user.id, dateStrings, regionId);
-            return await api.votes.cast(user.id, regionId, dateStrings);
-        },
-        onSuccess: async () => {
-            // A szavazat leadása után töröljük a piszkozatot, mert már kész a terv
-            if (user) {
-                try {
-                    await api.progress.clear(user.id);
-                } catch (e) {
-                    console.error('Hiba a piszkozat törlésekor:', e);
-                }
-            }
-            queryClient.invalidateQueries({ queryKey: ['summary'] });
-            navigate('/terv/osszegzes');
-        },
-        onError: (error: Error) => {
-            setError(error.message || 'Hiba történt a művelet során. Próbáld újra!');
-        }
-    });
-
-    // Vissza irányítás ha nincs dátum (pl. frissítésnél ha elveszne a perzisztencia)
-    useEffect(() => {
-        if (!dates || dates.length === 0) {
-            navigate('/terv/idopont');
-        }
-    }, [dates, navigate]);
-
     const handleVote = () => {
-        if (!user || !regionId || voteMutation.isPending) return;
-        setError(null);
-        voteMutation.mutate();
+        navigate('/terv/idopont');
     };
 
     if (!selectedPackage) return null;
 
     const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
 
-    const dayNames = sortedDates.map(d => format(d, 'EEEE', { locale: hu }));
+    // Alapértelmezett napnevek, ha még nincs választva dátum
+    const dayNames = sortedDates.length > 0
+        ? sortedDates.map(d => format(d, 'EEEE', { locale: hu }))
+        : ['Péntek', 'Szombat', 'Vasárnap'];
+
     const dateRangeLabel = sortedDates.length >= 2
         ? `${format(sortedDates[0], 'yyyy. MMMM d.', { locale: hu })} – ${format(sortedDates[sortedDates.length - 1], 'd.', { locale: hu })}`
-        : 'Nincs dátum';
+        : 'Időpont választása a szavazásnál';
 
     const SidebarInfo = (
         <div id="program-timeline-sidebar-info" className="flex flex-col relative w-full">
             {/* Fejléc */}
             <StepHeader
-                step="4. Lépés: Programok"
+                step="3. Lépés: Programok"
                 title={<>
                     <div id="program-timeline-county-badge-wrapper" className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
                         <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
@@ -152,22 +116,14 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
             </div>
 
-            {/* Hibaüzenet */}
-            {error && (
-                <div id="program-timeline-error-box" className="mb-4 p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100 font-bold text-center">
-                    {error}
-                </div>
-            )}
-
             {/* Akció gombok */}
             <div id="program-timeline-actions-wrapper" className="space-y-3 mb-4">
                 <button
                     id="program-timeline-vote-btn"
                     onClick={handleVote}
-                    disabled={voteMutation.isPending}
-                    className="w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-black shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                    {voteMutation.isPending ? 'MENTÉS...' : 'Szavazok erre!'}
+                    Szavazat leadása...
                 </button>
 
                 <button
@@ -183,7 +139,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             </div>
 
             <p id="program-timeline-vote-disclaimer" className="mt-2 text-[11px] text-gray-400 text-center leading-relaxed px-4">
-                A szavazatoddal rögzíted a választott megyét és időpontot is.
+                A következő lépésben választhatod ki a pontos időpontot a szavazat véglegesítéséhez.
             </p>
         </div>
     );

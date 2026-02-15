@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { InfoPill } from '../common/InfoPill';
@@ -32,7 +31,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
             {/* Bal oldal */}
             <div id="region-selection-content-left" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <StepHeader
-                    step="2. Lépés: Úti cél"
+                    step="1. Lépés: Úti cél"
                     title={<>Válaszd ki az <br /><span className="text-primary-dark">úti célt</span></>}
                     description="Kattints arra a régióra a térképen, ahol szívesen eltöltenéd a hétvégét."
                 />
@@ -42,7 +41,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                         id="region-selection-back-btn"
                         variant="outline"
                         icon={<ChevronLeft size={24} />}
-                        onClick={() => navigate('/terv/idopont')}
+                        onClick={() => navigate('/')}
                         title="Vissza"
                     />
                     <button
@@ -51,13 +50,7 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                         onClick={async () => {
                             if (selectedRegionId && user) {
                                 try {
-                                    // Ha vannak már dátumaink mentve, frissítsük a régióval együtt
-                                    const savedDates = localStorage.getItem('3nap_selected_dates');
-                                    const datesArr = savedDates ? JSON.parse(savedDates) : [];
-                                    const dateStrings = datesArr.map((d: string) => format(new Date(d), 'yyyy-MM-dd'));
-
-                                    await api.dates.save(user.id, dateStrings, selectedRegionId);
-                                    // Checkpoint 2: Régió megvan
+                                    // Mivel itt még nincs dátumunk az új folyamatban, csak a régiót mentjük a progress-be
                                     await api.progress.update(user.id, { regionId: selectedRegionId });
                                 } catch (e) {
                                     console.error('Hiba a régió szinkronizálásakor:', e);

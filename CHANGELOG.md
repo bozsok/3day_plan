@@ -2,6 +2,23 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [1.0.0] - 2026-02-15
+
+### A felfedezés szabadsága (Új UX folyamat)
+- **Áttervezett útvonal:** A tervezési folyamat mostantól a felfedezést helyezi előtérbe. Az új sorrend: 1. Helyszínválasztás → 2. Csomagválasztás → 3. Programok részletes nézete → 4. Időpontválasztás és szavazás véglegesítése.
+- **Kötöttségek nélküli böngészés:** A korábbiakkal ellentétben a felhasználók már dátum megadása nélkül is szabadon böngészhetnek a megyék, csomagok és részletes programjaik között.
+- **Dinamikus napnevek:** A programterv idővonalán akkor is látszódnak a napok nevei (Péntek, Szombat, Vasárnap), ha még nincs kiválasztva konkrét naptári időpont.
+
+### Szavazás és Tervezés finomhangolása
+- **Véglegesített szavazás:** A szavazat leadása és az időpont kiválasztása mostantól egyetlen, végső lépésbe került összevonva, így a szavazat csak a teljes tervezés végén kerül beküldésre.
+- **Tiszta újrakezdés:** Az eredmények oldalon a "Tovább tervezek" gomb mostantól az új 1. lépésre irányít, és automatikusan törli a korábbi választásokat a kliens oldalon.
+- **Szigorú magyar helyesírás:** A teljes felhasználói felület és a dokumentáció (README, CHANGELOG) szigorúan követi a magyar helyesírási szabályokat.
+
+### Technikai optimalizálás és takarítás
+- **Kódbázis tisztítás:** Eltávolítottuk a redundáns `Card.tsx` komponenst és az elavult fejlesztői segédscripteket (Python és régi JS scriptek).
+- **API optimalizálás:** Egyszerűsítettük a `userStatuses` adatstruktúrát, csökkentve a hálózati forgalmat és a felesleges adatokat.
+- **Folyamat perzisztálás:** A `resetSelection` megoldja a korábbi "beragadt" állapotokat az új útvonalon.
+
 ## [0.11.1] - 2026-02-15
 
 ### Újdonságok és javítások

@@ -11,14 +11,20 @@ import { useUser } from '../../context/UserContext';
 import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 interface DateSelectionProps {
     selected: Date[] | undefined;
     onSelect: (dates: Date[] | undefined) => void;
+    onVoteSuccess?: () => void;
+    regionId: string | undefined;
+    packageId: string | undefined;
 }
 
-export function DateSelection({ selected, onSelect }: DateSelectionProps) {
+export function DateSelection({ selected, onSelect, onVoteSuccess, regionId, packageId }: DateSelectionProps) {
     const navigate = useNavigate();
     const { user } = useUser();
+    const queryClient = useQueryClient();
     const dates = selected ?? [];
     const [isSaving, setIsSaving] = useState(false);
 
@@ -34,22 +40,35 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
     const hasThreeConsecutiveDays = isConsecutive(dates) && dates.length > 0 && dates[0].getDay() === 5;
 
     const handleNext = async () => {
-        if (!hasThreeConsecutiveDays || !user || isSaving) return;
+        if (!hasThreeConsecutiveDays || !user || !regionId || !packageId || isSaving) return;
 
         try {
             setIsSaving(true);
             const dateStrings = dates.map(d => format(d, 'yyyy-MM-dd'));
-            await api.dates.save(user.id, dateStrings);
-            // Checkpoint 1: Dátumok megvannak
-            await api.progress.update(user.id, { hasDates: true });
-            navigate('/terv/helyszin');
+
+            // Mentjük az időpontokat és leadjuk a szavazatot
+            await api.dates.save(user.id, dateStrings, regionId);
+            await api.votes.cast(user.id, regionId, dateStrings, packageId);
+
+            // Töröljük a piszkozatot
+            await api.progress.clear(user.id);
+
+            // Kliens oldali takarítás
+            onVoteSuccess?.();
+
+            // Query frissítés
+            queryClient.invalidateQueries({ queryKey: ['summary'] });
+
+            navigate('/terv/osszegzes');
         } catch (error) {
-            console.error('Hiba a dátumok mentésekor:', error);
-            navigate('/terv/helyszin');
+            console.error('Hiba a szavazat leadásakor:', error);
+            setError('Hiba történt a szavazat mentésekor. Próbáld újra!');
         } finally {
             setIsSaving(false);
         }
     };
+
+    const [error, setError] = useState<string | null>(null);
 
     const handleCalendarSelect = async (newDates: Date[]) => {
         onSelect(newDates);
@@ -57,10 +76,10 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
         // Live progress frissítése: Ha érvényes (3 nap) -> zöld, ha nem -> szürke
         if (user) {
             const isValid = isConsecutive(newDates) && newDates.length > 0 && newDates[0].getDay() === 5;
-            // Csak akkor küldjük, ha változik a validitás, de egyszerűbb mindig küldeni a jelenlegi állapotot debounce nélkül is,
-            // mivel a felhasználó nem kattintgat másodpercenként 10-szer.
+            // Csak akkor küldjük, ha változik a validitás, vagy ha van kiválasztás
             try {
-                await api.progress.update(user.id, { hasDates: isValid });
+                const dateStrings = newDates.map(d => format(d, 'yyyy-MM-dd'));
+                await api.progress.update(user.id, { hasDates: isValid, dates: dateStrings });
             } catch (e) {
                 // Silent fail
             }
@@ -82,9 +101,9 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
             {/* Bal oldal */}
             <div id="date-selection-content-left" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 flex flex-col justify-center items-start text-left">
                 <StepHeader
-                    step="1. Lépés: Időpont"
-                    title={<>Válaszd ki az <br /><span className="text-primary-dark">időpontot</span></>}
-                    description="Jelöld ki azt a 3 napos hétvégét (péntek-vasárnap), amikor utazni szeretnél."
+                    step="4. Lépés: Szavazás"
+                    title={<>Véglegesítsd a <br /><span className="text-primary-dark">szavazatod</span></>}
+                    description="Kérlek válassz egy időpontot, amivel véglegesíted a választott csomagot és helyszínt."
                 />
 
                 <div id="date-selection-nav-container" className="flex gap-4 items-center mt-4">
@@ -92,19 +111,25 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
                         id="date-selection-back-btn"
                         variant="outline"
                         icon={<ChevronLeft size={24} />}
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate('/terv/program')}
                         title="Vissza"
                     />
                     <button
                         id="date-selection-next-btn"
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 h-14 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={handleNext}
-                        disabled={!hasThreeConsecutiveDays}
+                        disabled={!hasThreeConsecutiveDays || isSaving}
                     >
-                        Tovább
-                        <ArrowRight id="date-selection-next-icon" size={20} className="group-hover:translate-x-1 transition-transform" />
+                        {isSaving ? 'Szavazat elküldése...' : 'Szavazat véglegesítése'}
+                        {!isSaving && <ArrowRight id="date-selection-next-icon" size={20} className="group-hover:translate-x-1 transition-transform" />}
                     </button>
                 </div>
+
+                {error && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-bold w-full text-center">
+                        {error}
+                    </div>
+                )}
             </div>
 
             {/* Jobb oldal */}

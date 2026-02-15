@@ -21,7 +21,7 @@ function queryOne(sql: string, params: any[] = []): any {
 /** POST /api/progress - Haladás mentése */
 router.post('/', (req, res) => {
     try {
-        const { userId: rawUserId, hasDates, regionId, packageId } = req.body || {};
+        const { userId: rawUserId, hasDates, regionId, packageId, dates } = req.body || {}; // dates hozzáadva
         if (!rawUserId) return res.status(400).json({ error: 'userId required' });
         const userId = Number(rawUserId);
 
@@ -31,15 +31,29 @@ router.post('/', (req, res) => {
         // Kikeressük az aktuálisat (Helyesen segédfüggvénnyel)
         const existing = queryOne("SELECT user_id FROM user_progress WHERE user_id = ?", [userId]);
 
+        const datesJson = dates && Array.isArray(dates) ? JSON.stringify(dates) : null;
+
         if (existing) {
             // UPDATE
             let sql = "UPDATE user_progress SET last_active = ?";
             const params: any[] = [now];
 
-            if (hasDates !== undefined) {
+            // Ha dates tömb érkezik, frissítjük az oszlopot és a flaget is
+            if (dates !== undefined) {
+                sql += ", dates = ?";
+                params.push(datesJson);
+
+                // Automatikusan beállítjuk a hasDates-t is, ha van érvényes dátum tömb
+                if (Array.isArray(dates) && dates.length > 0) {
+                    sql += ", has_dates = 1";
+                }
+            }
+            // Fallback: Ha csak hasDates jön (régi működés)
+            else if (hasDates !== undefined) {
                 sql += ", has_dates = ?";
                 params.push(hasDates ? 1 : 0);
             }
+
             if (regionId !== undefined) {
                 sql += ", region_id = ?";
                 params.push(regionId);
@@ -49,13 +63,19 @@ router.post('/', (req, res) => {
                 params.push(packageId);
             }
 
+            // Paraméterekhez hozzáadjuk a WHERE user_id értékét
+            sql += " WHERE user_id = ?";
             params.push(userId);
-            db.run(sql + " WHERE user_id = ?", params);
+
+            db.run(sql, params);
         } else {
             // INSERT
+            // Ha insertnél van dates, akkor a has_dates is legyen 1
+            const hasDataDates = dates && Array.isArray(dates) && dates.length > 0 ? 1 : (hasDates ? 1 : 0);
+
             db.run(
-                "INSERT INTO user_progress (user_id, has_dates, region_id, package_id, last_active) VALUES (?, ?, ?, ?, ?)",
-                [userId, hasDates ? 1 : 0, regionId || null, packageId || null, now]
+                "INSERT INTO user_progress (user_id, has_dates, region_id, package_id, dates, last_active) VALUES (?, ?, ?, ?, ?, ?)",
+                [userId, hasDataDates, regionId || null, packageId || null, datesJson, now]
             );
         }
 
