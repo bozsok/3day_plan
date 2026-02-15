@@ -8,22 +8,23 @@ A célunk egyszerű: levenni a tervezés terhét a válladról. Nem kell óráka
 
 ## Hogyan működik?
 
-A tervezés nálunk egy játékos, folyékony folyamat, ahol az oldalak közötti navigáció szinte észrevétlen:
-
+A tervezés nálunk egy játékos, gördülékeny folyamat, ahol az oldalak közötti navigáció szinte észrevétlen:
 1.  **Időzítés**: Válaszd ki a naptárban azt a három egymást követő napot (péntek–szombat–vasárnap), amikor utazni szeretnél. A felület azonnal menti és szinkronizálja a választásodat.
 2.  **Tájegység**: Egy interaktív SVG-térképen böngészhetsz Magyarország megyéi és turisztikai régiói között — a kurzorral rámutatva kiemeled, kattintással kiválasztod. A térkép mostantól még részletesebb és pontosabb.
 3.  **Programterv**: Részletes, napokra bontott idővonal a kiválasztott régió látnivalóival. Itt már nemcsak nézelődhetsz, hanem szavazhatsz is a kedvenc terveidre, miközben a költségek alakulását is nyomon követheted.
 
-## Modern Felhasználói Élmény
+## Modern felhasználói élmény
 
 Az alkalmazás legújabb verziója (v0.10+) a vizuális tökéletességre, a technikai stabilitásra és a tesztelhetőségre fókuszál:
 
 - **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az `element_id_map.md` fájlban. Ez lehetővé teszi a könnyű automatizált tesztelést és az elemek pontos beazonosítását.
 
-- **Folyékony navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz. A böngésző "Vissza" gombja is pontosan úgy működik, ahogy elvárod.
-- **Intelligens Adatkezelés:** A **TanStack Query** biztosítja, hogy minden szavazat és dátumválasztás azonnal és hibabiztosan célba érjen. A rendszer a háttérben folyamatosan szinkronizál, így mindig a legfrissebb eredményeket látod te és a barátaid is.
-- **Ponthű Design:** A felületvisszaállítása során minden lekerekítés, margó és gombméret a helyére került. Legyen szó asztali monitorról vagy egy apró mobilról, a design konzisztens és prémium érzetet nyújt.
-- **Atomic Design alapok:** A motorháztető alatt az alkalmazást jól elkülönített, moduláris egységekre bontottuk, ami villámgyors működést és könnyű bővíthetőséget garantál.
+- **Gördülékeny navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz. A böngésző "Vissza" gombja is pontosan úgy működik, ahogy elvárod.
+- **Intelligens adatkezelés:** A **TanStack Query** biztosítja, hogy minden szavazat és dátumválasztás azonnal és hibabiztosan célba érjen. A rendszer a háttérben folyamatosan szinkronizál, így mindig a legfrissebb eredményeket látod te és a barátaid is.
+- **Élő folyamat-visszajelzés (v0.11.0):** Valós idejű kommunikáció a résztvevők között már a naptárnál is. Ha valaki épp kijelöl egy időszakot, a többiek azonnal látják az aktív státuszt.
+- **Intelligens állapotkezelés:** Ha visszalépsz a kezdőlapra, a rendszer tudja, hogy újra szeretnéd kezdeni a tervezést, és automatikusan törli a szerverről a korábbi próbálkozásaidat, így mindig tiszta lappal indulsz.
+- **Ponthű dizájn:** A felületvisszaállítása során minden lekerekítés, margó és gombméret a helyére került. Legyen szó asztali monitorról vagy egy apró mobilról, a design konzisztens és prémium érzetet nyújt.
+- **Atomic design alapok:** A motorháztető alatt az alkalmazást jól elkülönített, moduláris egységekre bontottuk, ami villámgyors működést és könnyű bővíthetőséget garantál.
 
 ## Technológiai háttér
 
@@ -40,7 +41,7 @@ Az alkalmazás legújabb verziója (v0.10+) a vizuális tökéletességre, a tec
 - **SQLite** — megbízható, hordozható adatbázis
 - **Többfelhasználós támogatás** — valós idejű közös tervezés és szavazatszámlálás
 
-## Fejlesztés és Futtatás
+## Fejlesztés és futtatás
 
 A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is. Részletes útmutatót az egyes mappákban (`server`, `root`) található fájlokban találsz.
 

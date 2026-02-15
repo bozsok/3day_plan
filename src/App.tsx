@@ -13,6 +13,57 @@ import { StepIndicator } from './components/common/StepIndicator';
 import { Card } from './components/common/Card';
 import { useState, useEffect } from 'react';
 
+const getStepNumber = (pathname: string) => {
+  switch (pathname) {
+    case '/': return 0;
+    case '/terv/idopont': return 1;
+    case '/terv/helyszin': return 2;
+    case '/terv/csomagok': return 3;
+    case '/terv/program': return 4;
+    case '/terv/osszegzes': return 5;
+    default: return 0;
+  }
+};
+
+/**
+ * Route Observer: Figyeli a visszalépéseket az URL-ben
+ */
+import { useRef } from 'react';
+import { api } from './api/client';
+import { useUser } from './context/UserContext';
+
+function ProgressSync() {
+  const location = useLocation();
+  const { user } = useUser();
+  const lastPath = useRef(location.pathname);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const currentStep = getStepNumber(location.pathname);
+    const prevStep = getStepNumber(lastPath.current);
+
+    // Ha visszalépünk legalább egy szintet
+    if (currentStep < prevStep) {
+      if (currentStep === 0) {
+        // Visszamentünk a főoldalra -> akár törölhetjük az egész progress-t, vagy csak a dátumot
+        // De mivel a user "eljut a nyitóképernyőre", valószínűleg restartolta a folyamatot fejben.
+        api.progress.update(user.id, { hasDates: false, regionId: null, packageId: null }).catch(() => { });
+      } else if (currentStep === 1) {
+        // Visszamentünk a dátumválasztóhoz -> töröljük a mögötte lévőket
+        api.progress.update(user.id, { regionId: null, packageId: null }).catch(() => { });
+      } else if (currentStep === 2) {
+        // Visszamentünk a régióhoz -> töröljük a csomagot
+        api.progress.update(user.id, { packageId: null }).catch(() => { });
+      }
+    }
+
+    lastPath.current = location.pathname;
+  }, [location.pathname, user]);
+
+  return null;
+}
+
 function App() {
   const location = useLocation();
 
@@ -53,23 +104,12 @@ function App() {
     }
   }, [selectedDates, selectedRegion, selectedPackageId]);
 
-  const getStepNumber = (pathname: string) => {
-    switch (pathname) {
-      case '/': return 0;
-      case '/terv/idopont': return 1;
-      case '/terv/helyszin': return 2;
-      case '/terv/csomagok': return 3;
-      case '/terv/program': return 4;
-      case '/terv/osszegzes': return 5;
-      default: return 0;
-    }
-  };
-
   const step = getStepNumber(location.pathname);
 
   return (
     <ThemeProvider>
       <UserProvider>
+        <ProgressSync />
         <MainLayout>
           {/* Dinamikus idővonal konténer – összehúzódik, ha nincs rá szükség (Step 0 és 5) */}
           <motion.div

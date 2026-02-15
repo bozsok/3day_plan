@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { differenceInCalendarDays, format } from 'date-fns';
 import { hu } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import { ArrowRight, ChevronLeft, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../common/CustomCalendar';
 import { useUser } from '../../context/UserContext';
 import { StepCard } from '../common/StepCard';
+import { api } from '../../api/client';
 
 interface DateSelectionProps {
     selected: Date[] | undefined;
@@ -18,6 +20,7 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
     const navigate = useNavigate();
     const { user } = useUser();
     const dates = selected ?? [];
+    const [isSaving, setIsSaving] = useState(false);
 
     const isConsecutive = (d: Date[]) => {
         if (d.length !== 3) return false;
@@ -30,13 +33,38 @@ export function DateSelection({ selected, onSelect }: DateSelectionProps) {
 
     const hasThreeConsecutiveDays = isConsecutive(dates) && dates.length > 0 && dates[0].getDay() === 5;
 
-    const handleNext = () => {
-        if (!hasThreeConsecutiveDays || !user) return;
-        navigate('/terv/helyszin');
+    const handleNext = async () => {
+        if (!hasThreeConsecutiveDays || !user || isSaving) return;
+
+        try {
+            setIsSaving(true);
+            const dateStrings = dates.map(d => format(d, 'yyyy-MM-dd'));
+            await api.dates.save(user.id, dateStrings);
+            // Checkpoint 1: Dátumok megvannak
+            await api.progress.update(user.id, { hasDates: true });
+            navigate('/terv/helyszin');
+        } catch (error) {
+            console.error('Hiba a dátumok mentésekor:', error);
+            navigate('/terv/helyszin');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
-    const handleCalendarSelect = (newDates: Date[]) => {
+    const handleCalendarSelect = async (newDates: Date[]) => {
         onSelect(newDates);
+
+        // Live progress frissítése: Ha érvényes (3 nap) -> zöld, ha nem -> szürke
+        if (user) {
+            const isValid = isConsecutive(newDates) && newDates.length > 0 && newDates[0].getDay() === 5;
+            // Csak akkor küldjük, ha változik a validitás, de egyszerűbb mindig küldeni a jelenlegi állapotot debounce nélkül is,
+            // mivel a felhasználó nem kattintgat másodpercenként 10-szer.
+            try {
+                await api.progress.update(user.id, { hasDates: isValid });
+            } catch (e) {
+                // Silent fail
+            }
+        }
     };
 
     const formattedRange = dates.length > 0

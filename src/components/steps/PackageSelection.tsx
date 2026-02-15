@@ -5,6 +5,8 @@ import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { ArrowRight, ChevronLeft } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
+import { useUser } from '../../context/UserContext';
+import { api } from '../../api/client';
 
 interface PackageSelectionProps {
     regionId: string | undefined;
@@ -14,6 +16,7 @@ interface PackageSelectionProps {
 
 export function PackageSelection({ regionId, onSelect, selectedPackageId }: PackageSelectionProps) {
     const navigate = useNavigate();
+    const { user } = useUser();
     const [filter, setFilter] = useState('Összes');
 
     // Filter packages by county (passed as regionId prop from App.tsx)
@@ -42,7 +45,12 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                         id="package-selection-next-btn"
                         variant="primary"
                         icon={<ArrowRight size={24} />}
-                        onClick={() => navigate('/terv/program')}
+                        onClick={async () => {
+                            if (user && selectedPackageId) {
+                                await api.progress.update(user.id, { packageId: selectedPackageId });
+                            }
+                            navigate('/terv/program');
+                        }}
                         disabled={!selectedPackageId}
                         title="Tovább"
                     />
@@ -85,8 +93,11 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                             key={pkg.id}
                             id={`package-card-root-${pkg.id}`}
                             className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row cursor-pointer"
-                            onClick={() => {
+                            onClick={async () => {
                                 onSelect(pkg.id);
+                                if (user) {
+                                    await api.progress.update(user.id, { packageId: pkg.id });
+                                }
                                 navigate('/terv/program');
                             }}
                         >
@@ -132,9 +143,12 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
 
                                     <button
                                         id="package-card-select-btn"
-                                        onClick={(e) => {
+                                        onClick={async (e) => {
                                             e.stopPropagation();
                                             onSelect(pkg.id);
+                                            if (user) {
+                                                await api.progress.update(user.id, { packageId: pkg.id });
+                                            }
                                             navigate('/terv/program');
                                         }}
                                         className="bg-primary hover:bg-primary-dark text-zinc-900 font-bold px-4 py-2 rounded-xl transition-all text-sm flex items-center gap-2 shadow-sm hover:shadow-md shrink-0 ml-2"

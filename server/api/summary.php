@@ -82,7 +82,8 @@ try {
 
     $topIntervals = array_values($intervalCounts);
     usort($topIntervals, function ($a, $b) {
-        return ($b['count'] ?? 0) - ($a['count'] ?? 0); });
+        return ($b['count'] ?? 0) - ($a['count'] ?? 0);
+    });
     $topIntervals = array_slice($topIntervals, 0, 3);
 
     $voteRanking = [];
@@ -100,7 +101,8 @@ try {
         }
     }
     usort($voteRanking, function ($a, $b) {
-        return ($b['count'] ?? 0) - ($a['count'] ?? 0); });
+        return ($b['count'] ?? 0) - ($a['count'] ?? 0);
+    });
     $voteRanking = array_values($voteRanking);
 
     $userStatuses = [];
@@ -118,10 +120,28 @@ try {
         $userStatuses[] = ['id' => $uid, 'name' => $name, 'isComplete' => ($datesCount >= 3 && $votesCount >= 1), 'datesCount' => $datesCount, 'votesCount' => $votesCount];
     }
 
+    // --- Progress Adatok Lekérése (Live haladás) ---
+    $progressPath = __DIR__ . '/../data/progress.json';
+    $userProgress = [];
+    if (file_exists($progressPath)) {
+        $pJson = @file_get_contents($progressPath);
+        $pData = json_decode($pJson, true);
+        if (is_array($pData)) {
+            $now = time();
+            foreach ($pData as $uid => $p) {
+                // Csak az utolsó 15 percben aktívakat küldjük el (Passzív szűrés)
+                if (($p['lastActive'] ?? 0) >= ($now - 900)) {
+                    $userProgress[$uid] = $p;
+                }
+            }
+        }
+    }
+
     echo safe_json_encode([
         "topIntervals" => $topIntervals,
         "voteRanking" => $voteRanking,
-        "userStatuses" => $userStatuses
+        "userStatuses" => $userStatuses,
+        "userProgress" => $userProgress
     ]);
 
 } catch (Throwable $e) {

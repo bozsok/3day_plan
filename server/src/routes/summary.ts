@@ -94,7 +94,29 @@ router.get('/', (_req, res) => {
         isComplete: row.dates_count >= 3 && row.votes_count >= 1,
     }));
 
-    res.json({ topIntervals, voteRanking, userStatuses });
+    // 4. Live Haladás adatok (Progress)
+    const now = Math.floor(Date.now() / 1000);
+    const progressRows = queryAll(`
+        SELECT * FROM user_progress 
+        WHERE last_active >= ?
+    `, [now - 900]);
+
+    const userProgress: Record<number, any> = {};
+    for (const p of progressRows) {
+        userProgress[p.user_id] = {
+            hasDates: p.has_dates === 1,
+            regionId: p.region_id,
+            packageId: p.package_id,
+            lastActive: p.last_active
+        };
+    }
+
+    res.json({
+        topIntervals,
+        voteRanking,
+        userStatuses,
+        userProgress
+    });
 });
 
 export default router;

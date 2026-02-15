@@ -19,6 +19,7 @@ interface SummaryData {
     topIntervals: { start: string; end: string; count: number; users: string[] }[];
     voteRanking: { regionId: string; count: number; voters: string[] }[];
     userStatuses: { id: number; name: string; isComplete: boolean; datesCount: number; votesCount: number }[];
+    userProgress: Record<number, { hasDates: boolean, regionId: string | null, packageId: string | null, lastActive: number }>;
 }
 
 interface SummaryProps {
@@ -118,8 +119,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     id="summary-ranking-dates"
                     title="Mikor menjünk?"
                     icon={<CalendarIcon size={20} />}
-                    iconBg="bg-blue-100"
-                    iconColor="text-blue-600"
                     emptyText="Még senki nem választott teljes időszakot."
                     isEmpty={(data.topIntervals || []).length === 0}
                 >
@@ -130,7 +129,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                             count={item.count}
                             users={item.users}
                             isFirst={idx === 0}
-                            type="date"
                         />
                     ))}
                 </RankingSection>
@@ -140,8 +138,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     id="summary-ranking-regions"
                     title="Hova menjünk?"
                     icon={<Trophy size={20} />}
-                    iconBg="bg-yellow-100"
-                    iconColor="text-yellow-600"
                     emptyText="Még nem érkezett szavazat egyetlen régióra sem."
                     isEmpty={data.voteRanking.length === 0}
                 >
@@ -152,7 +148,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                             count={item.count}
                             users={item.voters}
                             isFirst={idx === 0}
-                            type="region"
                             onClick={() => {
                                 onRegionSelect?.(item.regionId);
                                 navigate('/terv/csomagok');
@@ -163,15 +158,23 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             </div>
 
             {/* 3. Felhasználók állapota (Csoportosítva) */}
-            <DesignerStatus id="summary-designer-status" users={data.userStatuses} />
+            <DesignerStatus id="summary-designer-status" users={data.userStatuses} userProgress={data.userProgress} />
 
             {/* Lebegő akció gomb: Tovább tervezek */}
             {onContinue && (
                 <div id="summary-fab-wrapper" className="fixed bottom-8 right-8 z-50 animate-bounce-slow">
                     <button
                         id="summary-continue-btn"
-                        onClick={() => {
-                            onContinue();
+                        onClick={async () => {
+                            // Piszkozat törlése a szerveren (Tiszta lap az új tervezéshez)
+                            if (user) {
+                                try {
+                                    await api.progress.clear(user.id);
+                                } catch (e) {
+                                    console.error('Hiba a piszkozat törlésekor:', e);
+                                }
+                            }
+                            onContinue?.(); // Opcionális hívás
                             navigate('/terv/idopont');
                         }}
                         className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-4 py-3 md:px-8 md:py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 border-4 border-white whitespace-nowrap"

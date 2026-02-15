@@ -2,26 +2,40 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.11.1] - 2026-02-15
+
+### Újdonságok és javítások
+- **Folyamatos aktivitáskövetés:** A "Kész" státuszú felhasználók (akik már adtak le szavazatot) mostantól nem tűnnek el a radarról, ha új tervezésbe kezdenek. Kártyájukon megjelenik az "Új terv" szekció a megszokott élő folyamatjelző ikonokkal (📅, 📍, 📦), így tevékenységük folyamatosan nyomon követhető.
+- **Szavazatszámláló badge:** A felhasználói kártyák "Kész" címkéje egy új, piros értesítő jelvényt kapott a jobb felső sarokban, amely dinamikusan mutatja a leadott érvényes szavazatok számát.
+
+## [0.11.0] - 2026-02-15
+
+### Élő folyamat-visszajelzés
+- **Azonnali státuszfrissítés:** A dátumválasztó (1. lépés) mostantól minden kattintásnál valós időben kommunikál a szerverrel.
+    - Ha a felhasználó kijelöl egy érvényes 3 napos intervallumot (P–Sz–V), a "naptár ikon" az összegzés oldalon azonnal zöldre vált a többi résztvevő számára.
+    - Ha a kijelölés érvénytelenné válik (pl. visszavonás), a státusz azonnal visszaáll szürkére.
+- **Intelligens reset:** Ha a felhasználó visszalép a nyitóképernyőre (Hero), a rendszer ezt "újrakezdésnek" tekinti, és automatikusan törli a szerverről a korábbi dátum- és csomagválasztásokat, így tisztán indul az új tervezés.
+
 ## [0.10.2] - 2026-02-15
 
-### Reszponzivitás és Mobil Optimalizálás
-- **StepIndicator (Idővonal sáv):** Az összekötő vonalak szélessége és a gombok közötti távolság dinamikusan alkalmazkodik a kijelzőhöz (w-4 és w-10 között), így kisebb kijelzőkön is tökéletesen elfér.
-- **Summary (Összegzés):** A "Tovább tervezek" lebegő gomb felirata sorkizárttá vált (`whitespace-nowrap`), és mobilon helytakarékosabb paddingot (`px-4 py-3`) kapott a kényelmesebb kezelhetőségért.
+### Reszponzivitás és mobiloptimalizálás
+- **StepIndicator (idővonal-sáv):** Az összekötő vonalak szélessége és a gombok közötti távolság dinamikusan alkalmazkodik a kijelzőhöz (w-4 és w-10 között), így kisebb kijelzőkön is tökéletesen elfér.
+- **Summary (összegzés):** A "Tovább tervezek" lebegő gomb felirata sorkizárttá vált (`whitespace-nowrap`), és mobilon helytakarékosabb paddinget (`px-4 py-3`) kapott a kényelmesebb kezelhetőségért.
 
-### CSS Architektúra Tisztítása
+### CSS-architektúra tisztítása
 - **Animációs konfliktusok feloldása:** Eltávolítottuk a globális `body *` transition kényszerítést. Ez megoldotta a Framer Motion-nal való ütközéseket és lehetővé tette az egyedi komponens-animációkat (pl. a csomagkártyák lágy nagyítását).
 
-### Csomagválasztó (3. Lépés) Finomhangolás
-- **Vizuális konzisztencia:** A kártyák időtartam jelzője (3 NAP / 2 ÉJ) megkapta a 4. lépésnél bevezetett prémium stílust (pill dizájn, zöld szín, uppercase).
+### Csomagválasztó (3. lépés) finomhangolása
+- **Vizuális konzisztencia:** A kártyák időtartam-jelzője (3 NAP / 2 ÉJ) megkapta a 4. lépésnél bevezetett prémium stílust (lekerekített stílus, zöld szín, uppercase).
 - **Sötét mód javítás:** A "Kiválasztás" gomb felirata sötét módban is sötét marad az élénkzöld háttéren, megőrizve a kontrasztot.
 - **Tisztább UI:** Eltávolítottuk a kártyacímek zavaró hover-kori átszíneződését.
 
-### Program Idővonal (4. Lépés) Dizájn-hű Újratervezése
-- **Ikonok:** Mostantól tökéletes kör alakúak (`rounded-full`), élénkzöld hátterel és fix sötét (`zinc-900`) ikonokkal, amelyek sötét módban sem fehérednek ki.
-- **Folyamatos Idővonal:** A szakadozott vonalak helyett egy folyamatos, 2px vastag szürke tengely fut végig a tartalom mögött a forrásdizájn alapján.
-- **Tipográfia és Hierarchia:** Finomított betűméretek és vastagságok (`text-xl font-bold` a címnek). Az időpontok új "pill" stílust kaptak.
+### Program idővonal (4. lépés) dizájnhű újratervezése
+- **Ikonok:** Mostantól tökéletes kör alakúak (`rounded-full`), élénkzöld háttérrel és fix sötét (`zinc-900`) ikonokkal, amelyek sötét módban sem fehérednek ki.
+- **Folyamatos idővonal:** A szakadozott vonalak helyett egy folyamatos, 2px vastag szürke tengely fut végig a tartalom mögött a forrásdizájn alapján.
+- **Tipográfia és hierarchia:** Finomított betűméretek és vastagságok (`text-xl font-bold` a címnek). Az időpontok új "pill" stílust kaptak.
 - **Új adatok:** Megjelentek a hiányzó kategória címkék (pl. GASZTRO) és a programok címei is.
-- **Tab-sáv javítás:** A napok közötti szürke szegély már nem fut ki a navigációs gombok alá, csak a funkcionális elemek (napok) végéig tart.
+- **Fülsáv javítása:** A napok közötti szürke szegély már nem fut ki a navigációs gombok alá, csak a funkcionális elemek (napok) végéig tart.
 
 ## [0.10.1] - 2026-02-14
 
@@ -31,7 +45,7 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 - **Navigációs gombok javítása:** Az 1. és 2. lépés "Tovább" gombjai fix 56px (`h-14`) magasságot kaptak, így pixelpontosan illeszkednek a "Vissza" gombokhoz.
 - **Levegősebb elrendezés:** Az 1. és 2. lépés navigációs konténerei `mt-4` felső margót kaptak a zsúfoltság elkerülése érdekében.
 - **"Clean" stílus:** Eltávolítottuk az alapértelmezett árnyékokat a szűrőgombokról és a csomagkártyákról. Utóbbiak hover esetén kapnak egy lágy `shadow-lg` kiemelést.
-- **Technikai javítás:** A szűrősáv `pt-1` felső paddingot kapott, megakadályozva a szegélyek levágását (clipping) oldalváltáskor.
+- **Technikai javítás:** A szűrősáv `pt-1` felső paddinget kapott, megakadályozva a szegélyek levágását (clipping) oldalváltáskor.
 
 ## [0.10.0] - 2026-02-14
 
@@ -72,7 +86,7 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 ### Újdonságok és Javítások
 - **Tervezési állapot perzisztálása:** A választott dátumok, megye és csomag mostantól mentésre kerül a böngésző helyi tárolójába (`localStorage`). Így oldalfrissítés után sem vesznek el az adatok, és elkerülhető a "Nincs dátum" hiba a 4. lépésben.
-- **Summary fejléc fix:** Az Összegzés oldal címe visszakapta a többi fő oldallal megegyező reszponzív méretezést (`text-3xl md:text-5xl font-extrabold`).
+- **Summary fejléc javítás:** Az Összegzés oldal címe visszakapta a többi fő oldallal megegyező reszponzív méretezést (`text-3xl md:text-5xl font-extrabold`).
 - **Biztonsági átirányítás:** A 4. lépés (ProgramTimeline) mostantól automatikusan visszairányít az 1. lépésre, ha valamilyen hiba folytán hiányoznának a dátumok.
 
 ## [0.9.4] - 2026-02-14
@@ -90,7 +104,7 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 ## [0.9.2] - 2026-02-14
 
 ### Újdonságok és Változások
-- **Teljeskörű Atomic Design Overhaul:**
+- **Teljeskörű Atomic Design Átdolgozás:**
     - **Új alapkomponensek:** Létrejött a `StepLabel`, `StepHeader` és `InfoPill` komponens az ismétlődő UI-elemek (fejlécek, információs panelek) egységesítésére.
     - **Kód tisztítás:** Az összes tervezési lépésnél (1-4) és az összegzésnél lecseréltük a manuális Tailwind-blokkokat az új közös komponensekre.
     - **Mobil navigáció fix:** A `ProgramTimeline` oldalon a mobil nézet navigációs gombjai is megkapták a `NavButton` egységesített implementációját.
@@ -107,19 +121,19 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 ### Újdonságok és Változások
 - **Atomic Design Refaktorálás (Strukturális fejlesztések):**
-    - **`NavButton` alapkomponens:** Létrejött a valódi közös navigációs gomb komponens, amely fix **56x56 px** méretet és egységes interakciókat biztosít az összes lépésnél (1-4) és az összegzésnél.
+    - **`NavButton` alapkomponens:** Létrejött a valódi közös navigációs gomb komponens, amely fix **56×56 px** méretet és egységes interakciókat biztosít az összes lépésnél (1–4) és az összegzésnél.
     - **Konzisztencia:** Minden helyi gomb-implementációt lecseréltünk a `NavButton`-ra, megszüntetve a vizuális eltéréseket.
     - **`Summary.tsx` dekompozíció:** A bonyolult összegző oldal kisebb, önálló modulokra lett bontva (`RankingSection`, `RankingItem`, `DesignerStatus`).
     - **`ProgramTimeline.tsx` dekompozíció:** Az idővonal logikája különálló komponensekbe került (`TimelineTabs`, `TimelineItem`, `SidebarInfo`, `SidebarActions`).
 - **UI Ponthű Helyreállítás (Layout Restoration):**
     - A 4. lépés (ProgramTimeline) és a korábbi lépések (1-3) vizuális elrendezése teljesen helyre lett állítva a dizájn referencia alapján.
-    - **Reszponzív navigáció:** A navigációs gombok (Vissza/Tovább) mobilnézetben (< 768px) a jobb felső sarokba kerültek, 440px alatt pedig a "3 napos programterv" felirat alá rendeződnek, elkerülve a tartalom kitakarását. A gombok pozíciója (top/right) mostantól minden felbontáson pontosan megegyezik a 3. lépés margóival (32px / 48px).
+    - **Reszponzív navigáció:** A navigációs gombok (Vissza/Tovább) mobil nézetben (< 768px) a jobb felső sarokba kerültek, 440px alatt pedig a "3 napos programterv" felirat alá rendeződnek, elkerülve a tartalom kitakarását. A gombok pozíciója (top/right) mostantól minden felbontáson pontosan megegyezik a 3. lépés margóival (32px / 48px).
     - **Desktop navigáció:** 1024px felett a gombok szorosan egymás mellett maradnak a jobb felső sarokban, a nap-választó tabok pedig kiegészültek egy biztonsági oldaltávolsággal (`lg:pr-40`), hogy ne legyen átfedés.
 - **Vizuális Finomhangolás:**
     - **Step Label szinkronizálás:** A 4. lépés címkéje (StepLabel) mostantól minden paraméterében (szín, padding, betűméret) megegyezik a 3. lépésben használttal.
     - **Méretek és színek:** A navigációs nyíl gombok mindenhol teljes méretűek (56px) lettek, a "Tovább" gomb pedig egységesen zöld (`bg-primary`) színt kapott.
     - **Fejléc igazítása:** Az 1-2. lépés (Dátum, Térkép) fejléce mobilnézetben (< 440px) balra zárt elrendezést kapott.
-    - **Padding és Grid egységesítés:** A 4. lépés belső margói (paddings) mostantól pontosan a 48 px-es rácsot követikasztali nézetben (`lg:p-12`), és a felesleges minimum magasságok eltávolításra kerültek.
+    - **Padding és Grid egységesítés:** A 4. lépés belső margói (paddings) mostantól pontosan a 48 px-es rácsot követik asztali nézetben (`lg:p-12`), és a felesleges minimum magasságok eltávolításra kerültek.
 - **Stabilitás:**
     - Az oldalsáv (Sidebar) asztali nézetben felülre került (`justify-start`), biztosítva a kompaktabb és átláthatóbb megjelenést.
 
@@ -143,7 +157,7 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 ### Módosítva
 - **HashRouter migráció**: Átállás `HashRouter`-re a PHP alapú tárhelyekkel való teljes kompatibilitás érdekében.
-- **Stabil Cross-fade**: Az oldalak közötti áttűnés most már tökéletesen simultán (popLayout + absolute exit), kiküszöbölve a kártyák egymás alá csúszását.
+- **Stabil Cross-fade**: Az oldalak közötti áttűnés most már tökéletesen szimultán (popLayout + absolute exit), kiküszöbölve a kártyák egymás alá csúszását.
 - **Layout finomhangolás**: A felső margó (padding-top) csökkentése (16px mobil / 32px desktop) a hatékonyabb helykihasználásért.
 
 ## [0.7.0] - 2026-02-14
@@ -291,7 +305,7 @@ Negyedik iteráció: valódi SVG térkép integráció és a Program Idővonal t
 - **Interaktív Magyarország térkép (`HungaryMap.tsx`):**
     - SimpleMaps `hu.svg` dinamikus betöltése (`fetch` + DOMParser).
     - 20 megyét 7 NUTS2 turisztikai régióba csoportosítva (Budapest és környéke, Közép-Dunántúl, Nyugat-Dunántúl, Dél-Dunántúl, Észak-Magyarország, Észak-Alföld, Dél-Alföld).
-    - Budapest jelölő: piros kör fehér szegéllyel + „Budapest" felirat.
+    - Budapest jelölő: piros kör fehér szegéllyel + „Budapest” felirat.
     - Event delegation alapú kattintás/hover kezelés (`data-region` attribútummal).
 - **ProgramTimeline újratervezése (dizájn referencia alapján):**
     - Kétoszlopos elrendezés: bal sidebar (Utazás Összegzése, becsült költség, Mentés/Megosztás gombok, Útiterv Adatok) + jobb tartalom.

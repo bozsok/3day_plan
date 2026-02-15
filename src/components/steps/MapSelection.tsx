@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { InfoPill } from '../common/InfoPill';
@@ -7,6 +8,8 @@ import { ArrowRight, ChevronLeft, MapPin, Map as MapIcon } from 'lucide-react';
 import { counties } from '../../data/mockData';
 import { HungaryMap } from '../common/HungaryMap';
 import { StepCard } from '../common/StepCard';
+import { useUser } from '../../context/UserContext';
+import { api } from '../../api/client';
 
 interface MapSelectionProps {
     selectedRegionId: string | undefined;
@@ -15,6 +18,7 @@ interface MapSelectionProps {
 
 export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) {
     const navigate = useNavigate();
+    const { user } = useUser();
     const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
 
     const selectedCounty = counties.find(c => c.id === selectedRegionId);
@@ -44,7 +48,23 @@ export function MapSelection({ selectedRegionId, onSelect }: MapSelectionProps) 
                     <button
                         id="region-selection-next-btn"
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 h-14 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
-                        onClick={() => navigate('/terv/csomagok')}
+                        onClick={async () => {
+                            if (selectedRegionId && user) {
+                                try {
+                                    // Ha vannak már dátumaink mentve, frissítsük a régióval együtt
+                                    const savedDates = localStorage.getItem('3nap_selected_dates');
+                                    const datesArr = savedDates ? JSON.parse(savedDates) : [];
+                                    const dateStrings = datesArr.map((d: string) => format(new Date(d), 'yyyy-MM-dd'));
+
+                                    await api.dates.save(user.id, dateStrings, selectedRegionId);
+                                    // Checkpoint 2: Régió megvan
+                                    await api.progress.update(user.id, { regionId: selectedRegionId });
+                                } catch (e) {
+                                    console.error('Hiba a régió szinkronizálásakor:', e);
+                                }
+                            }
+                            navigate('/terv/csomagok');
+                        }}
                         disabled={!selectedRegionId}
                     >
                         Tovább

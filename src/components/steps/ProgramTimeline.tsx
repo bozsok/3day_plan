@@ -56,7 +56,15 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             await api.dates.save(user.id, dateStrings, regionId);
             return await api.votes.cast(user.id, regionId, dateStrings);
         },
-        onSuccess: () => {
+        onSuccess: async () => {
+            // A szavazat leadása után töröljük a piszkozatot, mert már kész a terv
+            if (user) {
+                try {
+                    await api.progress.clear(user.id);
+                } catch (e) {
+                    console.error('Hiba a piszkozat törlésekor:', e);
+                }
+            }
             queryClient.invalidateQueries({ queryKey: ['summary'] });
             navigate('/terv/osszegzes');
         },

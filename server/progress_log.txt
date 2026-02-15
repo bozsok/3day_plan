@@ -1,0 +1,12 @@
+2026-02-15T02:23:20.360Z - DELETE error: Cannot read properties of undefined (reading 'userId')
+TypeError: Cannot read properties of undefined (reading 'userId')
+    at <anonymous> (D:\dev\projects\3nap_tervezo\server\src\routes\progress.ts:89:36)
+    at Layer.handleRequest (D:\dev\projects\3nap_tervezo\server\node_modules\router\lib\layer.js:152:17)
+    at next (D:\dev\projects\3nap_tervezo\server\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\dev\projects\3nap_tervezo\server\node_modules\router\lib\route.js:117:3)
+    at handle (D:\dev\projects\3nap_tervezo\server\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\dev\projects\3nap_tervezo\server\node_modules\router\lib\layer.js:152:17)
+    at D:\dev\projects\3nap_tervezo\server\node_modules\router\index.js:295:15
+    at processParams (D:\dev\projects\3nap_tervezo\server\node_modules\router\index.js:582:12)
+    at next (D:\dev\projects\3nap_tervezo\server\node_modules\router\index.js:291:5)
+    at Function.handle (D:\dev\projects\3nap_tervezo\server\node_modules\router\index.js:186:3)

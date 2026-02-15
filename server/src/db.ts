@@ -30,7 +30,9 @@ export async function initDatabase(): Promise<Database> {
             name       TEXT UNIQUE NOT NULL,
             created_at TEXT DEFAULT (datetime('now'))
         );
+    `);
 
+    db.run(`
         CREATE TABLE IF NOT EXISTS date_selections (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -39,13 +41,25 @@ export async function initDatabase(): Promise<Database> {
             created_at TEXT DEFAULT (datetime('now')),
             UNIQUE(user_id, region_id, date)
         );
+    `);
 
+    db.run(`
         CREATE TABLE IF NOT EXISTS vote_blocks (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             region_id  TEXT NOT NULL,
             dates      TEXT NOT NULL, -- JSON string a dátumok tömbjéről
             created_at TEXT DEFAULT (datetime('now'))
+        );
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS user_progress (
+            user_id    INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+            has_dates  INTEGER DEFAULT 0,
+            region_id  TEXT,
+            package_id TEXT,
+            last_active INTEGER
         );
     `);
 

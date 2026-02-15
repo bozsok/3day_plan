@@ -109,6 +109,24 @@ export const api = {
             return res.json();
         }
     },
+    progress: {
+        update: async (userId: number, data: { hasDates?: boolean, regionId?: string | null, packageId?: string | null }) => {
+            const res = await fetch(`${API_URL}/progress${EXT}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, ...data }),
+            });
+            if (!res.ok) throw new Error('Progress update failed');
+            return res.json();
+        },
+        clear: async (userId: number) => {
+            const res = await fetch(`${API_URL}/progress${EXT}?action=clear&userId=${userId}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) throw new Error('Progress clear failed');
+            return res.json();
+        }
+    },
     admin: {
         reset: async () => {
             const url = import.meta.env.PROD
