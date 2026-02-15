@@ -129,19 +129,46 @@ try {
         if (is_array($pData)) {
             $now = time();
             foreach ($pData as $uid => $p) {
-                // Csak az utolsó 15 percben aktívakat küldjük el (Passzív szűrés)
+                // Csak az utolsó 15 percben aktívakat küldjük el
                 if (($p['lastActive'] ?? 0) >= ($now - 900)) {
-                    $userProgress[$uid] = $p;
+                    $userProgress[$uid] = [
+                        'hasDates' => $p['hasDates'] ?? false,
+                        'regionId' => $p['regionId'] ?? null,
+                        'packageId' => $p['packageId'] ?? null,
+                        'dates' => $p['dates'] ?? [],
+                        'lastActive' => $p['lastActive'] ?? 0
+                    ];
                 }
             }
         }
     }
 
+    // --- Részletes Szavazatok ---
+    $detailedVotes = [];
+    if (!empty($db['vote_blocks']) && is_array($db['vote_blocks'])) {
+        foreach ($db['vote_blocks'] as $vb) {
+            $ts = isset($vb['created_at']) ? strtotime($vb['created_at']) : 0;
+            $detailedVotes[] = [
+                "id" => $vb['id'] ?? 0,
+                "userId" => $vb['user_id'] ?? 0,
+                "userName" => $usersMap[$vb['user_id'] ?? 0] ?? "Ismeretlen",
+                "dates" => $vb['dates'] ?? [],
+                "regionId" => $vb['region_id'] ?? null,
+                "packageId" => $vb['package_id'] ?? null,
+                "timestamp" => $ts * 1000 // JS format (ms)
+            ];
+        }
+    }
+    usort($detailedVotes, function ($a, $b) {
+        return ($b['timestamp'] ?? 0) - ($a['timestamp'] ?? 0);
+    });
+
     echo safe_json_encode([
         "topIntervals" => $topIntervals,
         "voteRanking" => $voteRanking,
         "userStatuses" => $userStatuses,
-        "userProgress" => $userProgress
+        "userProgress" => $userProgress,
+        "detailedVotes" => $detailedVotes
     ]);
 
 } catch (Throwable $e) {

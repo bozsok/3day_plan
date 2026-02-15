@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { packages } from '../../data/mockData';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
-import { ArrowRight, ChevronLeft } from 'lucide-react';
+import { ArrowRight, ChevronLeft, Flag, Palmtree, Sun, Mountain, Trees, Waves, Wine, Utensils, Footprints, Landmark, Castle, Ship, Star } from 'lucide-react';
 import { StepCard } from '../common/StepCard';
 import { useUser } from '../../context/UserContext';
 import { api } from '../../api/client';
@@ -13,6 +13,29 @@ interface PackageSelectionProps {
     onSelect: (packageId: string) => void;
     selectedPackageId?: string;
 }
+
+// Segédfüggvény a Material icon nevek Lucide-re fordításához
+const getLucideIcon = (iconName: string, size: number = 14) => {
+    const iconProps = { size, className: "shrink-0" };
+    switch (iconName) {
+        case 'flag': return <Flag {...iconProps} />;
+        case 'spa': return <Palmtree {...iconProps} />;
+        case 'wb_sunny': return <Sun {...iconProps} />;
+        case 'hiking': return <Mountain {...iconProps} />;
+        case 'trees':
+        case 'nature': return <Trees {...iconProps} />;
+        case 'waves': return <Waves {...iconProps} />;
+        case 'wine_bar': return <Wine {...iconProps} />;
+        case 'restaurant': return <Utensils {...iconProps} />;
+        case 'directions_walk':
+        case 'trail': return <Footprints {...iconProps} />;
+        case 'museum':
+        case 'account_balance': return <Landmark {...iconProps} />;
+        case 'castle': return <Castle {...iconProps} />;
+        case 'directions_boat': return <Ship {...iconProps} />;
+        default: return <Star {...iconProps} />;
+    }
+};
 
 export function PackageSelection({ regionId, onSelect, selectedPackageId }: PackageSelectionProps) {
     const navigate = useNavigate();
@@ -118,9 +141,11 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                         <h2 id="package-card-title" className="text-2xl font-bold text-gray-900">
                                             {pkg.title}
                                         </h2>
-                                        <span id="package-card-duration-badge" className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase whitespace-nowrap shrink-0">
-                                            3 Nap / 2 Éj
-                                        </span>
+                                        <div id="package-card-duration-badge" className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 whitespace-nowrap shrink-0">
+                                            <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                                                3 Nap / 2 Éj
+                                            </span>
+                                        </div>
                                     </div>
                                     <p id="package-card-description" className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
                                         {pkg.description}
@@ -131,8 +156,8 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                     <div id="package-card-tags-list" className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                                         {pkg.tags.map((tag, idx) => (
                                             <div key={idx} id={`package-card-tag-item-${idx}`} className="flex items-center gap-1 text-gray-500 shrink-0">
-                                                <span className="material-icons-outlined text-primary text-xl">
-                                                    {tag.icon}
+                                                <span className="text-primary flex items-center">
+                                                    {getLucideIcon(tag.icon, 14)}
                                                 </span>
                                                 <span className="text-xs font-semibold hidden lg:inline whitespace-nowrap">
                                                     {tag.label}
@@ -151,10 +176,10 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                             }
                                             navigate('/terv/program');
                                         }}
-                                        className="bg-primary hover:bg-primary-dark text-zinc-900 font-bold px-4 py-2 rounded-xl transition-all text-sm flex items-center gap-2 shadow-sm hover:shadow-md shrink-0 ml-2"
+                                        className="bg-primary hover:bg-primary-dark text-white font-black h-14 px-8 rounded-xl transition-all text-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/30 shrink-0 ml-2 active:scale-95"
                                     >
                                         Kiválasztás
-                                        <ArrowRight size={16} />
+                                        <ArrowRight size={20} />
                                     </button>
                                 </div>
                             </div>

@@ -2,6 +2,36 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [1.1.0] - 2026-02-15
+
+### Vizuális tisztaság és Ikonrendszer váltás
+- **Teljes Lucide ikon migráció:** Mostantól nemcsak a rangsor kártyák, hanem a 2. lépésben található **programcsomagok kártyái** is a modern Lucide ikonokat használják.
+- **Precíz ikonméretezés:**
+    - A rangsor kártyákon az ikonok méretét 12 pixelre finomítottuk.
+    - A csomagkártyák címkéinél (tags) az ikonok méretét 14 pixelre állítottuk, így tökéletes egyensúlyba kerültek a feliratokkal.
+- **Dinamikus ikon-leképezés:** A kategóriák (Hegyvidék, Bor, SPA, stb.) automatikusan a megfelelő stílusú Lucide ikonokat kapják meg a háttérben.
+
+### UI és Gomb finomhangolás
+- **Kiemelt navigáció:** Az összegzés oldalon a "Tovább tervezek" gombot rövidebb, ütősebb **"TERVEZEK"** feliratra cseréltük (csupa nagybetű, `font-black`).
+- **"Szavazok!" és "Kiválasztás" gombok:**
+    - Mindkét fő akciógomb fehér betűszínt és nagyobb méretet (`text-xl` / `text-lg`) kapott.
+    - Fix **`h-14`** magassággal rendelkeznek a tűpontos illeszkedés érdekében.
+    - A "Szavazok!" gomb felirata rövidebb és ütősebb lett.
+### UI és Gomb finomhangolás
+- **"Mikor menjünk?" kártyák teljes áttervezése:** A dátumkártyák vizuális stílusát a "Hova menjünk?" kártyák prémium szintjére emeltük:
+    - **Header:** Bal oldalon a "Győztes" jelvény (ha releváns), jobb felső sarokban szív ikonnal kiegészített szavazatszámláló.
+    - **Tartalom:** Középre rendezett, tipográfiailag kiemelt **"IDŐPONT"** felirat és dátum (pl. **febr. 20-22.**), felette diszkrét naptár ikonnal.
+    - **Footer:** Bal oldalon megnövelt méretű (24px) szavazó avatárok, jobb oldalon a márka színével kiemelt **"3 NAP"** időtartam jelző.
+- **UI térközök optimalizálása:**
+    - Eltávolítottuk a felesleges margókat a rangsor szekciók fejlécéből, így a kártyák közelebb kerültek a címhez.
+    - A szavazati táblázat fejléce megszabadult az oldalsó paddingtől, így a tartalom a teljes szélességet kitölti.
+- **Letisztult "Szavazataim" gomb:** A gomb stílusát visszafogott szürke árnyalatúra cseréltük (`bg-gray-200`, `text-gray-400`), hogy vizuálisan másodlagos maradjon a fő akciógombok mellett.
+
+### Rendszer és Adatkezelés
+- **Teljes ID lefedettség:** A rangsor kártyák és minden belső elemük egyedi azonosítót kaptak (ID 184-190).
+- **Intelligens láthatóság:** A folyamatban lévő tervezések csak akkor láthatóak a közös táblázatban, ha a felhasználó már megkezdte a dátumok kijelölését.
+- **Verziófrissítés:** Mind a frontend, mind a szerveroldali `package.json` verziószáma 1.1.0-ra frissült.
+
 ## [1.0.0] - 2026-02-15
 
 ### A felfedezés szabadsága (Új UX folyamat)

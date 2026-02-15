@@ -15,7 +15,7 @@ A tervezés nálunk egy játékos, gördülékeny folyamat, ahol az oldalak köz
 
 ## Modern felhasználói élmény
 
-Az alkalmazás legújabb verziója (v0.10+) a vizuális tökéletességre, a technikai stabilitásra és a tesztelhetőségre fókuszál:
+Az alkalmazás legújabb verziója (v1.1+) a vizuális tökéletességre, az egységes ikonrendszerre (Lucide) és a technikai stabilitásra fókuszál:
 
 - **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az `element_id_map.md` fájlban. Ez lehetővé teszi a könnyű automatizált tesztelést és az elemek pontos beazonosítását.
 

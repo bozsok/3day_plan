@@ -89,8 +89,11 @@ try {
             if (array_key_exists('regionId', $input)) {
                 $db[$userId]['regionId'] = $input['regionId']; // Null is valid
             }
-            if (array_key_exists('packageId', $input)) {
+            if (isset($input['packageId'])) {
                 $db[$userId]['packageId'] = $input['packageId']; // Null is valid
+            }
+            if (isset($input['dates'])) {
+                $db[$userId]['dates'] = $input['dates']; // Array of strings
             }
 
             $db[$userId]['lastActive'] = $now;

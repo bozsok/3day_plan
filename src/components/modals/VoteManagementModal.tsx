@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, type VoteBlock } from '../../api/client';
 import { useUser } from '../../context/UserContext';
@@ -45,16 +46,10 @@ export function VoteManagementModal({ isOpen, onClose }: VoteManagementModalProp
     const handleDelete = async (blockId: number) => {
         if (!user) return;
 
-        // UI-based confirmation or immediate delete (User asked to remove popups)
-        // For now: Immediate delete with optimisitc update is standard in modern UIs for this type of list
-
         setDeletingId(blockId);
         try {
             await api.votes.revoke(user.id, blockId);
-            // Remove from local list immediately
             setVotes(prev => prev.filter(v => v.id !== blockId));
-
-            // Invalidate summary query to refresh other components
             queryClient.invalidateQueries({ queryKey: ['summary'] });
         } catch (err) {
             console.error('Failed to delete vote:', err);
@@ -66,14 +61,22 @@ export function VoteManagementModal({ isOpen, onClose }: VoteManagementModalProp
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl min-[440px]:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in">
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[1001] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
+            <div
+                className="bg-white rounded-2xl min-[440px]:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in"
+                onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* Header */}
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        🗳️ Leadott Szavazataim
+                        🗳️ Leadott szavazataim
                     </h2>
                     <button
                         onClick={onClose}
@@ -128,7 +131,7 @@ export function VoteManagementModal({ isOpen, onClose }: VoteManagementModalProp
                                             title="Törlés"
                                         >
                                             {deletingId === vote.id ? (
-                                                <span className="animate-spin">⏳</span>
+                                                <span className="animate-spin text-xl block">⏳</span>
                                             ) : (
                                                 <Trash2 size={20} />
                                             )}
@@ -145,6 +148,7 @@ export function VoteManagementModal({ isOpen, onClose }: VoteManagementModalProp
                     A törlés azonnal megtörténik és mindenkinél frissül.
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

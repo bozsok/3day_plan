@@ -102,8 +102,16 @@ try {
             $vbList = [];
             if (!empty($db['vote_blocks'])) {
                 foreach ($db['vote_blocks'] as $v) {
-                    if (($v['user_id'] ?? 0) === $userId)
-                        $vbList[] = $v;
+                    if (($v['user_id'] ?? 0) === $userId) {
+                        $vbList[] = [
+                            "id" => $v['id'],
+                            "userId" => $v['user_id'],
+                            "regionId" => $v['region_id'],
+                            "packageId" => $v['package_id'] ?? null,
+                            "dates" => $v['dates'],
+                            "createdAt" => $v['created_at']
+                        ];
+                    }
                 }
             }
             echo json_encode([

@@ -4,8 +4,8 @@
    Color tokens & Theme logic
    ============================================= */
 :root {
-    --color-primary: #13ec13;
-    --color-primary-dark: #0fb80f;
+    --color-primary: #10b981;
+    --color-primary-dark: #059669;
 
     /* Semantic variables - Light mode defaults */
     --bg-main: #f1f5f9;

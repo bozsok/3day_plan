@@ -76,7 +76,7 @@ export const packages: Package[] = [
         imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPud2dEWrfLNXmY-oiPgDaJT_DnDZrSEGET7_Ykv2xpEGleogvVeG9OfVu0BpmIz9u_cn3NOP00KjMo3JKIJskjKadeHC73BpAxdUFVGHKh7DBYjV91xj4ax_8QYd9d03iY68nKnNDdOqvlJJJcQdyDofJjcnjOw3l1yix4RBquqwagWhFHQSIjmyuNgUPZAmQ8RAsBV6ggUzIXJSQBQacg8Yjgr_jr8G6gY8JWiFZViNQApnOyZ0_y6lCXpvn7odXFXdtR0Hpt6U',
         tags: [
             { icon: 'flag', label: 'Hegyvidék' },
-            { icon: 'spa', label: 'Wellness' },
+            { icon: 'spa', label: 'SPA' },
             { icon: 'self_improvement', label: 'Relax' }
         ],
         estimatedCost: '52.000',
@@ -89,8 +89,21 @@ export const packages: Package[] = [
                     { id: 'm1-3', time: '14:00', icon: 'hiking', category: 'AKTÍV', title: 'Kékestető meghódítása', description: 'Séta Magyarország legmagasabb pontjára.' }
                 ]
             },
-            { dayIndex: 2, items: [] },
-            { dayIndex: 3, items: [] }
+            {
+                dayIndex: 2,
+                items: [
+                    { id: 'm2-1', time: '09:00', icon: 'wb_sunny', category: 'TERMÉSZET', title: 'Reggeli a csúcson', description: 'Napfelkelte nézés a Kékesről.' },
+                    { id: 'm2-2', time: '11:00', icon: 'directions_walk', category: 'AKTÍV', title: 'Túra Sástó felé', description: 'Látogatás az ország legmagasabb tavához.' },
+                    { id: 'm2-3', time: '16:00', icon: 'spa', category: 'RELAX', title: 'Wellness délután', description: 'Pihenés szaunával és masszázzsal.' }
+                ]
+            },
+            {
+                dayIndex: 3,
+                items: [
+                    { id: 'm3-1', time: '10:00', icon: 'shopping_bag', category: 'HELYI', title: 'Kézműves piac', description: 'Vásárlás a helyi kistermelőktől.' },
+                    { id: 'm3-2', time: '13:00', icon: 'restaurant', category: 'GASZTRO', title: 'Búcsúebéd Gyöngyösön', description: 'Hagyományos pásztorételek a város szívében.' }
+                ]
+            }
         ]
     },
     {
@@ -109,11 +122,23 @@ export const packages: Package[] = [
             {
                 dayIndex: 1,
                 items: [
-                    { id: 't1-1', time: '14:00', icon: 'wine_bar', category: 'KULTÚRA', title: 'Pincelátogatás', description: 'Ismerkedés a Tokaji Aszú készítésével.' }
+                    { id: 't1-1', time: '14:00', icon: 'wine_bar', category: 'KULTÚRA', title: 'Pincelátogatás', description: 'Ismerkedés a Tokaji Aszú készítésével.' },
+                    { id: 't1-2', time: '19:00', icon: 'dinner_dining', category: 'GASZTRO', title: 'Borvacsora', description: 'Helyi borokhoz komponált 5 fogásos menü.' }
                 ]
             },
-            { dayIndex: 2, items: [] },
-            { dayIndex: 3, items: [] }
+            {
+                dayIndex: 2,
+                items: [
+                    { id: 't2-1', time: '10:00', icon: 'terrain', category: 'AKTÍV', title: 'Dűlőtúra terepjáróval', description: 'Látogatás a legszebb szőlőültetvényekre.' },
+                    { id: 't2-2', time: '15:00', icon: 'castle', category: 'KULTÚRA', title: 'Rákóczi-vár', description: 'Történelmi séta Sárospatakon.' }
+                ]
+            },
+            {
+                dayIndex: 3,
+                items: [
+                    { id: 't3-1', time: '11:00', icon: 'sailing', category: 'RELAX', title: 'Bodrog-parti séta', description: 'Hajózás vagy séta a folyóparton.' }
+                ]
+            }
         ]
     },
 
@@ -138,8 +163,19 @@ export const packages: Package[] = [
                     { id: 'a1-2', time: '12:00', icon: 'photo_camera', category: 'LÁTNIVALÓ', title: 'Kilenclyukú híd', description: 'Séta a világörökség részét képező hídnál.' }
                 ]
             },
-            { dayIndex: 2, items: [] },
-            { dayIndex: 3, items: [] }
+            {
+                dayIndex: 2,
+                items: [
+                    { id: 'a2-1', time: '09:00', icon: 'agriculture', category: 'KULTÚRA', title: 'Puszta-szafari', description: 'Vadszamarak és őstulkok megfigyelése.' },
+                    { id: 'a2-2', time: '14:00', icon: 'potted_plant', category: 'TERMÉSZET', title: 'Madárpark látogatás', description: 'Ismerkedés a megmentett ragadozó madarakkal.' }
+                ]
+            },
+            {
+                dayIndex: 3,
+                items: [
+                    { id: 'a3-1', time: '11:00', icon: 'menu_book', category: 'KULTÚRA', title: 'Pásztormúzeum', description: 'Hagyományok és életmód a pusztán.' }
+                ]
+            }
         ]
     },
 
@@ -157,9 +193,26 @@ export const packages: Package[] = [
         ],
         estimatedCost: '45.000',
         days: [
-            { dayIndex: 1, items: [] },
-            { dayIndex: 2, items: [] },
-            { dayIndex: 3, items: [] }
+            {
+                dayIndex: 1,
+                items: [
+                    { id: 'p1-1', time: '10:00', icon: 'directions_boat', category: 'UTAZÁS', title: 'Hajókázás Szentendrére', description: 'Romantikus hajóút a Dunán.' },
+                    { id: 'p1-2', time: '13:00', icon: 'palette', category: 'KULTÚRA', title: 'Művészetek városa', description: 'Galériák és a Kovács Margit Múzeum megtekintése.' }
+                ]
+            },
+            {
+                dayIndex: 2,
+                items: [
+                    { id: 'p2-1', time: '09:00', icon: 'fort', category: 'LÁTNIVALÓ', title: 'Visegrádi Fellegvár', description: 'Panoráma a Dunakanyarra a történelmi falakról.' },
+                    { id: 'p2-2', time: '15:00', icon: 'kayaking', category: 'AKTÍV', title: 'Kenutúra a Dunán', description: 'Evezés a Dunakanyar legszebb részein.' }
+                ]
+            },
+            {
+                dayIndex: 3,
+                items: [
+                    { id: 'p3-1', time: '11:00', icon: 'park', category: 'RELAX', title: 'Vácrátóti Arborétum', description: 'Botanikai séta hazánk leggazdagabb kertjében.' }
+                ]
+            }
         ]
     },
 
@@ -177,9 +230,26 @@ export const packages: Package[] = [
         ],
         estimatedCost: '55.000',
         days: [
-            { dayIndex: 1, items: [] },
-            { dayIndex: 2, items: [] },
-            { dayIndex: 3, items: [] }
+            {
+                dayIndex: 1,
+                items: [
+                    { id: 'v1-1', time: '14:00', icon: 'church', category: 'KULTÚRA', title: 'Tihanyi Apátság', description: 'Látogatás az 1055-ben alapított bencés monostorban.' },
+                    { id: 'v1-2', time: '18:00', icon: 'sunny', category: 'RELAX', title: 'Naplemente a Belső-tónál', description: 'Séta a levendulamezők mentén.' }
+                ]
+            },
+            {
+                dayIndex: 2,
+                items: [
+                    { id: 'v2-1', time: '10:00', icon: 'sailing', category: 'AKTÍV', title: 'Vitorlázás Balatonfüredről', description: 'Délelőtti skipperlés a nyílt vízen.' },
+                    { id: 'v2-2', time: '16:00', icon: 'wine_bar', category: 'GASZTRO', title: 'Borkóstoló a Badacsonyban', description: 'Kéknyelű és olaszrizling válogatás.' }
+                ]
+            },
+            {
+                dayIndex: 3,
+                items: [
+                    { id: 'v3-1', time: '11:00', icon: 'pool', category: 'SPA', title: 'Hévízi-tó', description: 'Reggeli fürdőzés a világ legnagyobb termál tavában.' }
+                ]
+            }
         ]
     }
 ];

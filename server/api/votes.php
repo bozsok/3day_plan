@@ -79,20 +79,22 @@ try {
         if (empty($input['userId']) || empty($input['regionId']) || !isset($input['dates']) || count($input['dates']) !== 3)
             throw new Exception("Invalid Vote");
         $userId = (int) $input['userId'];
-        $regionId = $input['regionId'];
+        $regionId = $input['regionId']; // countyId
         $dates = $input['dates'];
+        $packageId = $input['packageId'] ?? null;
 
-        $res = safeProcessDB(function (&$db) use ($userId, $regionId, $dates) {
+        $res = safeProcessDB(function (&$db) use ($userId, $regionId, $dates, $packageId) {
             if (!isset($db['vote_blocks']))
                 $db['vote_blocks'] = [];
 
             sort($dates);
-            // Idempotency
+            // Idempotency: Check if exactly the same vote exists
             foreach ($db['vote_blocks'] as $b) {
                 if (($b['user_id'] ?? 0) === $userId && ($b['region_id'] ?? '') === $regionId) {
                     $bd = $b['dates'] ?? [];
                     sort($bd);
-                    if ($bd == $dates)
+                    $bp = $b['package_id'] ?? null;
+                    if ($bd == $dates && $bp == $packageId)
                         return $b;
                 }
             }
@@ -101,6 +103,7 @@ try {
                 "id" => getNextId($db['vote_blocks']),
                 "user_id" => $userId,
                 "region_id" => $regionId,
+                "package_id" => $packageId,
                 "dates" => $dates,
                 "created_at" => date('Y-m-d H:i:s')
             ];
@@ -119,17 +122,34 @@ try {
         safeProcessDB(function (&$db) use ($userId, $blockId) {
             if (!isset($db['vote_blocks']))
                 return;
+
+            // Find the block to know which dates to cleanup
+            $datesToRemove = [];
+            $regionToClean = null;
+            
+            foreach ($db['vote_blocks'] as $b) {
+                if (($b['id'] ?? 0) === $blockId && ($b['user_id'] ?? 0) === $userId) {
+                    $datesToRemove = $b['dates'] ?? [];
+                    $regionToClean = $b['region_id'] ?? null;
+                    break;
+                }
+            }
+
+            // Remove the block
             $db['vote_blocks'] = array_values(array_filter($db['vote_blocks'], function ($b) use ($blockId) {
                 return ($b['id'] ?? 0) !== $blockId;
             }));
 
-            // Cleanup checks optional but good
-            if (isset($db['date_selections'])) {
-                // Logic to remove dates associated with this block could go here, 
-                // but kept simple to match "minimal" request for now.
-                // The previous safe implementation had complex logic here.
-                // Re-adding minimal cleanup:
+            // Cleanup associated individual date selections
+            if ($regionToClean && !empty($datesToRemove) && isset($db['date_selections'])) {
+                $db['date_selections'] = array_values(array_filter($db['date_selections'], function ($ds) use ($userId, $regionToClean, $datesToRemove) {
+                    $uOk = ($ds['user_id'] ?? 0) === $userId;
+                    $rOk = ($ds['region_id'] ?? '') === $regionToClean;
+                    $dOk = in_array($ds['date'] ?? '', $datesToRemove);
+                    return !($uOk && $rOk && $dOk);
+                }));
             }
+            
             return true;
         });
         echo json_encode(["success" => true]);
@@ -140,8 +160,16 @@ try {
         $ret = [];
         if (!empty($db['vote_blocks'])) {
             foreach ($db['vote_blocks'] as $v) {
-                if (!$userId || ($v['user_id'] ?? 0) === $userId)
-                    $ret[] = $v;
+                if (!$userId || ($v['user_id'] ?? 0) === $userId) {
+                    $ret[] = [
+                        "id" => $v['id'],
+                        "userId" => $v['user_id'],
+                        "regionId" => $v['region_id'],
+                        "packageId" => $v['package_id'] ?? null,
+                        "dates" => $v['dates'],
+                        "createdAt" => $v['created_at']
+                    ];
+                }
             }
         }
         echo json_encode($ret);

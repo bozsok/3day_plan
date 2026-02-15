@@ -1,8 +1,7 @@
 
 import { useState } from 'react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { ChevronDown, ChevronUp, Clock, Activity } from 'lucide-react';
 import { counties, packages } from '../../data/mockData';
 
 interface UserStatus {
@@ -32,6 +31,7 @@ interface DesignerStatusProps {
     users: UserStatus[];
     userProgress?: Record<number, UserProgress>;
     detailedVotes?: DetailedVote[];
+    onManageVotes?: () => void;
 }
 
 // Egységesített sor az összesítéshez
@@ -39,6 +39,7 @@ interface TableRow {
     id: string; // Egyedi azonosító (pl. vote-123 vagy progress-456)
     userId: number;
     userName: string;
+    avatarUrl?: string;
     status: 'COMPLETED' | 'IN_PROGRESS';
     datesDisplay: string;
     regionDisplay: string;
@@ -46,7 +47,7 @@ interface TableRow {
     timestamp: number;
 }
 
-export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], id }: DesignerStatusProps & { id?: string }) {
+export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], onManageVotes, id }: DesignerStatusProps & { id?: string }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     // 1. ADATELŐKÉSZÍTÉS: Sorok generálása
@@ -54,7 +55,6 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], i
 
     // A) KÉSZ (Leadott) szavazatok hozzáadása
     detailedVotes.forEach(vote => {
-        // Dátum formázása
         let datesDisplay = '';
         if (vote.dates && vote.dates.length > 0) {
             const start = new Date(vote.dates[0]);
@@ -62,9 +62,7 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], i
             datesDisplay = `${format(start, 'MMM d.', { locale: hu })} - ${format(end, 'MMM d.', { locale: hu })}`;
         }
 
-        // Régió és Csomag név keresése
         const regionName = vote.regionId ? (counties.find(c => c.id === vote.regionId)?.name || vote.regionId) : '';
-
         const packageName = vote.packageId ? (packages.find(p => p.id === vote.packageId)?.title || vote.packageId) : '';
 
         rows.push({
@@ -75,40 +73,40 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], i
             datesDisplay,
             regionDisplay: regionName,
             packageDisplay: packageName,
-            timestamp: typeof vote.timestamp === 'string' ? new Date(vote.timestamp).getTime() : vote.timestamp * 1000 // Backend timestamp kezelés
+            timestamp: typeof vote.timestamp === 'string' ? new Date(vote.timestamp).getTime() : vote.timestamp * 1000
         });
     });
 
     // B) FOLYAMATBAN lévő tervezések hozzáadása
-    // Csak akkor adjuk hozzá, ha tényleg van aktivitás (azaz nem üres progress)
     Object.entries(userProgress).forEach(([userIdStr, progress]) => {
-        // SZŰRÉS: Ha nincs dátum, akkor csak nézelődik -> nem mutatjuk
-        if (!progress.hasDates) return;
-
         const userId = parseInt(userIdStr);
+
+        // Ha már van leadott szavazata ebben a listában, akkor a "Függőben" lévőt csak akkor mutatjuk, 
+        // ha az frissebb (máshol tart a tervezésben). De egyszerűség kedvéért mutassuk mindkettőt, 
+        // a timestamp alapján úgyis sorrendbe kerülnek.
+
         const user = users.find(u => u.id === userId);
         if (!user) return;
 
-        // Csak akkor tekintjük folyamatban lévőnek, ha van dátum választva (mert az a folyamat eleje)
-        // VÉSZHELYZETI FIX: A 'datesDisplay' itt nem tudjuk pontosan, mert a progress csak boolean-t tárol ('hasDates').
-        // A kérés szerint: "A dátum is dinamikusan jelenik meg".
-        // DE: A progress API jelenleg nem küldi le a választott dátumokat, csak azt, hogy VAN-E.
-        // Ezért itt egyelőre egy helyőrzőt vagy a 'Folyamatban...' szöveget kell használnunk a dátum helyett,
-        // AMÍG a backend nem küldi a pontos draft adatokat.
-        // Mivel a kérés szigorú ("Ne törjön el a kód"), nem kockáztatok újabb backend hívással most.
-        // Megjelenítjük, amit tudunk: státuszjelzőket.
+        // Csak akkor mutatjuk, ha már elkezdett dátumot választani (Voksolási fázis)
+        const hasVisibleProgress = progress.dates && progress.dates.length > 0;
 
-        if (progress.hasDates || progress.regionId || progress.packageId) {
-            // Régió és Csomag név keresése (itt megvannak az ID-k!)
+        if (hasVisibleProgress) {
             const regionName = progress.regionId ? (counties.find(c => c.id === progress.regionId)?.name || progress.regionId) : '';
             const packageName = progress.packageId ? (packages.find(p => p.id === progress.packageId)?.title || progress.packageId) : '';
 
-            // Dátum megjelenítése: Ha van konkrét dátum, azt írjuk ki
-            let datesDisplay = progress.hasDates ? 'Dátum kiválasztva...' : '';
+            let datesDisplay = '';
             if (progress.dates && Array.isArray(progress.dates) && progress.dates.length > 0) {
-                const start = new Date(progress.dates[0]);
-                const end = new Date(progress.dates[progress.dates.length - 1]);
-                datesDisplay = `${format(start, 'MMM d.', { locale: hu })} - ${format(end, 'MMM d.', { locale: hu })}`;
+                const sortedDates = [...progress.dates].sort();
+                const start = new Date(sortedDates[0]);
+                const end = new Date(sortedDates[sortedDates.length - 1]);
+                const rangeText = `${format(start, 'MMM d.', { locale: hu })} - ${format(end, 'MMM d.', { locale: hu })}`;
+
+                if (progress.hasDates) {
+                    datesDisplay = rangeText;
+                } else {
+                    datesDisplay = `${progress.dates.length} nap kiválasztva...`;
+                }
             }
 
             rows.push({
@@ -116,112 +114,86 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], i
                 userId: userId,
                 userName: user.name,
                 status: 'IN_PROGRESS',
-                datesDisplay, // Ez most kompromisszumos
+                datesDisplay,
                 regionDisplay: regionName,
                 packageDisplay: packageName,
-                timestamp: progress.lastActive * 1000 // Sec -> MS konverzió
+                timestamp: progress.lastActive * 1000
             });
         }
     });
 
-    // Rendezés: Legfrissebb felül
     rows.sort((a, b) => b.timestamp - a.timestamp);
-
-    // Megjelenítendő sorok (Max 5 vagy mind)
     const displayedRows = isExpanded ? rows : rows.slice(0, 5);
 
     return (
-        <section id={id} className="bg-white dark:bg-card-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mt-12 w-full">
+        <section id={id || 'designer-status-root'} className="bg-surface rounded-2xl shadow-soft overflow-hidden mt-12 w-full transition-all">
             {/* Header */}
-            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <Activity className="text-primary" size={20} />
-                    Részletes Szavazatok
-                </h3>
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                    Összesen: {rows.length}
-                </span>
+            <div id="designer-status-header" className="py-6 px-0 flex justify-between items-center">
+                <h3 id="designer-status-title" className="text-2xl font-bold text-gray-900">Részletes szavazatok</h3>
+                {onManageVotes && (
+                    <button
+                        id="designer-status-manage-btn"
+                        onClick={onManageVotes}
+                        className="flex items-center justify-center px-8 h-14 bg-gray-200 text-gray-400 rounded-2xl text-lg font-bold tracking-tight hover:bg-gray-300 hover:text-gray-600 transition-all active:scale-95"
+                    >
+                        <span>Szavazataim</span>
+                    </button>
+                )}
             </div>
 
             {/* Táblázat */}
-            <div className="overflow-x-auto w-full">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                    <thead>
-                        <tr className="border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-card-dark text-xs font-extrabold uppercase text-gray-500 dark:text-gray-400 tracking-wider">
-                            <th className="p-5 w-1/4">Tervező</th>
-                            <th className="p-5 w-1/6">Státusz</th>
-                            <th className="p-5 w-1/5">Dátum</th>
-                            <th className="p-5 w-1/6">Helyszín</th>
-                            <th className="p-5 w-1/6 text-left">Csomag</th>
-                            <th className="p-5 w-1/6 text-right">Aktivitás</th>
+            <div id="designer-status-table-container" className="overflow-x-auto w-full">
+                <table id="designer-status-table" className="w-full text-left border-collapse min-w-[650px]">
+                    <thead id="designer-status-thead">
+                        <tr className="border-b border-border-subtle text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 tracking-widest">
+                            <th className="p-5">Tervező</th>
+                            <th className="p-5">Időpont</th>
+                            <th className="p-5">Helyszín</th>
+                            <th className="p-5">Csomag</th>
+                            <th className="p-5 text-right">Státusz</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
+                    <tbody id="designer-status-tbody" className="divide-y divide-border-subtle text-sm bg-gray-50/50">
                         {displayedRows.length === 0 ? (
-                            <tr>
-                                <td colSpan={7} className="p-8 text-center text-gray-400 italic">
+                            <tr id="designer-status-empty-row">
+                                <td colSpan={5} className="p-8 text-center text-content-muted italic">
                                     Még nem érkezett szavazat, de a tervezés már elindult...
                                 </td>
                             </tr>
                         ) : (
                             displayedRows.map((row) => (
-                                <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                                    {/* Név + Avatar */}
+                                <tr id={`designer-status-row-${row.id}`} key={row.id} className="hover:bg-surface-hover transition-colors group">
                                     <td className="p-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 ring-2 ring-transparent group-hover:ring-primary/20 transition-all shadow-sm">
-                                                {row.userName.charAt(0)}
+                                            <div id={`designer-status-avatar-box-${row.userId}`} className="h-9 w-9 rounded-full bg-surface-alt flex items-center justify-center text-xs font-bold text-content-muted ring-2 ring-transparent group-hover:ring-primary/20 transition-all shadow-sm">
+                                                {row.avatarUrl ? <img src={row.avatarUrl} alt={row.userName} className="h-full w-full rounded-full object-cover" /> : row.userName.charAt(0)}
                                             </div>
-                                            <div>
-                                                <div className="font-bold text-gray-900 dark:text-white">{row.userName}</div>
-                                                {/* Dinamikus csomag kijelzés mobilon vagy alcímként */}
-                                                {row.packageDisplay && (
-                                                    <div className="text-xs text-primary font-medium md:hidden">
-                                                        {row.packageDisplay}
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <span id={`designer-status-user-name-${row.userId}`} className="font-bold text-content-main">{row.userName}</span>
                                         </div>
                                     </td>
 
-                                    {/* Státusz */}
-                                    <td className="p-5">
+                                    <td id={`designer-status-cell-dates-${row.userId}`} className="p-5 text-content-muted font-medium">
+                                        {row.datesDisplay || <span className="opacity-20">-</span>}
+                                    </td>
+
+                                    <td id={`designer-status-cell-region-${row.userId}`} className="p-5 text-content-muted font-medium">
+                                        {row.regionDisplay || <span className="opacity-20">-</span>}
+                                    </td>
+
+                                    <td id={`designer-status-cell-package-${row.userId}`} className="p-5 text-content-muted font-medium">
+                                        {row.packageDisplay || <span className="opacity-20">-</span>}
+                                    </td>
+
+                                    <td id={`designer-status-cell-status-${row.userId}`} className="p-5 text-right flex justify-end">
                                         {row.status === 'COMPLETED' ? (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800 shadow-sm">
-                                                KÉSZ
-                                            </span>
+                                            <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                                                Végleges
+                                            </div>
                                         ) : (
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm animate-pulse">
-                                                FOLYAMATBAN
-                                            </span>
+                                            <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 font-bold text-[10px] tracking-widest uppercase">
+                                                Függőben
+                                            </div>
                                         )}
-                                    </td>
-
-                                    {/* Dátum (Dinamikus) */}
-                                    <td className="p-5 text-gray-700 dark:text-gray-300 font-medium">
-                                        {row.datesDisplay || <span className="text-gray-300 dark:text-gray-600">-</span>}
-                                    </td>
-
-                                    {/* Helyszín */}
-                                    <td className="p-5">
-                                        <span className="font-bold text-gray-800 dark:text-gray-200">
-                                            {row.regionDisplay || <span className="text-gray-300 dark:text-gray-600 font-normal">-</span>}
-                                        </span>
-                                    </td>
-
-                                    {/* Csomag */}
-                                    <td className="p-5">
-                                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                                            {row.packageDisplay || <span className="text-gray-300 dark:text-gray-600 font-normal">-</span>}
-                                        </span>
-                                    </td>
-
-                                    {/* Aktivitás (Relatív idő) */}
-                                    <td className="p-5 text-right">
-                                        <div className="flex items-center justify-end gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400">
-                                            <Clock size={12} className="opacity-70" />
-                                            {formatDistanceToNow(row.timestamp, { addSuffix: true, locale: hu })}
-                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -230,21 +202,19 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], i
                 </table>
             </div>
 
-            {/* Expand / Collapse Button */}
-            {rows.length > 5 && (
-                <div className="p-0 border-t border-gray-100 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-800/20">
-                    <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="w-full py-3 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-primary transition-colors flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    >
-                        {isExpanded ? (
-                            <>Kevesebb mutatása <ChevronUp size={14} /></>
-                        ) : (
-                            <>Összes résztvevő mutatása ({rows.length}) <ChevronDown size={14} /></>
-                        )}
-                    </button>
-                </div>
-            )}
+            {/* Footer */}
+            <div id="designer-status-footer" className="p-4 border-t border-border-subtle text-center">
+                <button
+                    id="designer-status-expand-btn"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-primary transition-colors flex items-center justify-center gap-2 w-full py-2"
+                >
+                    {isExpanded ? 'Kevesebb mutatása' : `Összes résztvevő mutatása (${rows.length})`}
+                    <span className="material-icons-outlined text-base">
+                        {isExpanded ? 'expand_less' : 'expand_more'}
+                    </span>
+                </button>
+            </div>
         </section>
     );
 }

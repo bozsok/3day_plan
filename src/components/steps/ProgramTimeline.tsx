@@ -50,10 +50,11 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
 
     const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
 
-    // Alapértelmezett napnevek, ha még nincs választva dátum
-    const dayNames = sortedDates.length > 0
+    // Alapértelmezett napnevek, ha még nincs választva dátum, vagy nem teljes a 3 nap
+    const defaultDayNames = ['Péntek', 'Szombat', 'Vasárnap'];
+    const dayNames = sortedDates.length === 3
         ? sortedDates.map(d => format(d, 'EEEE', { locale: hu }))
-        : ['Péntek', 'Szombat', 'Vasárnap'];
+        : defaultDayNames;
 
     const dateRangeLabel = sortedDates.length >= 2
         ? `${format(sortedDates[0], 'yyyy. MMMM d.', { locale: hu })} – ${format(sortedDates[sortedDates.length - 1], 'd.', { locale: hu })}`
@@ -64,14 +65,21 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
             {/* Fejléc */}
             <StepHeader
                 step="3. Lépés: Programok"
-                title={<>
-                    <div id="program-timeline-county-badge-wrapper" className="flex items-center justify-start md:justify-center lg:justify-start gap-2 mb-2">
-                        <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
+                title={<div className="flex flex-col">
+                    <div id="program-timeline-county-badge-wrapper" className="flex items-center justify-start md:justify-center lg:justify-start mb-2">
+                        <span id="program-timeline-county-badge" className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded uppercase tracking-wider">
                             {county?.name}
                         </span>
                     </div>
-                    {selectedPackage.title}
-                </>}
+                    <div className="flex justify-between items-start gap-4 w-full">
+                        <span className="text-left md:text-center lg:text-left leading-tight">{selectedPackage.title}</span>
+                        <div id="program-timeline-duration-badge" className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 whitespace-nowrap shrink-0">
+                            <span className="text-primary-dark font-bold text-[10px] tracking-widest uppercase">
+                                3 NAP / 2 ÉJ
+                            </span>
+                        </div>
+                    </div>
+                </div>}
                 description="3 napos programterv"
                 titleClassName="text-2xl font-bold text-gray-900 mb-2 text-left md:text-center lg:text-left"
                 descriptionClassName="text-gray-500 text-sm text-left md:text-center lg:text-left mb-6"
@@ -121,20 +129,17 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 <button
                     id="program-timeline-vote-btn"
                     onClick={handleVote}
-                    className="w-full font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-black shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full h-14 font-black rounded-xl transition-all flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white text-xl shadow-lg shadow-primary/30 active:scale-95"
                 >
-                    Szavazat leadása...
+                    Szavazok!
                 </button>
 
                 <button
                     id="program-timeline-results-btn"
                     onClick={() => navigate('/terv/osszegzes')}
-                    className="group bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 w-full"
+                    className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 text-gray-600 hover:text-primary-dark font-bold text-lg px-8 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
                 >
                     Eredmények
-                    <span className="text-xl group-hover:translate-x-1 transition-transform inline-flex items-center">
-                        <ArrowRight size={20} />
-                    </span>
                 </button>
             </div>
 

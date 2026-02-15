@@ -220,27 +220,34 @@ Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosít
 | 165 | [x] | Rangsor elem felhasználók listája | `ranking-item-users-list` | |
 | 166 | [x] | Rangsor elem felhasználó tag | `ranking-item-user-tag-{idx}` | |
 
-### 7.3. DesignerStatus.tsx
+### 7.3. DesignerStatus.tsx (Részletes szavazatok táblázat)
 
 | # | Kész | Elem megnevezése | ID | Kontextus |
 |---|:---:|---|---|---|
-| 167 | [x] | Tervezői állapot gyökér | `designer-status-root` | |
-| 168 | [x] | Aktív tervezők szekció | `designer-status-active-section` | |
-| 169 | [x] | Aktív tervezők fejléc | `designer-status-active-header` | |
-| 170 | [x] | Aktív tervezők ikon doboz | `designer-status-active-icon-box` | |
-| 171 | [x] | Aktív tervezők cím (H2) | `designer-status-active-title` | |
-| 172 | [x] | Aktív tervezők rácsa (Grid) | `designer-status-active-grid` | |
-| 173 | [x] | Felhasználói állapot kártya | `designer-status-user-card-{id}` | |
-| 174 | [x] | Felhasználó neve a kártyán | `designer-status-user-name-{id}` | |
-| 175 | [x] | Felhasználó statisztika konténer | `designer-status-user-stats-{id}` | |
-| 176 | [x] | Felhasználó dátum állapota | `designer-status-user-dates-{id}` | |
-| 177 | [x] | Felhasználó szavazat állapota | `designer-status-user-votes-{id}` | |
-| 178 | [x] | Függőben lévő szavazók szekció | `designer-status-pending-section` | |
-| 179 | [x] | Függőben lévő fejléc | `designer-status-pending-header` | |
-| 180 | [x] | Függőben lévő ikon doboz | `designer-status-pending-icon-box` | |
-| 181 | [x] | Függőben lévő cím (H2) | `designer-status-pending-title` | |
-| 182 | [x] | Függőben lévő nevek listája | `designer-status-pending-tags-list` | |
-| 183 | [x] | Felhasználói állapot pilula (pill) | `designer-status-user-pill-{id}` | |
+| 167 | [x] | Szekció gyökér konténer | `designer-status-root` | |
+| 168 | [x] | Szekció fejléc sáv | `designer-status-header` | Szürke sáv |
+| 169 | [x] | Szekció címe (H3) | `designer-status-title` | "Részletes Szavazatok" |
+| 170 | [x] | "Szavazat módosítása" gomb | `designer-status-manage-btn` | Fejlécben |
+| 171 | [x] | Táblázat görgethető konténere | `designer-status-table-container` | |
+| 172 | [x] | Szavazati táblázat (table) | `designer-status-table` | |
+| 173 | [x] | Táblázat fejléce (thead) | `designer-status-thead` | |
+| 174 | [x] | Táblázat tartalom (tbody) | `designer-status-tbody` | |
+| 175 | [x] | Egyedi szavazati sor (tr) | `designer-status-row-{id}` | |
+| 176 | [x] | Felhasználó avatar doboza | `designer-status-avatar-box-{userId}` | |
+| 177 | [x] | Felhasználó neve (span) | `designer-status-user-name-{userId}` | |
+| 178 | [x] | Időpont cella | `designer-status-cell-dates-{userId}` | |
+| 179 | [x] | Helyszín cella | `designer-status-cell-region-{userId}` | |
+| 180 | [x] | Csomag cella | `designer-status-cell-package-{userId}` | |
+| 181 | [x] | Státusz cella | `designer-status-cell-status-{userId}` | Végleges/Függőben |
+| 182 | [x] | Táblázat lábléc (footer) | `designer-status-footer` | |
+| 183 | [x] | "Összes mutatása" gomb | `designer-status-expand-btn` | Expand gomb |
+| 184 | [x] | Dátum rangsor kártya gyökér | `ranking-card-date-{idx}` | RankingCard.tsx |
+| 185 | [x] | Dátum kártya tartalom (belső) | `ranking-card-date-{idx}-content` | |
+| 186 | [x] | Dátum kártya szavazatszám | `ranking-card-date-{idx}-count-value` | |
+| 187 | [x] | Helyszín rangsor kártya gyökér | `ranking-card-location-{id}` | RankingCard.tsx |
+| 188 | [x] | Helyszín kártya kép | `ranking-card-location-{id}-img` | |
+| 189 | [x] | Helyszín kártya szavazat badge | `ranking-card-location-{id}-count-badge` | |
+| 190 | [x] | Helyszín kártya győztes jelvény | `ranking-card-location-{id}-winner-badge` | Csak az 1. helyezettnél |
 
 ---
 *Folytatás következik a további lépésekkel.*

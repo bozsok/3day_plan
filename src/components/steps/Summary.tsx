@@ -9,7 +9,7 @@ import { StepCard } from '../common/StepCard';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
 import { counties, packages } from '../../data/mockData';
-import { Trophy, Calendar as CalendarIcon, ArrowRight, Settings2, ChevronLeft } from 'lucide-react';
+import { Trophy, Calendar as CalendarIcon, ArrowRight, ChevronLeft } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
 import { RankingSection } from '../summary/RankingSection';
 import { RankingCard } from '../summary/RankingCard';
@@ -86,121 +86,129 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     if (!data) return null;
 
     return (
-        <StepCard id="summary-step-card">
-            <div id="summary-header-row" className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12">
-                <StepHeader
-                    step="Élő Eredmények"
-                    title={<>Közös <span id="summary-secret-admin-trigger" className="text-primary-dark" onClick={handleTitleClick}>tervezés</span></>}
-                    description="Itt láthatod a csapat összesített döntéseit valós időben."
-                    titleClassName="select-none cursor-default active:scale-95 transition-transform"
-                />
-
-                <div id="summary-nav-controls" className="flex gap-4 shrink-0">
-                    <NavButton
-                        id="summary-back-btn"
-                        variant="outline"
-                        icon={<ChevronLeft size={24} />}
-                        onClick={() => navigate('/terv/program')}
-                        title="Vissza"
+        <>
+            <StepCard id="summary-step-card">
+                <div id="summary-header-row" className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12">
+                    <StepHeader
+                        step="Élő Eredmények"
+                        title={<>Közös <span id="summary-secret-admin-trigger" className="text-primary-dark" onClick={handleTitleClick}>tervezés</span></>}
+                        description="Itt láthatod a csapat összesített döntéseit valós időben."
+                        titleClassName="select-none cursor-default active:scale-95 transition-transform"
                     />
-                    <button
-                        id="summary-manage-votes-btn"
-                        onClick={() => setShowVoteModal(true)}
-                        className="flex items-center gap-2 px-6 py-4 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-2xl text-sm font-bold transition-all shadow-sm"
-                    >
-                        <Settings2 size={18} />
-                        <span>Szavazataim</span>
-                    </button>
 
-                    {onContinue && (
-                        <button
-                            id="summary-continue-header-btn"
-                            onClick={async () => {
-                                if (user) {
-                                    try {
-                                        await api.progress.clear(user.id);
-                                    } catch (e) {
-                                        console.error('Hiba a piszkozat törlésekor:', e);
-                                    }
-                                }
-                                onContinue?.();
-                                navigate('/terv/helyszin');
-                            }}
-                            className="flex items-center gap-2 px-6 py-4 bg-primary hover:bg-primary-dark text-gray-900 rounded-2xl text-sm font-bold transition-all shadow-sm hover:scale-105"
-                        >
-                            <CalendarIcon size={18} />
-                            <span>Tovább tervezek</span>
-                            <ArrowRight size={18} />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            <div id="summary-ranking-container" className="flex flex-col gap-12 mb-12">
-                {/* 1. Dátum Intervallumok (Mikor menjünk?) - LEGFONTOSABB */}
-                <RankingSection
-                    id="summary-ranking-dates"
-                    title="Mikor menjünk?"
-                    icon={<CalendarIcon size={20} />}
-                    emptyText="Még senki nem választott teljes időszakot."
-                    isEmpty={(data.topIntervals || []).length === 0}
-                >
-                    {(data.topIntervals || []).map((item, idx) => (
-                        <RankingCard
-                            key={idx}
-                            variant="date"
-                            title={`${format(new Date(item.start), 'MMM d.', { locale: hu })} - ${format(new Date(item.end), 'MMM d.', { locale: hu })}`}
-                            count={item.count}
-                            users={item.users}
-                            isFirst={idx === 0}
+                    <div id="summary-nav-controls" className="flex gap-4 shrink-0">
+                        <NavButton
+                            id="summary-back-btn"
+                            variant="outline"
+                            icon={<ChevronLeft size={24} />}
+                            onClick={() => navigate('/terv/program')}
+                            title="Vissza"
                         />
-                    ))}
-                </RankingSection>
 
-                {/* 2. Helyszín Rangsor (Hova menjünk?) */}
-                <RankingSection
-                    id="summary-ranking-regions"
-                    title="Hova menjünk?"
-                    icon={<Trophy size={20} />}
-                    emptyText="Még nem érkezett szavazat egyetlen régióra sem."
-                    isEmpty={data.voteRanking.length === 0}
-                >
-                    {data.voteRanking.map((item, idx) => {
-                        const regionName = counties.find(r => r.id === item.regionId)?.name ?? item.regionId;
-                        // Kép keresése a csomagok között erre a régióra
-                        const regionImage = packages.find(p => p.countyId === item.regionId || p.id === item.regionId)?.imageUrl
-                            || `https://placehold.co/600x400/EEE/31343C/png?text=${encodeURIComponent(regionName)}`;
-
-                        return (
-                            <RankingCard
-                                key={item.regionId}
-                                variant="location"
-                                title={regionName}
-                                count={item.count}
-                                users={item.voters}
-                                imageUrl={regionImage}
-                                isFirst={idx === 0}
-                                onClick={() => {
-                                    onRegionSelect?.(item.regionId);
-                                    navigate('/terv/csomagok');
+                        {onContinue && (
+                            <button
+                                id="summary-continue-header-btn"
+                                onClick={async () => {
+                                    if (user) {
+                                        try {
+                                            await api.progress.clear(user.id);
+                                        } catch (e) {
+                                            console.error('Hiba a piszkozat törlésekor:', e);
+                                        }
+                                    }
+                                    onContinue?.();
+                                    navigate('/terv/helyszin');
                                 }}
+                                className="flex items-center gap-2 px-6 py-4 bg-primary hover:bg-primary-dark text-gray-900 rounded-2xl text-base font-black uppercase tracking-tight transition-all shadow-sm hover:scale-105"
+                            >
+                                <CalendarIcon size={18} />
+                                <span>Tervezek</span>
+                                <ArrowRight size={18} />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                <div id="summary-ranking-container" className="flex flex-col gap-12 mb-12">
+                    {/* 1. Dátum Intervallumok (Mikor menjünk?) */}
+                    <RankingSection
+                        id="summary-ranking-dates"
+                        title="Mikor menjünk?"
+                        icon={<CalendarIcon size={20} />}
+                        emptyText="Még senki nem választott teljes időszakot."
+                        isEmpty={(data.topIntervals || []).length === 0}
+                    >
+                        {(data.topIntervals || []).map((item, idx) => (
+                            <RankingCard
+                                key={idx}
+                                id={`ranking-card-date-${idx}`}
+                                variant="date"
+                                title={(() => {
+                                    const startDate = new Date(item.start);
+                                    const endDate = new Date(item.end);
+                                    if (startDate.getMonth() === endDate.getMonth()) {
+                                        return `${format(startDate, 'MMM d', { locale: hu })}-${format(endDate, 'd.', { locale: hu })}`;
+                                    }
+                                    return `${format(startDate, 'MMM d.', { locale: hu })} - ${format(endDate, 'MMM d.', { locale: hu })}`;
+                                })()}
+                                count={item.count}
+                                users={item.users}
+                                isFirst={idx === 0}
                             />
-                        );
-                    })}
-                </RankingSection>
-            </div>
+                        ))}
+                    </RankingSection>
 
-            {/* 3. Felhasználók állapota (Csoportosítva) */}
-            <DesignerStatus
-                id="summary-designer-status"
-                users={data.userStatuses}
-                userProgress={data.userProgress}
-                detailedVotes={data.detailedVotes || []}
-            />
+                    {/* 2. Helyszín Rangsor (Hova menjünk?) */}
+                    <RankingSection
+                        id="summary-ranking-regions"
+                        title="Hova menjünk?"
+                        icon={<Trophy size={20} />}
+                        emptyText="Még nem érkezett szavazat egyetlen régióra sem."
+                        isEmpty={data.voteRanking.length === 0}
+                    >
+                        {data.voteRanking.map((item, idx) => {
+                            const county = counties.find(c => c.id === item.regionId);
+                            const regionName = county?.name ?? item.regionId;
 
-            {/* Lebegő akció gomb: Tovább tervezek */}
+                            // Megkeressük az első csomagot ehhez a régióhoz, hogy kinyerjük a képet, leírást és tageket
+                            const relatedPackage = packages.find(p => p.countyId === item.regionId);
 
+                            const regionImage = relatedPackage?.imageUrl
+                                || `https://placehold.co/600x400/EEE/31343C/png?text=${encodeURIComponent(regionName)}`;
 
+                            return (
+                                <RankingCard
+                                    key={item.regionId}
+                                    id={`ranking-card-location-${item.regionId}`}
+                                    variant="location"
+                                    title={regionName}
+                                    description={relatedPackage?.description || county?.description}
+                                    count={item.count}
+                                    users={item.voters}
+                                    imageUrl={regionImage}
+                                    isFirst={idx === 0}
+                                    tags={relatedPackage?.tags}
+                                    onClick={() => {
+                                        onRegionSelect?.(item.regionId);
+                                        navigate('/terv/csomagok');
+                                    }}
+                                />
+                            );
+                        })}
+                    </RankingSection>
+                </div>
+
+                {/* 3. Felhasználók állapota */}
+                <DesignerStatus
+                    id="summary-designer-status"
+                    users={data.userStatuses}
+                    userProgress={data.userProgress}
+                    detailedVotes={data.detailedVotes || []}
+                    onManageVotes={() => setShowVoteModal(true)}
+                />
+            </StepCard>
+
+            {/* MODALS & OVERLAYS (Moved outside StepCard to cover browser viewport) */}
             <VoteManagementModal
                 isOpen={showVoteModal}
                 onClose={() => setShowVoteModal(false)}
@@ -208,7 +216,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
 
             {/* ADMIN PANEL OVERLAY */}
             {adminMode && (
-                <div id="summary-admin-overlay" className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
+                <div id="summary-admin-overlay" className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setAdminMode(false)}>
                     <div id="summary-admin-panel" className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
                         <div id="summary-admin-header" className="flex justify-between items-center mb-6">
                             <h2 id="summary-admin-title" className="text-2xl font-bold text-red-600 flex items-center gap-2">
@@ -259,6 +267,6 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     </div>
                 </div>
             )}
-        </StepCard>
+        </>
     );
 }
