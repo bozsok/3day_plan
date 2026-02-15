@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { UserProvider } from './context/UserContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { Hero } from './components/steps/Hero';
 import { DateSelection } from './components/steps/DateSelection';
@@ -67,83 +68,85 @@ function App() {
   const step = getStepNumber(location.pathname);
 
   return (
-    <UserProvider>
-      <MainLayout>
-        {/* Dinamikus idővonal konténer – összehúzódik, ha nincs rá szükség (Step 0 és 5) */}
-        <motion.div
-          id="step-indicator-animation-wrapper"
-          animate={{
-            height: (step > 0 && step < 5) ? 50 : 0,
-            marginBottom: (step > 0 && step < 5) ? 32 : 0,
-            opacity: (step > 0 && step < 5) ? 1 : 0
-          }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="w-full flex justify-center relative overflow-hidden will-change-[height,opacity]"
-        >
-          <div id="step-indicator-centering-box" className="absolute inset-0 flex justify-center items-center">
-            <StepIndicator currentStep={step} totalSteps={4} />
-          </div>
-        </motion.div>
+    <ThemeProvider>
+      <UserProvider>
+        <MainLayout>
+          {/* Dinamikus idővonal konténer – összehúzódik, ha nincs rá szükség (Step 0 és 5) */}
+          <motion.div
+            id="step-indicator-animation-wrapper"
+            animate={{
+              height: (step > 0 && step < 5) ? 50 : 0,
+              marginBottom: (step > 0 && step < 5) ? 32 : 0,
+              opacity: (step > 0 && step < 5) ? 1 : 0
+            }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+            className="w-full flex justify-center relative overflow-hidden will-change-[height,opacity]"
+          >
+            <div id="step-indicator-centering-box" className="absolute inset-0 flex justify-center items-center">
+              <StepIndicator currentStep={step} totalSteps={4} />
+            </div>
+          </motion.div>
 
-        <div id="main-content-router-wrapper" className="w-full relative">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              id="page-transition-layer"
-              key={location.pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{
-                opacity: 0,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                zIndex: 0
-              }}
-              transition={{ duration: 0.3, ease: "linear" }}
-              className="w-full transform-gpu will-change-[opacity]"
-            >
-              <Routes location={location}>
-                <Route path="/" element={<Card><Hero /></Card>} />
-                <Route path="/terv/idopont" element={
-                  <Card>
-                    <DateSelection selected={selectedDates} onSelect={setSelectedDates} />
-                  </Card>
-                } />
-                <Route path="/terv/helyszin" element={
-                  <Card>
-                    <MapSelection selectedRegionId={selectedRegion} onSelect={setSelectedRegion} />
-                  </Card>
-                } />
-                <Route path="/terv/csomagok" element={
-                  <Card>
-                    <PackageSelection regionId={selectedRegion} onSelect={setSelectedPackageId} selectedPackageId={selectedPackageId} />
-                  </Card>
-                } />
-                <Route path="/terv/program" element={
-                  <Card>
-                    <ProgramTimeline regionId={selectedRegion} packageId={selectedPackageId} dates={selectedDates} />
-                  </Card>
-                } />
-                <Route path="/terv/osszegzes" element={
-                  <Card>
-                    <Summary onContinue={() => {
-                      setSelectedDates([]);
-                      setSelectedRegion(undefined);
-                      setSelectedPackageId(undefined);
-                      localStorage.removeItem('3nap_selected_dates');
-                      localStorage.removeItem('3nap_selected_region');
-                      localStorage.removeItem('3nap_selected_package');
-                    }} onRegionSelect={setSelectedRegion} />
-                  </Card>
-                } />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </MainLayout>
-    </UserProvider>
+          <div id="main-content-router-wrapper" className="w-full relative">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                id="page-transition-layer"
+                key={location.pathname}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{
+                  opacity: 0,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  zIndex: 0
+                }}
+                transition={{ duration: 0.3, ease: "linear" }}
+                className="w-full transform-gpu will-change-[opacity]"
+              >
+                <Routes location={location}>
+                  <Route path="/" element={<Card><Hero /></Card>} />
+                  <Route path="/terv/idopont" element={
+                    <Card>
+                      <DateSelection selected={selectedDates} onSelect={setSelectedDates} />
+                    </Card>
+                  } />
+                  <Route path="/terv/helyszin" element={
+                    <Card>
+                      <MapSelection selectedRegionId={selectedRegion} onSelect={setSelectedRegion} />
+                    </Card>
+                  } />
+                  <Route path="/terv/csomagok" element={
+                    <Card>
+                      <PackageSelection regionId={selectedRegion} onSelect={setSelectedPackageId} selectedPackageId={selectedPackageId} />
+                    </Card>
+                  } />
+                  <Route path="/terv/program" element={
+                    <Card>
+                      <ProgramTimeline regionId={selectedRegion} packageId={selectedPackageId} dates={selectedDates} />
+                    </Card>
+                  } />
+                  <Route path="/terv/osszegzes" element={
+                    <Card>
+                      <Summary onContinue={() => {
+                        setSelectedDates([]);
+                        setSelectedRegion(undefined);
+                        setSelectedPackageId(undefined);
+                        localStorage.removeItem('3nap_selected_dates');
+                        localStorage.removeItem('3nap_selected_region');
+                        localStorage.removeItem('3nap_selected_package');
+                      }} onRegionSelect={setSelectedRegion} />
+                    </Card>
+                  } />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </MainLayout>
+      </UserProvider>
+    </ThemeProvider>
   );
 }
 

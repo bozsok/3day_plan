@@ -27,7 +27,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                 <StepHeader
                     step="3. Lépés: Csomagok"
                     title={<>Válaszd ki a <span className="text-primary-dark">kalandod</span>!</>}
-                    description="Válassz egyet az előre összeállított, izgalmas programcsomagjaink közül."
+                    description="Válassz egyet az előre összeállított, izgalmas programcsomagok közül."
                 />
 
                 <div id="package-selection-nav-controls" className="flex gap-4 shrink-0">
@@ -104,10 +104,10 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                             <div id="package-card-content" className="flex-1 p-5 md:p-6 flex flex-col justify-between min-w-0">
                                 <div id="package-card-body">
                                     <div id="package-card-header-group" className="flex justify-between items-start mb-3 gap-4">
-                                        <h2 id="package-card-title" className="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">
+                                        <h2 id="package-card-title" className="text-2xl font-bold text-gray-900">
                                             {pkg.title}
                                         </h2>
-                                        <span id="package-card-duration-badge" className="text-xs font-bold bg-primary/10 text-gray-800 px-3 py-1 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0">
+                                        <span id="package-card-duration-badge" className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase whitespace-nowrap shrink-0">
                                             3 Nap / 2 Éj
                                         </span>
                                     </div>
@@ -137,7 +137,7 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                             onSelect(pkg.id);
                                             navigate('/terv/program');
                                         }}
-                                        className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-4 py-2 rounded-xl transition-all text-sm flex items-center gap-2 shadow-sm hover:shadow-md shrink-0 ml-2"
+                                        className="bg-primary hover:bg-primary-dark text-zinc-900 font-bold px-4 py-2 rounded-xl transition-all text-sm flex items-center gap-2 shadow-sm hover:shadow-md shrink-0 ml-2"
                                     >
                                         Kiválasztás
                                         <ArrowRight size={16} />

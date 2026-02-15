@@ -1,15 +1,83 @@
 @import "tailwindcss";
 
 /* =============================================
-   Custom Theme — A forrás code.html-ből
+   Color tokens & Theme logic
    ============================================= */
-@theme {
+:root {
     --color-primary: #13ec13;
     --color-primary-dark: #0fb80f;
-    --color-background-light: #f1f5f9;
-    --color-background-dark: #0f172a;
-    --color-neutral-light: #f1f5f9;
-    --color-neutral-dark: #1e293b;
+
+    /* Semantic variables - Light mode defaults */
+    --bg-main: #f1f5f9;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-subtle: #f1f5f9;
+    /* gray-100 */
+    --border-nav: #e2e8f0;
+    /* gray-200 */
+
+    --bg-hover: #f8fafc;
+    --bg-alt: #f1f5f9;
+}
+
+.dark {
+    /* Semantic variables for dark mode */
+    --bg-main: #060b14;
+    /* Mélyebb slate/negro */
+    --bg-card: #0f172a;
+    /* Slate 900 */
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #94a3b8;
+    /* Slate 400 */
+    --border-subtle: #1e293b;
+    /* Slate 800 */
+    --border-nav: #334155;
+    /* Slate 700 */
+
+    --bg-hover: #1e293b;
+    /* Slate 800 */
+    --bg-alt: #020617;
+    /* Slate 950 */
+
+    /* Overriding Tailwind's gray scale for automatic dark mode support */
+    /* Ez a "mágia": a Tailwind gray-X osztályai megváltoznak dark módban */
+    --color-gray-50: #0f172a;
+    --color-gray-100: #1e293b;
+    --color-gray-200: #334155;
+    --color-gray-300: #475569;
+    --color-gray-400: #94a3b8;
+    --color-gray-500: #cbd5e1;
+    --color-gray-600: #e2e8f0;
+    --color-gray-700: #f1f5f9;
+    --color-gray-800: #f8fafc;
+    --color-gray-900: #ffffff;
+
+    /* Akcentusok sötét módra */
+    --color-blue-50: #0f172a;
+    --color-blue-100: #1e3a8a;
+    --color-blue-600: #3b82f6;
+    --color-blue-700: #60a5fa;
+
+    /* Speciális felülbírálás a fehér háttérre */
+    --color-white: #0f172a;
+}
+
+@theme {
+    --color-primary: var(--color-primary);
+    --color-primary-dark: var(--color-primary-dark);
+
+    /* Map variables to tailwind classes */
+    --color-background-app: var(--bg-main);
+    --color-surface: var(--bg-card);
+    --color-content-main: var(--text-main);
+    --color-content-muted: var(--text-muted);
+    --color-border-subtle: var(--border-subtle);
+    --color-base-nav: var(--border-nav);
+
+    --color-surface-hover: var(--bg-hover);
+    --color-surface-alt: var(--bg-alt);
 
     --font-family-display: 'Plus Jakarta Sans', sans-serif;
 }
@@ -24,6 +92,9 @@ html {
 
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* =============================================
@@ -31,8 +102,9 @@ body {
    ============================================= */
 .region-path,
 .county-path {
-    fill: #e2e8f0;
-    stroke: #cbd5e1;
+    fill: var(--bg-card);
+    /* Fehér helyett kártya szín */
+    stroke: var(--border-nav);
     stroke-width: 1;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -42,21 +114,19 @@ body {
 .region-path.hovered,
 .county-path:hover,
 .county-path.hovered {
-    fill: #cbd5e1;
-    stroke: #94a3b8;
+    fill: var(--bg-hover);
+    stroke: var(--text-muted);
 }
 
-/* Halvány tájegység kiemelés */
 .county-path.region-hover {
-    fill: #cdd1d7;
-    /* Sötétebb szürkés árnyalat */
-    stroke: #94a3b8;
+    fill: var(--bg-alt);
+    stroke: var(--text-muted);
 }
 
 .region-path.selected,
 .county-path.selected {
-    fill: #13ec13;
-    stroke: #0fb80f;
+    fill: var(--color-primary);
+    stroke: var(--color-primary-dark);
 }
 
 /* =============================================
@@ -64,7 +134,6 @@ body {
    ============================================= */
 .timeline-line {
     position: relative;
-    padding-left: 2rem;
 }
 
 .timeline-line::before {
@@ -75,6 +144,7 @@ body {
     bottom: 0;
     width: 2px;
     background: #e5e7eb;
+    z-index: 0;
 }
 
 .timeline-card {
@@ -89,8 +159,8 @@ body {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
-    background: #13ec13;
-    border: 2px solid white;
+    background: var(--color-primary);
+    border: 2px solid var(--bg-card);
 }
 
 /* =============================================

@@ -7,14 +7,14 @@ interface StepIndicatorProps {
 
 export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
     return (
-        <div id="step-indicator-nav" className="flex justify-center items-center p-2 gap-2 bg-white/80 backdrop-blur-sm w-fit mx-auto rounded-full border border-gray-100">
+        <div id="step-indicator-nav" className="flex justify-center items-center p-2 gap-1 md:gap-2 bg-white/80 backdrop-blur-sm w-fit mx-auto rounded-full border border-gray-100">
             {Array.from({ length: totalSteps }).map((_, index) => {
                 const stepNumber = index + 1;
                 const isActive = stepNumber === currentStep;
                 const isCompleted = stepNumber < currentStep;
 
                 return (
-                    <div key={stepNumber} id={`step-item-container-${stepNumber}`} className="flex items-center gap-2">
+                    <div key={stepNumber} id={`step-item-container-${stepNumber}`} className="flex items-center gap-1 md:gap-2">
                         <div
                             id={`step-circle-${stepNumber}`}
                             className={`w-8 h-8 rounded-full flex justify-center items-center font-bold text-sm transition-all duration-300 ${isActive
@@ -31,7 +31,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                         {stepNumber < totalSteps && (
                             <div
                                 id={`step-connector-line-${stepNumber}`}
-                                className={`w-10 h-0.5 transition-colors duration-300 ${isCompleted ? 'bg-primary' : 'bg-gray-200'
+                                className={`w-4 min-[400px]:w-6 md:w-10 h-0.5 transition-colors duration-300 ${isCompleted ? 'bg-primary' : 'bg-gray-200'
                                     }`}
                             />
                         )}

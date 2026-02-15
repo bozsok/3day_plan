@@ -1,4 +1,4 @@
-# Projekt ID Térkép - Ellenőrző Lista (v0.10.1)
+# Projekt ID Térkép - Ellenőrző Lista (v0.10.2)
 
 Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosítóját (ID), a megjelenés sorrendjében és logikai egységekbe bontva.
 
@@ -159,6 +159,7 @@ Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosít
 | 119 | [x] | Fő tartalmi terület | `program-timeline-content` | |
 | 120 | [x] | Mobil fejléc (wrapper) | `program-timeline-mobile-header` | |
 | 121 | [x] | Napválasztó fülek sávja | `program-timeline-tabs-row` | |
+| 121b| [x] | Napválasztó fülek belső szegélyezett sávja | `program-timeline-tabs-inner` | A szürke vonal helyzete |
 | 122 | [x] | Egyedi nap választó fül | `program-day-tab-btn-{idx}` | |
 | 123 | [x] | Nap neve (fülön) | `program-day-tab-name-{idx}` | |
 | 124 | [x] | Nap száma (fülön) | `program-day-tab-number-{idx}` | |
@@ -169,6 +170,8 @@ Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosít
 | 129 | [x] | Idővonal elem összekötő vonal | `program-timeline-item-connector` | |
 | 130 | [x] | Idővonal elem szöveges rész | `program-timeline-item-content` | |
 | 131 | [x] | Idővonal elem időpontja | `program-timeline-item-time` | |
+| 131b| [x] | Idővonal elem kategóriája | `program-timeline-item-category` | pl. GASZTRO |
+| 131c| [x] | Idővonal elem címe | `program-timeline-item-title` | |
 | 132 | [x] | Idővonal elem leírása | `program-timeline-item-description` | |
 | 133 | [x] | Mobil lábléc (wrapper) | `program-timeline-mobile-footer` | |
 

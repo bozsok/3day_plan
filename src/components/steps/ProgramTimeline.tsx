@@ -215,51 +215,58 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
 
                 {/* NAP FÜLEK */}
-                <div id="program-timeline-tabs-row" className="flex border-b border-gray-200 bg-white lg:pr-40">
-                    {[1, 2, 3].map((dayIndex) => {
-                        const isActive = activeDay === dayIndex;
-                        const idx = dayIndex;
-                        const dayName = (dayNames[dayIndex - 1] || `${dayIndex}. nap`).toUpperCase();
-                        return (
-                            <button
-                                key={dayIndex}
-                                id={`program-day-tab-btn-${idx}`}
-                                onClick={() => setActiveDay(dayIndex)}
-                                className={`flex-1 py-6 px-4 text-center border-b-4 transition-all ${isActive
-                                    ? 'border-primary bg-primary/5 text-gray-900 font-bold'
-                                    : 'border-transparent text-gray-400'
-                                    }`}
-                            >
-                                <span id={`program-day-tab-name-${idx}`} className={`block text-xs uppercase tracking-widest mb-1 ${isActive ? 'text-primary font-bold' : 'text-gray-400'
-                                    }`}>
-                                    {dayName}
-                                </span>
-                                <span id={`program-day-tab-number-${idx}`} className="text-base font-black">
-                                    {dayIndex}. Nap
-                                </span>
-                            </button>
-                        );
-                    })}
+                <div id="program-timeline-tabs-row" className="flex bg-white lg:pr-40">
+                    <div id="program-timeline-tabs-inner" className="flex flex-1 border-b border-gray-200">
+                        {[1, 2, 3].map((dayIndex) => {
+                            const isActive = activeDay === dayIndex;
+                            const idx = dayIndex;
+                            const dayName = (dayNames[dayIndex - 1] || `${dayIndex}. nap`).toUpperCase();
+                            return (
+                                <button
+                                    key={dayIndex}
+                                    id={`program-day-tab-btn-${idx}`}
+                                    onClick={() => setActiveDay(dayIndex)}
+                                    className={`flex-1 py-6 px-4 text-center border-b-4 transition-all -mb-[4px] ${isActive
+                                        ? 'border-primary bg-primary/5 text-gray-900 font-bold'
+                                        : 'border-transparent text-gray-400'
+                                        }`}
+                                >
+                                    <span id={`program-day-tab-name-${idx}`} className={`block text-xs uppercase tracking-widest mb-1 ${isActive ? 'text-primary font-bold' : 'text-gray-400'
+                                        }`}>
+                                        {dayName}
+                                    </span>
+                                    <span id={`program-day-tab-number-${idx}`} className="text-base font-black">
+                                        {dayIndex}. Nap
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* TIMELINE TARTALOM */}
                 <div id="program-timeline-items-scroll" className="flex-1 p-[15px] min-[440px]:p-8 md:p-12 lg:p-12 overflow-y-auto bg-white">
-                    <div id="program-timeline-items-wrapper" className="max-w-2xl mx-auto lg:mx-0">
-                        {selectedPackage.days.find(d => d.dayIndex === activeDay)?.items.map((item, idx, arr) => (
-                            <div key={item.id} id={`program-timeline-item-${item.id}`} className="flex gap-6 md:gap-10 group">
-                                <div className="flex flex-col items-center shrink-0">
-                                    <div id="program-timeline-item-icon-box" className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-center text-primary transition-transform duration-300 group-hover:scale-110">
-                                        <span className="material-icons-outlined text-3xl md:text-4xl">{item.icon}</span>
-                                    </div>
-                                    {idx !== arr.length - 1 && (
-                                        <div id="program-timeline-item-connector" className="w-0.5 h-full bg-gray-100/50 my-3" />
-                                    )}
-                                </div>
-                                <div id="program-timeline-item-content" className="pb-10 md:pb-14 pt-2 md:pt-3">
-                                    <span id="program-timeline-item-time" className="text-[10px] md:text-[11px] font-black text-primary-dark uppercase tracking-[0.3em] mb-2 md:mb-3 block">
-                                        {item.time}
+                    <div id="program-timeline-items-wrapper" className="max-w-2xl mx-auto lg:mx-0 relative timeline-line space-y-12">
+                        {selectedPackage.days.find(d => d.dayIndex === activeDay)?.items.map((item) => (
+                            <div key={item.id} id={`program-timeline-item-${item.id}`} className="relative z-10 flex gap-8 items-start group">
+                                <div id="program-timeline-item-icon-box" className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20 transition-all duration-300 group-hover:scale-110">
+                                    <span className="material-icons-outlined text-zinc-900 !text-[18px] select-none flex items-center justify-center">
+                                        {item.icon}
                                     </span>
-                                    <p id="program-timeline-item-description" className="text-gray-900 text-lg md:text-2xl font-black leading-relaxed">
+                                </div>
+                                <div id="program-timeline-item-content" className="flex-1">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
+                                        <span id="program-timeline-item-time" className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full w-fit">
+                                            {item.time}
+                                        </span>
+                                        <span id="program-timeline-item-category" className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                                            {item.category}
+                                        </span>
+                                    </div>
+                                    <h3 id="program-timeline-item-title" className="text-xl font-bold text-gray-900 mb-2">
+                                        {item.title}
+                                    </h3>
+                                    <p id="program-timeline-item-description" className="text-gray-600 leading-relaxed">
                                         {item.description}
                                     </p>
                                 </div>

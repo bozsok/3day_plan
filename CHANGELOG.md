@@ -2,6 +2,27 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+## [0.10.2] - 2026-02-15
+
+### Reszponzivitás és Mobil Optimalizálás
+- **StepIndicator (Idővonal sáv):** Az összekötő vonalak szélessége és a gombok közötti távolság dinamikusan alkalmazkodik a kijelzőhöz (w-4 és w-10 között), így kisebb kijelzőkön is tökéletesen elfér.
+- **Summary (Összegzés):** A "Tovább tervezek" lebegő gomb felirata sorkizárttá vált (`whitespace-nowrap`), és mobilon helytakarékosabb paddingot (`px-4 py-3`) kapott a kényelmesebb kezelhetőségért.
+
+### CSS Architektúra Tisztítása
+- **Animációs konfliktusok feloldása:** Eltávolítottuk a globális `body *` transition kényszerítést. Ez megoldotta a Framer Motion-nal való ütközéseket és lehetővé tette az egyedi komponens-animációkat (pl. a csomagkártyák lágy nagyítását).
+
+### Csomagválasztó (3. Lépés) Finomhangolás
+- **Vizuális konzisztencia:** A kártyák időtartam jelzője (3 NAP / 2 ÉJ) megkapta a 4. lépésnél bevezetett prémium stílust (pill dizájn, zöld szín, uppercase).
+- **Sötét mód javítás:** A "Kiválasztás" gomb felirata sötét módban is sötét marad az élénkzöld háttéren, megőrizve a kontrasztot.
+- **Tisztább UI:** Eltávolítottuk a kártyacímek zavaró hover-kori átszíneződését.
+
+### Program Idővonal (4. Lépés) Dizájn-hű Újratervezése
+- **Ikonok:** Mostantól tökéletes kör alakúak (`rounded-full`), élénkzöld hátterel és fix sötét (`zinc-900`) ikonokkal, amelyek sötét módban sem fehérednek ki.
+- **Folyamatos Idővonal:** A szakadozott vonalak helyett egy folyamatos, 2px vastag szürke tengely fut végig a tartalom mögött a forrásdizájn alapján.
+- **Tipográfia és Hierarchia:** Finomított betűméretek és vastagságok (`text-xl font-bold` a címnek). Az időpontok új "pill" stílust kaptak.
+- **Új adatok:** Megjelentek a hiányzó kategória címkék (pl. GASZTRO) és a programok címei is.
+- **Tab-sáv javítás:** A napok közötti szürke szegély már nem fut ki a navigációs gombok alá, csak a funkcionális elemek (napok) végéig tart.
+
 ## [0.10.1] - 2026-02-14
 
 ### Vizuális Konzisztencia és UI Finomhangolás

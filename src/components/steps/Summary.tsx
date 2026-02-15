@@ -174,7 +174,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                             onContinue();
                             navigate('/terv/idopont');
                         }}
-                        className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 border-4 border-white"
+                        className="bg-primary hover:bg-primary-dark text-gray-900 font-bold px-4 py-3 md:px-8 md:py-4 rounded-full shadow-2xl flex items-center gap-3 transition-all hover:scale-105 border-4 border-white whitespace-nowrap"
                     >
                         <CalendarIcon size={24} />
                         Tovább tervezek

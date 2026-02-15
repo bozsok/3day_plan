@@ -20,16 +20,23 @@ export function DesignerStatus({ users, id }: DesignerStatusProps & { id?: strin
         <div id={id} className="mt-12 space-y-8">
             {/* 1. Aktív Szavazók */}
             {activeUsers.length > 0 && (
-                <div id="designer-status-active-section" className="bg-gray-900 text-white rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8">
+                <div id="designer-status-active-section" className="bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 rounded-2xl min-[440px]:rounded-3xl p-[15px] min-[440px]:p-8 transition-colors">
                     <div id="designer-status-active-header" className="flex items-center gap-3 mb-6">
-                        <div id="designer-status-active-icon-box" className="w-10 h-10 rounded-xl bg-gray-800 text-green-400 flex items-center justify-center">
+                        <div id="designer-status-active-icon-box" className="w-10 h-10 rounded-xl bg-gray-800 dark:bg-gray-100 text-green-400 flex items-center justify-center">
                             <Users size={20} />
                         </div>
                         <h2 id="designer-status-active-title" className="text-xl font-bold">Aktív Tervezők</h2>
                     </div>
                     <div id="designer-status-active-grid" className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {activeUsers.map(u => (
-                            <div key={u.id} id={`designer-status-user-card-${u.id}`} className={`p-4 rounded-xl border ${u.isComplete ? 'bg-green-500/20 border-green-500/50' : 'bg-gray-800 border-gray-700'}`}>
+                            <div
+                                key={u.id}
+                                id={`designer-status-user-card-${u.id}`}
+                                className={`p-4 rounded-xl border transition-colors ${u.isComplete
+                                        ? 'bg-green-500/20 dark:bg-green-500/10 border-green-500/50 dark:border-green-500/30'
+                                        : 'bg-gray-800 dark:bg-gray-100 border-gray-700 dark:border-gray-200'
+                                    }`}
+                            >
                                 <p id={`designer-status-user-name-${u.id}`} className="font-bold truncate mb-1">{u.name}</p>
                                 <div id={`designer-status-user-stats-${u.id}`} className="text-xs space-y-1 opacity-80">
                                     <p id={`designer-status-user-dates-${u.id}`}>🗓️ {u.datesCount > 0 ? '✅' : '❌'}</p>

@@ -16,7 +16,7 @@ interface StepCardProps {
  * Tartalmazza az árnyékot, lekerekítést, szegélyt és reszponzív viselkedést.
  */
 export function StepCard({ children, className = '', noPadding = false, padding, id }: StepCardProps) {
-    const baseClasses = "bg-white rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 relative";
+    const baseClasses = "bg-surface rounded-2xl min-[440px]:rounded-[2.5rem] shadow-2xl overflow-hidden border border-border-subtle relative transition-colors duration-300";
 
     // Alapértelmezett padding, ha nincs kikapcsolva és nincs egyedi megadva
     const paddingClasses = padding ? padding : (noPadding ? "" : "p-[15px] min-[440px]:p-8 md:p-12");
