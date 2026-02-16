@@ -3,6 +3,20 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 
+## [2.1.1] - 2026-02-16
+
+### UI / UX Finomítások és Javítások
+- **Adminisztrációs Varázsló:**
+    - **Ár Kijelzés Javítása (Critical Fix):** A "Becsült ár" mező mostantól minden nézetben (Lista és Live Preview) helyesen jelenik meg. A korábbi `NaN Ft` vagy `0 Ft` hiba üres vagy érvénytelen érték esetén `-` jelre cserélve.
+    - **Biztonságos Törlés:** A programpontok törlésekor (kuka ikon) a natív, csúnya böngésző ablak helyett az egységes `ConfirmationModal` jelenik meg, illeszkedve az arculathoz.
+    - **Vizuális Igazítások:**
+        - A "Kilépés" gomb szövege mostantól tökéletesen egy vonalban van a lépésjelzőkkel (a gomb paddingjának korrigálásával).
+        - A fejlécben megnöveltük a távolságot a lépésjelző (breadcrumbs) és a cím között a jobb áttekinthetőségért.
+    - **Ikon Csere:** A programpont szerkesztés gomb ikonja a félrevezető Címke (Tag) helyett Ceruza (Pencil) lett.
+    - **Segítségnyújtás:** A 2. lépésnél (Hangulat) a borítókép feltöltésénél mostantól megjelenik az ajánlott képméret (800x600px).
+- **Technikai:**
+    - **Build Javítás:** Eltávolítottuk a használaton kívüli `Tag` importot, ami fordítási hibát okozott.
+
 ## [2.1.0] - 2026-02-16
 
 ### Javítások (Bugfix)

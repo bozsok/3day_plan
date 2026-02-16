@@ -89,13 +89,15 @@ try {
 
             sort($dates);
             // Idempotency: Check if exactly the same vote exists
-            foreach ($db['vote_blocks'] as $b) {
+            foreach ($db['vote_blocks'] as &$b) {
                 if (($b['user_id'] ?? 0) === $userId && ($b['region_id'] ?? '') === $regionId) {
                     $bd = $b['dates'] ?? [];
                     sort($bd);
                     $bp = $b['package_id'] ?? null;
-                    if ($bd == $dates && $bp == $packageId)
+                    if ($bd == $dates && $bp == $packageId) {
+                        $b['created_at'] = date('Y-m-d H:i:s'); // Update timestamp
                         return $b;
+                    }
                 }
             }
 
@@ -126,7 +128,7 @@ try {
             // Find the block to know which dates to cleanup
             $datesToRemove = [];
             $regionToClean = null;
-            
+
             foreach ($db['vote_blocks'] as $b) {
                 if (($b['id'] ?? 0) === $blockId && ($b['user_id'] ?? 0) === $userId) {
                     $datesToRemove = $b['dates'] ?? [];
@@ -149,7 +151,7 @@ try {
                     return !($uOk && $rOk && $dOk);
                 }));
             }
-            
+
             return true;
         });
         echo json_encode(["success" => true]);

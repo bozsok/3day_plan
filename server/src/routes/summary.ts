@@ -155,7 +155,7 @@ router.get('/', (_req, res) => {
                 endDate: endDateStr,
                 regionId: row.region_id,
                 packageId: row.package_id,
-                timestamp: row.created_at_unix ? Number(row.created_at_unix) : Math.floor(Date.now() / 1000)
+                timestamp: row.created_at_unix ? Number(row.created_at_unix) * 1000 : Date.now()
             };
         });
     } catch (err) {

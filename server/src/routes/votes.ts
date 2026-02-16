@@ -59,12 +59,14 @@ router.post('/', (req, res) => {
 
     let blockId;
 
+    const createdAt = new Date().toISOString();
+
     if (existing) {
-        // Már létezik ez a konkrét szavazat -> Nem csinálunk semmit
+        // Már létezik ez a konkrét szavazat -> Frissítjük a dátumot (hogy az aktivitásban látszódjon)
         blockId = existing.id;
+        db.run('UPDATE vote_blocks SET created_at = ? WHERE id = ?', [createdAt, blockId]);
     } else {
         // Még nem létezik -> Létrehozzuk (ÚJ szavazat)
-        const createdAt = new Date().toISOString();
         db.run(
             'INSERT INTO vote_blocks (user_id, region_id, package_id, dates, created_at) VALUES (?, ?, ?, ?, ?)',
             [uid, regionId, packageId || null, datesJson, createdAt]

@@ -3,6 +3,70 @@ import { packages as mockPackages } from '../data/mockData';
 
 const API_URL = import.meta.env.PROD ? 'server/api' : (import.meta.env.VITE_API_URL || '/api');
 const EXT = import.meta.env.PROD ? '.php' : '';
+const UPLOAD_FIELD_NAME = import.meta.env.PROD ? 'images[]' : 'images';
+
+const LEGACY_ICON_MAP: Record<string, string> = {
+    // Csomag címkék
+    'flag': '🌲', // Hegyvidék
+    'spa': '🧖‍♀️',
+    'self_improvement': '🧘', // Relax
+    'wine_bar': '🍷',
+    'restaurant': '🍽️',
+    'pets': '🦅', // Természet (sas/állat)
+    'museum': '🏺',
+    'hiking': '🥾',
+    'castle': '🏰',
+    'sailing': '⛵',
+    'directions_bike': '🚴',
+    'festival': '🎉',
+
+    // Programpontok
+    'luggage': '🧳',
+    'wb_sunny': '☀️', // Napos/Reggeli
+    'directions_walk': '🚶',
+    'shopping_bag': '🛍️',
+    'dinner_dining': '🍽️',
+    'terrain': '🚙', // Dűlőtúra
+    'directions_car': '🚗',
+    'photo_camera': '🌉', // Kilenclyukú híd/Fotózás
+    'agriculture': '🐂', // Puszta
+    'potted_plant': '🦅', // Madárpark
+    'menu_book': '🏛️', // Pásztormúzeum
+    'directions_boat': '🚢',
+    'palette': '🎨',
+    'fort': '🏰',
+    'kayaking': '🛶',
+    'park': '🌳',
+    'church': '⛪',
+    'sunny': '🌅', // Naplemente
+    'pool': '🏊',
+    'bus': '🚌',
+    'train': '🚂',
+    'flight': '✈️'
+};
+
+function migrateLegacyIcons(pkg: any): any {
+    // 1. Címkék (tags)
+    if (pkg.tags && Array.isArray(pkg.tags)) {
+        pkg.tags = pkg.tags.map((tag: any) => ({
+            ...tag,
+            icon: LEGACY_ICON_MAP[tag.icon] || tag.icon // Ha nincs a map-ben, marad az eredeti (ami lehet már emoji vagy ismeretlen string)
+        }));
+    }
+
+    // 2. Napok és programpontok (days -> items)
+    if (pkg.days && Array.isArray(pkg.days)) {
+        pkg.days = pkg.days.map((day: any) => ({
+            ...day,
+            items: day.items.map((item: any) => ({
+                ...item,
+                icon: LEGACY_ICON_MAP[item.icon] || item.icon
+            }))
+        }));
+    }
+
+    return pkg;
+}
 
 export const PackageService = {
     async getPackages(): Promise<Package[]> {
@@ -19,13 +83,16 @@ export const PackageService = {
                 return mockPackages;
             }
 
-            return data;
+            // MIGRÁCIÓ: Régi ikonok cseréje emojikra (csak a megjelenítéshez, a DB marad változatlan egyelőre)
+            const migratedPackages = data.map(migrateLegacyIcons);
+            return migratedPackages;
         } catch (error) {
             console.error('Failed to fetch packages:', error);
             // Fallback mock adatokra hiba esetén is (hogy működjön offline / dev módban)
             return mockPackages;
         }
     },
+
 
     async savePackages(packages: Package[]): Promise<any> {
         const response = await fetch(`${API_URL}/packages${EXT}`, {
@@ -59,7 +126,7 @@ export const PackageService = {
                     fileName = `${fileName.split('.')[0]}.${ext}`;
                 }
             }
-            formData.append('images[]', file, fileName);
+            formData.append(UPLOAD_FIELD_NAME, file, fileName);
         });
 
         // Note: PHP formatting might need 'images[]' if multiple, but let's stick to what works or standard forms.
@@ -93,8 +160,12 @@ export const PackageService = {
         // Prepend API_URL to make the path correct relative to the application root
         // data.files returns "uploads/filename", we need "server/api/uploads/filename" (PROD) or "/api/uploads/filename" (DEV)
         return uploadedPaths.map((file: string) => {
-            // Remove leading slash from file if present to avoid double slash
-            const cleanFile = file.startsWith('/') ? file.substring(1) : file;
+            // If file path starts with '/', it's an absolute path from server root (Node/Dev)
+            if (file.startsWith('/')) {
+                return file;
+            }
+            // Otherwise it's relative, so prepend API_URL (PHP/Prod)
+            const cleanFile = file;
             const cleanApiUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
             return `${cleanApiUrl}/${cleanFile}`;
         });

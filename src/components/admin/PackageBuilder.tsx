@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Package, ProgramItem } from '../../data/mockData';
 import { usePackages } from '../../hooks/usePackages';
-import { Loader2, Plus, ArrowRight, ArrowLeft, Save, Upload, Trash2, MapPin } from 'lucide-react';
+import { Loader2, Plus, ArrowRight, ArrowLeft, Save, Upload, Trash2, MapPin, Calendar, Pencil } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ProgramItemModal } from './ProgramItemModal';
-import { HelpTooltip } from '../common/HelpTooltip';
 import { ConfirmationModal } from '../common/ConfirmationModal';
 import { UnsavedChangesModal } from '../common/UnsavedChangesModal';
 import { PackageTagsEditor } from './PackageTagsEditor';
@@ -32,6 +31,18 @@ export const PackageBuilder: React.FC = () => {
     const [editingItem, setEditingItem] = useState<{ item: ProgramItem | null, dayIndex: number } | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+
+    // Delete Item Modal
+    const [showItemDeleteModal, setShowItemDeleteModal] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<{ dayIndex: number, itemId: string } | null>(null);
+
+    const confirmDeleteItem = () => {
+        if (itemToDelete) {
+            removeProgramItem(itemToDelete.dayIndex, itemToDelete.itemId);
+            setShowItemDeleteModal(false);
+            setItemToDelete(null);
+        }
+    };
 
     const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -105,13 +116,13 @@ export const PackageBuilder: React.FC = () => {
             await savePackages(updatedPackages);
 
             setIsDirty(false); // Mentés sikeres -> tiszta állapot
+            setIsDirty(false); // Mentés sikeres -> tiszta állapot
+            setShowUnsavedModal(false); // Modal bezárása
 
             if (shouldExit) {
                 setIsEditing(false);
                 setSelectedPackage(null);
                 setStep(1);
-            } else {
-                // Opcionális: visszajelzés a felhasználónak, hogy sikeres volt a mentés
             }
         } catch (error) {
             console.error('Mentési hiba:', error);
@@ -236,26 +247,25 @@ export const PackageBuilder: React.FC = () => {
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <button
                         className="p-1.5 bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-lg transition-colors cursor-pointer"
-                        onPointerDown={(e) => e.stopPropagation()} // KLIKK JAVÍTÁS: Megakadályozza a drag indítást
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                             e.stopPropagation();
                             setEditingItem({ item, dayIndex });
                             setIsModalOpen(true);
                         }}
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" /></svg>
+                        <Pencil size={14} />
                     </button>
                     <button
                         className="p-1.5 bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
-                        onPointerDown={(e) => e.stopPropagation()} // KLIKK JAVÍTÁS
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm('Biztosan törölni szeretnéd ezt a programpontot?')) {
-                                removeProgramItem(dayIndex, item.id);
-                            }
+                            setItemToDelete({ dayIndex, itemId: item.id });
+                            setShowItemDeleteModal(true);
                         }}
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
+                        <Trash2 size={14} />
                     </button>
                 </div>
                 <div className="flex gap-3 mb-1">
@@ -272,69 +282,57 @@ export const PackageBuilder: React.FC = () => {
                     </div>
                 </div>
                 <p className="text-sm text-gray-500 line-clamp-2 mt-1 pl-[3.2rem]">{item.description}</p>
-                {item.galleryImages && item.galleryImages.length > 0 && (
-                    <div className="pl-[3.2rem] mt-2 flex gap-1">
-                        {item.galleryImages.map((img: string, i: number) => (
-                            <img key={i} src={img} className="w-8 h-8 rounded-md object-cover border border-white shadow-sm" alt="" />
-                        ))}
-                    </div>
-                )}
             </div>
         );
     };
 
-    // --- Wizard Lépések ---
+    // --- Wizard Lépések (Narratív) ---
 
+    // Step 1: Az Alapok (Szöveges)
     const renderStep1 = () => (
-        <div className="space-y-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">
-                        Csomag neve
-                        <HelpTooltip text="A csomag megjelenő neve, pl. 'Romantikus Hétvége a Dunakanyarban'." />
-                    </label>
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title || ''}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
-                        className="w-full rounded-lg border-gray-300 border p-3 focus:ring-primary focus:border-primary shadow-sm"
-                        placeholder="Pl. Romantikus Hétvége"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">
-                        Régió / Megye
-                        <HelpTooltip text="Válaszd ki, melyik megyében található a programcsomag." />
-                    </label>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <select
-                            name="countyId"
-                            value={formData.countyId || ''}
-                            onChange={(e) => handleInputChange('countyId', e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 border focus:ring-primary focus:border-primary shadow-sm appearance-none bg-white"
-                        >
-                            <option value="">Válassz megyét...</option>
-                            {HUNGARIAN_COUNTIES.map((county) => (
-                                <option key={county.value} value={county.value}>
-                                    {county.label}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
+        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Hová tervezzük a kalandot? 🗺️</h3>
+                <p className="text-gray-500 mb-4 text-sm">Válaszd ki azt a megyét, ahová a program szól. Ez segít a felhasználóknak a szűrésben.</p>
+                <div className="relative">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={20} />
+                    <select
+                        name="countyId"
+                        value={formData.countyId || ''}
+                        onChange={(e) => handleInputChange('countyId', e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm appearance-none bg-white font-bold text-lg text-gray-800 transition-all cursor-pointer hover:border-gray-300"
+                    >
+                        <option value="">Válassz megyét...</option>
+                        {HUNGARIAN_COUNTIES.map((county) => (
+                            <option key={county.value} value={county.value}>
+                                {county.label}
+                            </option>
+                        ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                     </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">
-                        Becsült ár (Ft)
-                        <HelpTooltip text="A teljes csomag becsült ára 2 főre, Forintban. Csak számokat írj be (e nélkül)." />
-                    </label>
+            </div>
+
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Hogy nevezzük el? ✨</h3>
+                <p className="text-gray-500 mb-4 text-sm">Adj neki egy hangzatos, figyelemfelkeltő nevet! <span className="font-medium text-primary">Pl. "Romantikus Hétvége a Dunakanyarban"</span></p>
+                <input
+                    type="text"
+                    value={formData.title || ''}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm font-bold text-lg placeholder:text-gray-300 transition-all"
+                    placeholder="Írd ide a csomag nevét..."
+                />
+            </div>
+
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Mennyibe fog kerülni? 💰</h3>
+                <p className="text-gray-500 mb-4 text-sm">Becsült ár 2 főre, teljes hétvégére. Csak számokat írj!</p>
+                <div className="relative">
                     <input
                         type="number"
-                        name="estimatedCost"
                         value={formData.estimatedCost || ''}
                         onChange={(e) => handleInputChange('estimatedCost', e.target.value)}
                         onKeyDown={(e) => {
@@ -342,95 +340,112 @@ export const PackageBuilder: React.FC = () => {
                                 e.preventDefault();
                             }
                         }}
-                        className="w-full rounded-lg border-gray-300 border p-3 focus:ring-primary focus:border-primary shadow-sm"
+                        className="w-full pl-5 pr-12 py-4 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm font-bold text-lg placeholder:text-gray-300 transition-all"
                         placeholder="Pl. 45000"
                     />
-                </div>
-                <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1">
-                        Borítókép
-                        <span className="text-xs font-normal text-gray-500 ml-2">(Javasolt méret: 800x600 px)</span>
-                        <HelpTooltip text="A csomag főképének feltöltése. (JPG/PNG, max 2MB)" />
-                    </label>
-
-                    <div className="space-y-3">
-                        {formData.imageUrl ? (
-                            <div className="relative group w-full h-48 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shadow-sm">
-                                <img src={formData.imageUrl} alt="Borítókép" className="w-full h-full object-cover" />
-                                <button
-                                    onClick={() => handleInputChange('imageUrl', '')}
-                                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-sm cursor-pointer"
-                                    title="Kép törlése"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ) : (
-                            <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-primary transition-all group relative overflow-hidden ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                    {isUploading ? (
-                                        <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
-                                    ) : (
-                                        <Upload className="w-8 h-8 text-gray-400 group-hover:text-primary mb-2 transition-colors" />
-                                    )}
-                                    <p className="mb-1 text-sm text-gray-500"><span className="font-bold text-gray-700">Kattints a feltöltéshez</span></p>
-                                    <p className="text-xs text-gray-400">SVG, PNG, JPG (MAX. 2MB)</p>
-                                </div>
-                                <input
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/*"
-                                    onChange={handleCoverImageUpload}
-                                    disabled={isUploading}
-                                />
-                            </label>
-                        )}
-                    </div>
+                    <span className="absolute right-5 top-1/2 -translate-y-1/2 font-bold text-gray-400">Ft</span>
                 </div>
             </div>
+
             <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">
-                    Leírás
-                    <HelpTooltip text="Rövid, kedvcsináló leírás a csomagról, ami megjelenik a kártyán." />
-                </label>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Miért fogják imádni? ❤️</h3>
+                <p className="text-gray-500 mb-4 text-sm">Írj egy rövid, kedvcsináló leírást (2-3 mondat). Emeld ki a lényeget!</p>
                 <textarea
-                    name="description"
                     value={formData.description || ''}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     rows={4}
-                    className="w-full rounded-lg border-gray-300 border p-3 focus:ring-primary focus:border-primary shadow-sm"
-                    placeholder="Írj egy rövid leírást..."
+                    className="w-full px-5 py-4 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 shadow-sm text-base leading-relaxed placeholder:text-gray-300 transition-all resize-none"
+                    placeholder="Ez a csomag tökéletes választás azoknak, akik..."
                 />
             </div>
         </div>
     );
 
+    // Step 2: Hangulat (Vizuális)
+    const renderStep2 = () => (
+        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">A kaland arca 📸</h3>
+                <p className="text-gray-500 mb-6 text-sm">Tölts fel egy jó minőségű borítóképet, ami megadja az alaphangulatot. (Ajánlott méret: 800x600px)</p>
 
-
-    const renderStep3 = () => (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-gray-800 flex items-center">
-                    Programterv
-                    <HelpTooltip text="Állítsd össze a 3 napos programot! Húzd át az elemeket a napok között, vagy addj hozzá újakat. Tipp: Kezdj egy péntek délutáni érkezéssel, szombatra tegyél több aktivitást, vasárnapra pedig egy levezető programot." />
-                </h3>
-                <div className="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 flex items-center gap-2">
-                    <span className="text-lg">💡</span> Húzd és ejtsd a programpontokat a sorrend módosításához.
+                <div className="group relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 hover:border-primary/50 hover:bg-primary/5 transition-all">
+                    {formData.imageUrl ? (
+                        <>
+                            <img src={formData.imageUrl} alt="Borító" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg flex items-center gap-2">
+                                    <Upload size={16} />
+                                    Csere
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
+                                </label>
+                                <button
+                                    onClick={() => handleInputChange('imageUrl', '')}
+                                    className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
+                            <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                {isUploading ? <Loader2 className="animate-spin text-primary" size={24} /> : <Upload className="text-primary" size={24} />}
+                            </div>
+                            <span className="font-bold text-gray-600 text-lg group-hover:text-primary transition-colors">Kattints a feltöltéshez</span>
+                            <span className="text-sm text-gray-400 mt-1">vagy húzd ide a képet</span>
+                            <input type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
+                        </label>
+                    )}
                 </div>
             </div>
 
+            <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Címkék és jellemzők 🏷️</h3>
+                <p className="text-gray-500 mb-6 text-sm">Milyen stílusú ez az utazás? Válassz vagy adj hozzá új címkéket!</p>
+                <PackageTagsEditor
+                    tags={formData.tags || []}
+                    onChange={(tags) => handleInputChange('tags', tags)}
+                />
+            </div>
+        </div>
+    );
+
+    // Step 3: A Program (Tett) - Megmarad, de frissített körítéssel
+    const renderStep3 = () => (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    <Calendar className="text-primary" size={20} />
+                    Szervezzük meg a hétvégét!
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                    Húzd a programpontokat a megfelelő naphoz, vagy hozz létre újakat.
+                    <span className="font-bold"> Tipp:</span> Egy jó 3 napos terv változatos és nem túl zsúfolt.
+                </p>
+            </div>
+
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                     {formData.days?.map((day, dIdx) => (
-                        <div key={day.dayIndex} className="bg-gray-50/50 rounded-xl border border-gray-200 flex flex-col h-full bg-slate-50">
-                            <div className="p-4 border-b border-gray-100 bg-white rounded-t-xl sticky top-0 z-10 shadow-sm">
-                                <h4 className="font-black text-gray-700 uppercase tracking-wider text-sm flex justify-between items-center">
-                                    {dIdx === 0 ? 'Péntek' : dIdx === 1 ? 'Szombat' : 'Vasárnap'}
-                                    <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full border border-gray-200">{day.items.length}</span>
+                        <div key={day.dayIndex} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                                <h4 className="font-black text-gray-700 uppercase tracking-wider text-sm flex items-center gap-3">
+                                    <span className={`w-2 h-2 rounded-full ${dIdx === 0 ? 'bg-amber-400' : dIdx === 1 ? 'bg-emerald-400' : 'bg-blue-400'}`}></span>
+                                    {dIdx === 0 ? 'Péntek (1. Nap)' : dIdx === 1 ? 'Szombat (2. Nap)' : 'Vasárnap (3. Nap)'}
                                 </h4>
+                                <button
+                                    onClick={() => {
+                                        setEditingItem({ item: null, dayIndex: dIdx });
+                                        setIsModalOpen(true);
+                                    }}
+                                    className="p-2 bg-white hover:bg-primary hover:text-white rounded-lg text-gray-400 transition-all border border-gray-200 hover:border-primary shadow-sm"
+                                    title="Programpont hozzáadása"
+                                >
+                                    <Plus size={16} />
+                                </button>
                             </div>
 
-                            <div className="p-3 flex-1 min-h-[200px] space-y-3">
+                            <div className="p-4 min-h-[120px] space-y-3 bg-gray-50/30">
                                 <SortableContext items={day.items.map(i => i.id)} strategy={verticalListSortingStrategy}>
                                     {day.items.map(item => (
                                         <SortableItem key={item.id} id={item.id} item={item} dayIndex={dIdx} />
@@ -438,25 +453,11 @@ export const PackageBuilder: React.FC = () => {
                                 </SortableContext>
 
                                 {day.items.length === 0 && (
-                                    <div className="text-center py-8 text-gray-400 text-sm italic border-2 border-dashed border-gray-200 rounded-lg m-2">
-                                        Nincs programpont erre a napra.
+                                    <div className="flex flex-col items-center justify-center py-8 text-gray-300 border-2 border-dashed border-gray-200 rounded-xl">
+                                        <span className="text-2xl mb-1 opacity-50">🌱</span>
+                                        <span className="text-xs font-medium">Még üres ez a nap</span>
                                     </div>
                                 )}
-                            </div>
-
-                            <div className="p-3 border-t border-gray-200 bg-white rounded-b-xl">
-                                <button
-                                    onClick={() => {
-                                        setEditingItem({ item: null, dayIndex: dIdx }); // Új elem
-                                        setIsModalOpen(true);
-                                    }}
-                                    className="w-full py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 font-bold hover:border-primary hover:text-primary hover:bg-primary/5 transition-all text-sm flex items-center justify-center gap-2 group"
-                                >
-                                    <div className="bg-gray-200 rounded-full p-0.5 group-hover:bg-primary group-hover:text-white transition-colors">
-                                        <Plus size={14} />
-                                    </div>
-                                    Programpont hozzáadása
-                                </button>
                             </div>
                         </div>
                     ))}
@@ -464,6 +465,67 @@ export const PackageBuilder: React.FC = () => {
             </DndContext>
         </div>
     );
+
+    // Live Preview Component
+    const LivePreview = () => (
+        <div className="sticky top-8 space-y-6">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-4">Élő Előnézet</h3>
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 w-full max-w-sm mx-auto">
+                <div className="h-56 overflow-hidden relative bg-gray-100">
+                    {formData.imageUrl ? (
+                        <img src={formData.imageUrl} alt={formData.title} className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
+                            <span className="text-5xl">🖼️</span>
+                        </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
+                        <h3 className="text-white font-bold text-xl leading-tight drop-shadow-md">
+                            {formData.title || <span className="opacity-50 italic">Csomag Neve...</span>}
+                        </h3>
+                    </div>
+                    {formData.countyId && (
+                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
+                            {formData.countyId}
+                        </div>
+                    )}
+                </div>
+                <div className="p-6">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {formData.tags?.length ? (
+                            formData.tags.map((tag, i) => (
+                                <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-md flex items-center gap-1">
+                                    {tag.icon} {tag.label}
+                                </span>
+                            ))
+                        ) : (
+                            <span className="px-2 py-1 bg-gray-50 text-gray-300 text-xs font-bold rounded-md border border-dashed border-gray-200">
+                                #Címkék
+                            </span>
+                        )}
+                    </div>
+                    <p className="text-gray-600 line-clamp-3 mb-6 text-sm leading-relaxed min-h-[3rem]">
+                        {formData.description || <span className="opacity-40 italic">Itt fog megjelenni a rövid leírás, amit a felhasználók látni fognak...</span>}
+                    </p>
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-50">
+                        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Becsült ár</span>
+                        <span className="font-black text-primary text-lg">
+                            {formData.estimatedCost && !isNaN(Number(formData.estimatedCost)) && Number(formData.estimatedCost) > 0
+                                ? `${Number(formData.estimatedCost).toLocaleString('hu-HU')} Ft`
+                                : '-'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="text-center">
+                <p className="text-xs text-gray-400 leading-relaxed max-w-xs mx-auto">
+                    Így fog kinézni a kártya a felhasználók számára a választó képernyőn.
+                </p>
+            </div>
+        </div>
+    );
+
 
     if (isLoading) {
         return (
@@ -475,143 +537,161 @@ export const PackageBuilder: React.FC = () => {
     }
 
     return (
-        <div className="container mx-auto p-6 max-w-6xl">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Programcsomagok</h1>
-                    <p className="text-gray-500 mt-1">Hozzon létre új utazási ajánlatokat vagy szerkessze a meglévőket.</p>
-                </div>
-                {!isEditing && (
+        <div className="container mx-auto p-6 max-w-7xl">
+            {/* Main Header (All packages view) */}
+            {!isEditing && (
+                <div className="flex justify-between items-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Kalandor varázsló 🧙‍♂️</h1>
+                        <p className="text-gray-500 mt-2 text-lg">Hozz létre felejthetetlen élményeket pár kattintással.</p>
+                    </div>
                     <button
                         onClick={() => {
                             setSelectedPackage(null);
                             setIsEditing(true);
                         }}
-                        className="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:scale-105 active:scale-95"
+                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:scale-105 active:scale-95"
                     >
-                        <Plus size={20} />
-                        Új Csomag
+                        <Plus size={24} />
+                        Új kaland tervezése
                     </button>
-                )}
-            </div>
+                </div>
+            )}
 
             {isEditing ? (
-                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                    {/* Header */}
-                    <div className="bg-gray-50/50 px-8 py-6 border-b flex justify-between items-center">
-                        <div>
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                                {selectedPackage ? 'Csomag szerkesztése' : 'Új csomag létrehozása'}
-                                <span className="text-sm font-normal text-gray-400 bg-white px-2 py-0.5 rounded border border-gray-100 shadow-sm ml-2">
-                                    Lépés {step} / 3
-                                </span>
-                            </h2>
+                <div className="flex flex-col lg:flex-row gap-8 items-start h-full">
+                    {/* Left Side: Wizard Form */}
+                    <div className="flex-1 w-full">
+                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
+                            {/* Wizard Header */}
+                            <div className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-start sticky top-0 z-20">
+                                <div>
+                                    <div className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">
+                                        <span className={`flex items-center gap-1 ${step >= 1 ? 'text-primary' : ''}`}>
+                                            <span className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-xs">1</span>
+                                            Alapok
+                                        </span>
+                                        <span className="w-4 h-0.5 bg-gray-200"></span>
+                                        <span className={`flex items-center gap-1 ${step >= 2 ? 'text-primary' : ''}`}>
+                                            <span className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-xs">2</span>
+                                            Hangulat
+                                        </span>
+                                        <span className="w-4 h-0.5 bg-gray-200"></span>
+                                        <span className={`flex items-center gap-1 ${step >= 3 ? 'text-primary' : ''}`}>
+                                            <span className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-xs">3</span>
+                                            Program
+                                        </span>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-gray-900">
+                                        {step === 1 && 'Az alapok 📝'}
+                                        {step === 2 && 'Hangulat és látvány 🎨'}
+                                        {step === 3 && 'A program összeállítása 🗺️'}
+                                    </h2>
+                                </div>
+                                <button onClick={handleBack} className="-mt-2 text-red-500 hover:text-red-600 font-bold transition-colors px-4 py-2 hover:bg-red-50 rounded-xl text-sm border border-transparent hover:border-red-100">
+                                    Kilépés
+                                </button>
+                            </div>
+
+                            {/* Content Area */}
+                            <div className="p-8 lg:p-10 min-h-[500px] bg-white">
+                                {step === 1 && renderStep1()}
+                                {step === 2 && renderStep2()}
+                                {step === 3 && renderStep3()}
+                            </div>
+
+                            {/* Footer Navigation */}
+                            <div className="bg-gray-50/80 backdrop-blur-sm px-8 py-6 border-t border-gray-100 flex justify-between items-center sticky bottom-0 z-20">
+                                <button
+                                    onClick={() => {
+                                        if (step === 1) handleBack();
+                                        else setStep(step - 1);
+                                    }}
+                                    className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-white hover:text-gray-800 hover:shadow-sm transition-all flex items-center gap-2"
+                                >
+                                    <ArrowLeft size={18} />
+                                    {step === 1 ? 'Mégse' : 'Vissza'}
+                                </button>
+
+                                {step < 3 ? (
+                                    <button
+                                        onClick={() => setStep(step + 1)}
+                                        className="px-8 py-4 rounded-xl font-black bg-gray-900 text-white hover:bg-black flex items-center gap-3 shadow-xl shadow-gray-200 hover:-translate-y-1 transition-all text-lg"
+                                    >
+                                        Tovább
+                                        <ArrowRight size={20} />
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => handleSave(true)}
+                                        disabled={isSaving}
+                                        className="px-10 py-4 rounded-xl font-black bg-gradient-to-r from-primary-dark to-primary text-white hover:brightness-110 flex items-center gap-3 shadow-xl shadow-primary/30 hover:-translate-y-1 transition-all text-lg disabled:opacity-70"
+                                    >
+                                        <Save size={20} />
+                                        {isSaving ? 'Mentés...' : 'Kaland Mentése!'}
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                        <button onClick={handleBack} className="text-gray-500 hover:text-red-500 font-medium transition-colors px-3 py-1 hover:bg-red-50 rounded-lg">
-                            Mégse
-                        </button>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="w-full bg-gray-100 h-1">
-                        <div
-                            className="bg-primary h-1 transition-all duration-300 ease-out"
-                            style={{ width: `${(step / 3) * 100}%` }}
-                        />
+                    {/* Right Side: Live Preview (Desktop Only) */}
+                    <div className="hidden lg:block w-96 shrink-0 animate-in fade-in slide-in-from-right-8 duration-700 delay-100">
+                        <LivePreview />
                     </div>
-
-                    {/* Content */}
-                    <div className="p-8 min-h-[400px]">
-                        {step === 1 && renderStep1()}
-                        {step === 2 && (
-                            <PackageTagsEditor
-                                tags={formData.tags || []}
-                                onChange={(tags) => handleInputChange('tags', tags)}
-                            />
-                        )}
-                        {step === 3 && renderStep3()}
-                    </div>
-
-                    {/* Footer / Navigation */}
-                    <div className="bg-gray-50 px-8 py-6 border-t flex justify-between items-center">
-                        <button onClick={() => setStep(step - 1)} disabled={step === 1} className="px-6 py-3 rounded-xl font-bold bg-white text-gray-700 border border-gray-200 hover:border-gray-300 disabled:opacity-50 flex items-center gap-2 shadow-sm transition-all hover:bg-gray-50">
-                            <ArrowLeft size={18} />
-                            Vissza
-                        </button>
-                        {step < 3 ? (
-                            <button onClick={() => setStep(step + 1)} className="px-8 py-3 rounded-xl font-bold bg-gray-900 text-white hover:bg-black flex items-center gap-2 shadow-lg shadow-gray-200/50 transition-all hover:-translate-y-0.5">
-                                Tovább
-                                <ArrowRight size={18} />
-                            </button>
-                        ) : (
-                            <button onClick={() => handleSave(true)} disabled={isSaving} className="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-primary-dark to-primary text-white hover:brightness-110 flex items-center gap-2 shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
-                                <Save size={18} />
-                                {isSaving ? 'Mentés...' : 'Mentés'}
-                            </button>
-                        )}
-                    </div>
-
-                    <UnsavedChangesModal
-                        isOpen={showUnsavedModal}
-                        onSave={() => handleSave(true)}
-                        onDiscard={handleDiscard}
-                        onCancel={() => setShowUnsavedModal(false)}
-                    />
                 </div>
             ) : (
+                /* Dashboard View - Package List */
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {/* Add New Card */}
+                    <div
+                        onClick={() => { setSelectedPackage(null); setIsEditing(true); }}
+                        className="bg-white rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group min-h-[400px] text-center"
+                    >
+                        <div className="w-20 h-20 rounded-full bg-blue-50 group-hover:bg-primary group-hover:text-white flex items-center justify-center mb-6 transition-all shadow-sm text-primary">
+                            <Plus size={32} />
+                        </div>
+                        <h3 className="text-xl font-black text-gray-900 mb-2 group-hover:text-primary transition-colors">Új Csomag</h3>
+                        <p className="text-gray-400 font-medium">Kezdj egy teljesen új<br />programterv összeállításába.</p>
+                    </div>
+
                     {packages.map(pkg => (
-                        <div key={pkg.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col hover:-translate-y-1" onClick={() => { setSelectedPackage(pkg); setIsEditing(true); }}>
-                            <div className="h-56 overflow-hidden relative bg-gray-100">
+                        <div key={pkg.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col hover:-translate-y-2" onClick={() => { setSelectedPackage(pkg); setIsEditing(true); }}>
+                            <div className="h-48 overflow-hidden relative bg-gray-100">
                                 {pkg.imageUrl ? (
-                                    <img src={pkg.imageUrl} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    <img src={pkg.imageUrl} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
-                                        <span className="text-4xl opacity-20">🖼️</span>
+                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                        <span className="text-4xl">🖼️</span>
                                     </div>
                                 )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
-                                    <h3 className="text-white font-bold text-xl leading-tight drop-shadow-md">{pkg.title}</h3>
-                                </div>
+                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
                                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
                                     {pkg.countyId}
                                 </div>
                                 <button
                                     onClick={(e) => handleDeletePackageClick(pkg.id, e)}
-                                    className="absolute top-4 left-4 bg-red-500/90 hover:bg-red-600 text-white p-2 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
-                                    title="Csomag törlése"
+                                    className="absolute top-4 left-4 bg-white hover:bg-red-50 text-gray-400 hover:text-red-500 p-2 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                                    title="Törlés"
                                 >
                                     <Trash2 size={16} />
                                 </button>
                             </div>
                             <div className="p-6 flex-1 flex flex-col">
-                                <p className="text-gray-600 line-clamp-3 mb-6 flex-1 text-sm leading-relaxed">{pkg.description}</p>
-                                <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-50">
+                                <h3 className="text-xl font-black text-gray-900 mb-2 leading-tight group-hover:text-primary transition-colors">{pkg.title}</h3>
+                                <p className="text-gray-500 line-clamp-3 mb-6 flex-1 text-sm leading-relaxed">{pkg.description}</p>
+
+                                <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
                                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Becsült ár</span>
-                                    <span className="font-black text-primary text-lg">{parseInt(pkg.estimatedCost).toLocaleString('hu-HU')} Ft</span>
+                                    <span className="font-black text-primary text-lg">
+                                        {pkg.estimatedCost && !isNaN(Number(pkg.estimatedCost)) && Number(pkg.estimatedCost) > 0
+                                            ? `${Number(pkg.estimatedCost).toLocaleString('hu-HU')} Ft`
+                                            : '-'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     ))}
-
-                    {/* Hozzáadás Kártya */}
-                    <div
-                        onClick={() => { setSelectedPackage(null); setIsEditing(true); }}
-                        className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-8 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group min-h-[300px]"
-                    >
-                        <div className="w-16 h-16 rounded-full bg-gray-50 group-hover:bg-white flex items-center justify-center mb-4 transition-colors shadow-sm">
-                            <Plus size={32} className="text-gray-300 group-hover:text-primary transition-colors" />
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-400 group-hover:text-primary transition-colors">Új Csomag</h3>
-                        <p className="text-sm text-gray-400 mt-2 text-center">Hozzon létre egy teljesen új<br />programtervet.</p>
-                    </div>
-
-                    {/* Empty State ha nincs csomag */}
-                    {packages.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-gray-400 hidden">
-                            Nincsenek megjeleníthető csomagok.
-                        </div>
-                    )}
                 </div>
             )}
 
@@ -631,6 +711,24 @@ export const PackageBuilder: React.FC = () => {
                 onConfirm={confirmDeletePackage}
                 onCancel={() => { setShowDeleteModal(false); setPackageToDelete(null); }}
                 isDestructive={true}
+            />
+
+            <ConfirmationModal
+                isOpen={showItemDeleteModal}
+                title="Programpont törlése"
+                message="Biztosan törölni szeretnéd ezt a programpontot?"
+                confirmLabel="Törlés"
+                cancelLabel="Mégse"
+                onConfirm={confirmDeleteItem}
+                onCancel={() => { setShowItemDeleteModal(false); setItemToDelete(null); }}
+                isDestructive={true}
+            />
+
+            <UnsavedChangesModal
+                isOpen={showUnsavedModal}
+                onSave={() => handleSave(true)}
+                onDiscard={handleDiscard}
+                onCancel={() => setShowUnsavedModal(false)}
             />
         </div>
     );
