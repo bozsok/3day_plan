@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Compass, Calendar, MapPin, Users } from 'lucide-react';
+import { ArrowRight, Calendar, Map as MapIcon, Sparkles, Users } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { StepCard } from '../common/StepCard';
@@ -88,25 +88,28 @@ export function Hero({ }: HeroProps) {
                     )}
                 </p>
 
+
+
+
                 {/* Feature Icons */}
                 <div id="hero-features-container" className="hidden md:flex justify-center gap-8 md:gap-16 mb-12 text-gray-400">
-                    <div id="feature-timing-box" className="flex flex-col items-center gap-2 group">
-                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
-                            <Calendar size={24} />
-                        </div>
-                        <span className="text-xs font-semibold uppercase tracking-wider">Időzítés</span>
-                    </div>
                     <div id="feature-region-box" className="flex flex-col items-center gap-2 group">
                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
-                            <Compass size={24} />
+                            <MapIcon size={24} />
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-wider">Tájegység</span>
                     </div>
                     <div id="feature-program-box" className="flex flex-col items-center gap-2 group">
                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
-                            <MapPin size={24} />
+                            <Sparkles size={24} />
                         </div>
                         <span className="text-xs font-semibold uppercase tracking-wider">Program</span>
+                    </div>
+                    <div id="feature-timing-box" className="flex flex-col items-center gap-2 group">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary-dark transition-colors">
+                            <Calendar size={24} />
+                        </div>
+                        <span className="text-xs font-semibold uppercase tracking-wider">Időzítés</span>
                     </div>
                 </div>
 

@@ -250,4 +250,136 @@ Ez a dokumentum tartalmazza az alkalmazás összes vizuális elemének azonosít
 | 190 | [x] | Helyszín kártya győztes jelvény | `ranking-card-location-{id}-winner-badge` | Csak az 1. helyezettnél |
 
 ---
-*Folytatás következik a további lépésekkel.*
+## 8. Adminisztrációs Felület (PackageBuilder.tsx)
+
+### 8.1. Dashboard és Keretrendszer (Strukturális elemek)
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 191 | [x] | Admin felület gyökér konténer | `admin-package-builder-root` | PackageBuilder.tsx |
+| 192 | [x] | Dashboard fejléc konténer | `admin-dashboard-header` | Cím és gomb tárolója |
+| 193 | [x] | Dashboard rács nézet | `admin-dashboard-grid` | Csomaglista containere |
+| 194 | [x] | "Új kaland tervezése" gomb | `admin-dashboard-new-adventure-button` | Jobb fent |
+| 195 | [x] | "Új Csomag" kártya | `admin-dashboard-card-new` | Lista eleje |
+| 196 | [x] | Csomag kártya | `admin-dashboard-card-{id}` | Lista elem |
+| 197 | [x] | Csomag törlése gomb | `admin-dashboard-card-delete-{id}` | Kártyán hoverre |
+
+### 8.2. Varázsló Keret
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 198 | [x] | Varázsló fő elrendezés | `admin-wizard-layout` | Bal: Form, Jobb: Preview |
+| 199 | [x] | Űrlap konténer | `admin-wizard-form-container` | Bal oldal |
+| 200 | [x] | Varázsló kártya | `admin-wizard-card` | Fehér doboz |
+| 201 | [x] | Varázsló fejléc | `admin-wizard-header` | Cím és lépések |
+| 202 | [x] | Lépés indikátor sáv | `admin-wizard-steps-indicator` | 1-2-3 lépések |
+| 203 | [x] | Aktuális lépés címe | `admin-wizard-step-title` | H2 cím |
+| 204 | [x] | Tartalmi terület | `admin-wizard-content-area` | Változó tartalom |
+| 205 | [x] | "Kilépés" gomb | `admin-wizard-exit-button` | Fejléc jobb széle |
+| 206 | [x] | Lábléc navigáció | `admin-wizard-footer` | Gombok tárolója |
+
+### 8.3. Varázsló 1. Lépés: Alapok
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 207 | [x] | 1. Lépés konténer | `admin-step1-container` | Wrapper |
+| 208 | [x] | Helyszín szekció | `admin-step1-section-location` | Megye választás |
+| 209 | [x] | Megye választó legördülő | `admin-package-select-county` | Select elem |
+| 210 | [x] | Cím szekció | `admin-step1-section-title` | Név megadás |
+| 211 | [x] | Csomag címe input | `admin-package-input-title` | Text input |
+| 212 | [x] | Ár szekció | `admin-step1-section-price` | Ár megadás |
+| 213 | [x] | Becsült ár input | `admin-package-input-price` | Number input |
+| 214 | [x] | Leírás szekció | `admin-step1-section-description` | Szöveges leírás |
+| 215 | [x] | Leírás szövegdoboz | `admin-package-textarea-description` | Textarea |
+| 216 | [x] | 1. Lépés "Tovább" gomb | `admin-step1-next-button` | Lábléc |
+
+### 8.4. Varázsló 2. Lépés: Hangulat
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 217 | [x] | 2. Lépés konténer | `admin-step2-container` | Wrapper |
+| 218 | [x] | Borítókép szekció | `admin-step2-section-cover` | Képfeltöltés |
+| 219 | [x] | Borítókép előnézet konténer | `admin-step2-cover-preview-container` | Képdoboz |
+| 220 | [x] | Borítókép feltöltés input | `admin-package-upload-cover` | Hidden file input |
+| 221 | [x] | Borítókép törlése gomb | `admin-package-delete-cover-button` | Feltöltött képnél |
+| 222 | [x] | Címkék szekció | `admin-step2-section-tags` | Címkeszerkesztő wrapper |
+| 223 | [x] | 2. Lépés "Vissza" gomb | `admin-step2-back-button` | Lábléc |
+| 224 | [x] | 2. Lépés "Tovább" gomb | `admin-step2-next-button` | Lábléc |
+
+### 8.5. Varázsló 3. Lépés: Program
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 225 | [x] | 3. Lépés konténer | `admin-step3-container` | Wrapper |
+| 226 | [x] | Információs doboz | `admin-step3-info-box` | Kék tipp doboz |
+| 227 | [x] | Napok rács elrendezés | `admin-step3-days-grid` | Nap kártyák tárolója |
+| 228 | [x] | Nap kártya konténer | `admin-step3-day-card-{dIdx}` | Egy nap doboza |
+| 229 | [x] | Nap fejléce | `admin-step3-day-header-{dIdx}` | Nap neve és gomb |
+| 230 | [x] | Új programpont gomb | `admin-program-add-item-button-{dayIndex}` | Nap fejléc |
+| 231 | [x] | Nap tartalom / Drop area | `admin-step3-day-drop-area-{dIdx}` | Programlista |
+| 232 | [x] | Üres nap állapotjelző | `admin-step3-day-empty-{dIdx}` | Ha nincs elem |
+| 233 | [x] | Programpont szerkesztése | `admin-program-item-edit-{itemId}` | Lista elem gomb |
+| 234 | [x] | Programpont törlése | `admin-program-item-delete-{itemId}` | Lista elem gomb |
+| 235 | [x] | 3. Lépés "Vissza" gomb | `admin-step3-back-button` | Lábléc |
+| 236 | [x] | "Kaland Mentése" gomb | `admin-step3-save-button` | Lábléc |
+
+### 8.6. Élő Előnézet (Desktop Sidebar)
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 237 | [x] | Előnézet konténer | `admin-preview-container` | Jobb oldali sáv |
+| 238 | [x] | Előnézet fejléc cím | `admin-preview-header` | "Kártya Előnézet" felirat |
+| 239 | [x] | Program előnézet kártya | `admin-preview-program-card` | Step 3-nál |
+| 240 | [x] | Program előnézet fejléc | `admin-preview-program-header` | Csomag címe |
+| 241 | [x] | Program előnézet tartalom | `admin-preview-program-content` | Görgethető lista |
+| 242 | [x] | Program előnézet lábléc | `admin-preview-program-footer` | Összesítés |
+| 243 | [x] | Normál kártya előnézet | `admin-preview-standard-card` | Step 1-2-nél |
+| 244 | [x] | Kártya kép konténer | `admin-preview-card-image` | Kép doboz |
+| 245 | [x] | Kártya tartalom | `admin-preview-card-content` | Leírás doboz |
+| 246 | [x] | Kártya lábléc | `admin-preview-card-footer` | Ár sáv |
+
+## 9. Programpont Szerkesztő Modal (`ProgramItemModal.tsx`)
+
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 247 | [x] | Modal Overlay (Háttér) | `admin-modal-overlay` | Sötét háttér |
+| 248 | [x] | Modal Ablak | `admin-modal-window` | Fehér panel |
+| 249 | [x] | Modal Fejléc | `admin-modal-header` | Címsor sáv |
+| 250 | [x] | Modal Cím | `admin-modal-title` | H2 Cím |
+| 251 | [x] | Bezárás gomb | `admin-modal-program-close-button` | X ikon |
+| 252 | [x] | Modal Tartalom (Body) | `admin-modal-body` | Görgethető rész |
+| 253 | [x] | Alapadatok szekció | `admin-modal-section-basic` | Idő, Cím |
+| 254 | [x] | Időpont input | `admin-modal-program-input-time` | Time input |
+| 255 | [x] | Cím input | `admin-modal-program-input-title` | Text input |
+| 256 | [x] | Leírás szekció | `admin-modal-section-notes` | Textarea wrapper |
+| 257 | [x] | Leírás szövegdoboz | `admin-modal-program-input-notes` | Textarea |
+| 258 | [x] | Kategória szekció | `admin-modal-section-category` | Kategória, Ikon |
+| 259 | [x] | Kategória választó | `admin-modal-program-input-activity` | Select |
+| 260 | [x] | Ikon választó gomb | `admin-modal-program-icon-trigger` | Emoji gomb |
+| 261 | [x] | Ikon popover konténer | `admin-modal-icon-picker-popover` | Ikon lista |
+| 262 | [x] | Ikon opció gomb | `admin-modal-program-icon-option-{icon}` | Emoji gombok |
+| 263 | [x] | Marketing szekció | `admin-modal-section-marketing` | Címke, Galéria |
+| 264 | [x] | Marketing/Címke input | `admin-modal-program-input-marketing` | Text input |
+| 265 | [x] | Galéria rács | `admin-modal-gallery-grid` | Képek listája |
+| 266 | [x] | Galéria képfeltöltés input | `admin-modal-gallery-upload-input` | Hidden file input |
+| 267 | [x] | Galéria elem | `admin-modal-gallery-item-{index}` | Kép wrapper |
+| 268 | [x] | Galéria kép törlése gomb | `admin-modal-gallery-delete-button-{index}` | Kuka ikon |
+| 269 | [x] | Üres galéria jelző | `admin-modal-gallery-empty` | Ha nincs kép |
+| 270 | [x] | Modal Lábléc | `admin-modal-footer` | Gombok sávja |
+| 271 | [x] | "Mégse" gomb | `admin-modal-program-cancel-button` | Bal gomb |
+| 272 | [x] | "Mentés" gomb | `admin-modal-program-save-button` | Jobb gomb |
+
+## 10. Címke Szerkesztő Komponens (`PackageTagsEditor.tsx`)
+
+| # | Kész | Elem megnevezése | ID | Kontextus |
+|---|:---:|---|---|---|
+| 273 | [x] | Editor gyökér | `admin-tags-editor-root` | Fő konténer |
+| 274 | [x] | Input terület | `admin-tags-input-area` | Felső sáv |
+| 275 | [x] | Ikon választó wrapper | `admin-tags-icon-wrapper` | Ikon gomb tároló |
+| 276 | [x] | Ikon választó gomb | `admin-tags-icon-trigger` | Gomb |
+| 277 | [x] | Ikon popover | `admin-tags-icon-popover` | Emoji lista |
+| 278 | [x] | Ikon opció | `admin-tags-icon-option-{icon}` | Emoji gomb |
+| 279 | [x] | Szöveg input wrapper | `admin-tags-text-wrapper` | Input mező tároló |
+| 280 | [x] | Címke kereső input | `admin-tags-input-search` | Input mező |
+| 281 | [x] | Hozzáadás gomb | `admin-tags-button-add` | + Gomb |
+| 282 | [x] | Javaslatok terület | `admin-tags-suggestions-area` | Gyorsgombok |
+| 283 | [x] | Javaslat címke gomb | `admin-tags-option-{index}` | Címke gomb |
+| 284 | [x] | Aktív címkék lista | `admin-tags-active-list` | Alsó doboz |
+| 285 | [x] | Aktív címke elem | `admin-tags-active-item-{index}` | Egy címke |
+| 286 | [x] | Címke törlése gomb | `admin-tags-button-delete-{index}` | X gomb |
+| 287 | [x] | Üres lista jelző | `admin-tags-empty-state` | Ha nincs címke |
+

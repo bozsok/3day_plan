@@ -10,6 +10,8 @@ import { ConfirmationModal } from '../common/ConfirmationModal';
 import { UnsavedChangesModal } from '../common/UnsavedChangesModal';
 import { PackageTagsEditor } from './PackageTagsEditor';
 import { compressImages } from '../../utils/imageUtils';
+import { StatusModal, type StatusModalType } from '../common/StatusModal';
+
 import { HUNGARIAN_COUNTIES } from '../../utils/constants';
 
 export const PackageBuilder: React.FC = () => {
@@ -36,6 +38,23 @@ export const PackageBuilder: React.FC = () => {
     const [showItemDeleteModal, setShowItemDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<{ dayIndex: number, itemId: string } | null>(null);
 
+    // Status Modal State
+    const [statusModal, setStatusModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        type: StatusModalType;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info'
+    });
+
+    const showStatus = (title: string, message: string, type: StatusModalType = 'info') => {
+        setStatusModal({ isOpen: true, title, message, type });
+    };
+
     const confirmDeleteItem = () => {
         if (itemToDelete) {
             removeProgramItem(itemToDelete.dayIndex, itemToDelete.itemId);
@@ -58,7 +77,7 @@ export const PackageBuilder: React.FC = () => {
             }
         } catch (error) {
             console.error('Cover image upload failed:', error);
-            alert('Hiba a borítókép feltöltése során!');
+            showStatus('Hiba történt', 'Nem sikerült a borítókép feltöltése. Kérlek próbáld újra!', 'error');
         } finally {
             setIsUploading(false);
         }
@@ -94,10 +113,41 @@ export const PackageBuilder: React.FC = () => {
         setIsDirty(true);
     };
 
+    const validateStep = (currentStep: number): boolean => {
+        if (currentStep === 1) {
+            if (!formData.title?.trim()) {
+                showStatus('Hiányzó adat', 'Kérlek adj meg egy nevet a csomagnak!', 'warning');
+                return false;
+            }
+            if (!formData.countyId) {
+                showStatus('Hiányzó adat', 'Kérlek válassz egy megyét!', 'warning');
+                return false;
+            }
+        }
+        if (currentStep === 2) {
+            if (!formData.imageUrl) {
+                showStatus('Hiányzó kép', 'A csomaghoz kötelező borítóképet feltölteni!', 'warning');
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const handleNextStep = () => {
+        if (validateStep(step)) {
+            setStep(prev => prev + 1);
+        }
+    };
+
     const handleSave = async (shouldExit = false) => {
-        if (!formData.title || !formData.countyId) {
-            alert('A csomag neve és a megye kötelező!');
-            return;
+        // Végső validáció mentés előtt
+        if (!validateStep(1) || !validateStep(2)) return;
+
+        // Ha nincs programpont, figyelmeztetés, de engedjük menteni
+        const totalItems = formData.days?.reduce((acc, day) => acc + day.items.length, 0) || 0;
+        if (totalItems === 0) {
+            // Opcionális: itt is lehetne warning, de a felhasználó kérése szerint lehet, hogy csak a mezők kitöltése a kritikus.
+            // Hagyjuk a mentést, de ha gondolod, ide is rakhatsz egy ellenőrzést.
         }
 
         // Ha nincs ID, generálunk egyet
@@ -116,17 +166,23 @@ export const PackageBuilder: React.FC = () => {
             await savePackages(updatedPackages);
 
             setIsDirty(false); // Mentés sikeres -> tiszta állapot
-            setIsDirty(false); // Mentés sikeres -> tiszta állapot
             setShowUnsavedModal(false); // Modal bezárása
 
             if (shouldExit) {
-                setIsEditing(false);
-                setSelectedPackage(null);
-                setStep(1);
+                showStatus('Sikeres mentés', 'A kalandot sikeresen elmentettük!', 'success');
+                // Kis késleltetéssel lépjünk vissza, hogy lássa a modalt
+                setTimeout(() => {
+                    setStatusModal(prev => ({ ...prev, isOpen: false }));
+                    setIsEditing(false);
+                    setSelectedPackage(null);
+                    setStep(1);
+                }, 1500);
+            } else {
+                showStatus('Sikeres mentés', 'A változtatásokat rögzítettük.', 'success');
             }
         } catch (error) {
             console.error('Mentési hiba:', error);
-            alert('Hiba történt a mentés során!');
+            showStatus('Mentési hiba', 'Nem sikerült menteni a csomagot. Kérlek próbáld újra!', 'error');
         }
     };
 
@@ -195,9 +251,10 @@ export const PackageBuilder: React.FC = () => {
                 setSelectedPackage(null);
                 setStep(1);
             }
+            showStatus('Sikeres törlés', 'A csomagot véglegesen töröltük.', 'success');
         } catch (error) {
             console.error('Törlési hiba:', error);
-            alert('Nem sikerült a törlés.');
+            showStatus('Törlési hiba', 'Nem sikerült törölni a csomagot.', 'error');
         }
     };
 
@@ -246,6 +303,7 @@ export const PackageBuilder: React.FC = () => {
             <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 group hover:shadow-md transition-all relative touch-none">
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <button
+                        id={`admin-program-item-edit-${item.id}`}
                         className="p-1.5 bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-lg transition-colors cursor-pointer"
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
@@ -257,6 +315,7 @@ export const PackageBuilder: React.FC = () => {
                         <Pencil size={14} />
                     </button>
                     <button
+                        id={`admin-program-item-delete-${item.id}`}
                         className="p-1.5 bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 rounded-lg transition-colors cursor-pointer"
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => {
@@ -290,13 +349,14 @@ export const PackageBuilder: React.FC = () => {
 
     // Step 1: Az Alapok (Szöveges)
     const renderStep1 = () => (
-        <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div>
+        <div id="admin-step1-container" className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div id="admin-step1-section-location">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Hová tervezzük a kalandot? 🗺️</h3>
                 <p className="text-gray-500 mb-4 text-sm">Válaszd ki azt a megyét, ahová a program szól. Ez segít a felhasználóknak a szűrésben.</p>
                 <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={20} />
                     <select
+                        id="admin-package-select-county"
                         name="countyId"
                         value={formData.countyId || ''}
                         onChange={(e) => handleInputChange('countyId', e.target.value)}
@@ -315,10 +375,11 @@ export const PackageBuilder: React.FC = () => {
                 </div>
             </div>
 
-            <div>
+            <div id="admin-step1-section-title">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Hogy nevezzük el? ✨</h3>
                 <p className="text-gray-500 mb-4 text-sm">Adj neki egy hangzatos, figyelemfelkeltő nevet! <span className="font-medium text-primary">Pl. "Romantikus Hétvége a Dunakanyarban"</span></p>
                 <input
+                    id="admin-package-input-title"
                     type="text"
                     value={formData.title || ''}
                     onChange={(e) => handleInputChange('title', e.target.value)}
@@ -327,11 +388,12 @@ export const PackageBuilder: React.FC = () => {
                 />
             </div>
 
-            <div>
+            <div id="admin-step1-section-price">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Mennyibe fog kerülni? 💰</h3>
-                <p className="text-gray-500 mb-4 text-sm">Becsült ár 2 főre, teljes hétvégére. Csak számokat írj!</p>
+                <p className="text-gray-500 mb-4 text-sm">Becsült ár 2 főre, teljes hétvégére. Nem muszáj kitölteni.</p>
                 <div className="relative">
                     <input
+                        id="admin-package-input-price"
                         type="number"
                         value={formData.estimatedCost || ''}
                         onChange={(e) => handleInputChange('estimatedCost', e.target.value)}
@@ -347,10 +409,11 @@ export const PackageBuilder: React.FC = () => {
                 </div>
             </div>
 
-            <div>
+            <div id="admin-step1-section-description">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Miért fogják imádni? ❤️</h3>
                 <p className="text-gray-500 mb-4 text-sm">Írj egy rövid, kedvcsináló leírást (2-3 mondat). Emeld ki a lényeget!</p>
                 <textarea
+                    id="admin-package-textarea-description"
                     value={formData.description || ''}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     rows={4}
@@ -363,12 +426,12 @@ export const PackageBuilder: React.FC = () => {
 
     // Step 2: Hangulat (Vizuális)
     const renderStep2 = () => (
-        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div>
+        <div id="admin-step2-container" className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div id="admin-step2-section-cover">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">A kaland arca 📸</h3>
                 <p className="text-gray-500 mb-6 text-sm">Tölts fel egy jó minőségű borítóképet, ami megadja az alaphangulatot. (Ajánlott méret: 800x600px)</p>
 
-                <div className="group relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 hover:border-primary/50 hover:bg-primary/5 transition-all">
+                <div id="admin-step2-cover-preview-container" className="group relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 hover:border-primary/50 hover:bg-primary/5 transition-all">
                     {formData.imageUrl ? (
                         <>
                             <img src={formData.imageUrl} alt="Borító" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -376,9 +439,10 @@ export const PackageBuilder: React.FC = () => {
                                 <label className="cursor-pointer bg-white text-gray-800 px-4 py-2 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg flex items-center gap-2">
                                     <Upload size={16} />
                                     Csere
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
+                                    <input id="admin-package-upload-cover" type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
                                 </label>
                                 <button
+                                    id="admin-package-delete-cover-button"
                                     onClick={() => handleInputChange('imageUrl', '')}
                                     className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
                                 >
@@ -393,13 +457,13 @@ export const PackageBuilder: React.FC = () => {
                             </div>
                             <span className="font-bold text-gray-600 text-lg group-hover:text-primary transition-colors">Kattints a feltöltéshez</span>
                             <span className="text-sm text-gray-400 mt-1">vagy húzd ide a képet</span>
-                            <input type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
+                            <input id="admin-package-upload-cover" type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
                         </label>
                     )}
                 </div>
             </div>
 
-            <div>
+            <div id="admin-step2-section-tags">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Címkék és jellemzők 🏷️</h3>
                 <p className="text-gray-500 mb-6 text-sm">Milyen stílusú ez az utazás? Válassz vagy adj hozzá új címkéket!</p>
                 <PackageTagsEditor
@@ -412,28 +476,29 @@ export const PackageBuilder: React.FC = () => {
 
     // Step 3: A Program (Tett) - Megmarad, de frissített körítéssel
     const renderStep3 = () => (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 mb-6">
+        <div id="admin-step3-container" className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div id="admin-step3-info-box" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 mb-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
                     <Calendar className="text-primary" size={20} />
                     Szervezzük meg a hétvégét!
                 </h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                    Húzd a programpontokat a megfelelő naphoz, vagy hozz létre újakat.
+                    Hozd létre a programpontokat a megfelelő naphoz, vagy húzd át a meglévőket.<br />
                     <span className="font-bold"> Tipp:</span> Egy jó 3 napos terv változatos és nem túl zsúfolt.
                 </p>
             </div>
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-1 gap-6">
+                <div id="admin-step3-days-grid" className="grid grid-cols-1 gap-6">
                     {formData.days?.map((day, dIdx) => (
-                        <div key={day.dayIndex} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
+                        <div key={day.dayIndex} id={`admin-step3-day-card-${dIdx}`} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                            <div id={`admin-step3-day-header-${dIdx}`} className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
                                 <h4 className="font-black text-gray-700 uppercase tracking-wider text-sm flex items-center gap-3">
                                     <span className={`w-2 h-2 rounded-full ${dIdx === 0 ? 'bg-amber-400' : dIdx === 1 ? 'bg-emerald-400' : 'bg-blue-400'}`}></span>
                                     {dIdx === 0 ? 'Péntek (1. Nap)' : dIdx === 1 ? 'Szombat (2. Nap)' : 'Vasárnap (3. Nap)'}
                                 </h4>
                                 <button
+                                    id={`admin-program-add-item-button-${dIdx}`}
                                     onClick={() => {
                                         setEditingItem({ item: null, dayIndex: dIdx });
                                         setIsModalOpen(true);
@@ -445,7 +510,7 @@ export const PackageBuilder: React.FC = () => {
                                 </button>
                             </div>
 
-                            <div className="p-4 min-h-[120px] space-y-3 bg-gray-50/30">
+                            <div id={`admin-step3-day-drop-area-${dIdx}`} className="p-4 min-h-[120px] space-y-3 bg-gray-50/30">
                                 <SortableContext items={day.items.map(i => i.id)} strategy={verticalListSortingStrategy}>
                                     {day.items.map(item => (
                                         <SortableItem key={item.id} id={item.id} item={item} dayIndex={dIdx} />
@@ -453,7 +518,7 @@ export const PackageBuilder: React.FC = () => {
                                 </SortableContext>
 
                                 {day.items.length === 0 && (
-                                    <div className="flex flex-col items-center justify-center py-8 text-gray-300 border-2 border-dashed border-gray-200 rounded-xl">
+                                    <div id={`admin-step3-day-empty-${dIdx}`} className="flex flex-col items-center justify-center py-8 text-gray-300 border-2 border-dashed border-gray-200 rounded-xl">
                                         <span className="text-2xl mb-1 opacity-50">🌱</span>
                                         <span className="text-xs font-medium">Még üres ez a nap</span>
                                     </div>
@@ -468,59 +533,110 @@ export const PackageBuilder: React.FC = () => {
 
     // Live Preview Component
     const LivePreview = () => (
-        <div className="sticky top-8 space-y-6">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-4">Élő Előnézet</h3>
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 w-full max-w-sm mx-auto">
-                <div className="h-56 overflow-hidden relative bg-gray-100">
-                    {formData.imageUrl ? (
-                        <img src={formData.imageUrl} alt={formData.title} className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
-                            <span className="text-5xl">🖼️</span>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
-                        <h3 className="text-white font-bold text-xl leading-tight drop-shadow-md">
-                            {formData.title || <span className="opacity-50 italic">Csomag Neve...</span>}
+        <div id="admin-preview-container" className="sticky top-8 space-y-6">
+            <h3 id="admin-preview-header" className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-4 mt-2">
+                {step === 3 ? 'Program Terv Előnézet' : 'Kártya Előnézet'}
+            </h3>
+
+            {step === 3 ? (
+                // --- Program Timeline Preview (Step 3) ---
+                <div id="admin-preview-program-card" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 w-full max-w-sm mx-auto flex flex-col max-h-[600px]">
+                    <div id="admin-preview-program-header" className="p-4 bg-gray-50 border-b border-gray-100 text-center shrink-0">
+                        <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide truncate px-4">
+                            {formData.title || "Tervezett Program"}
                         </h3>
+                        <p className="text-xs text-gray-500 mt-1">3 Napos Terv</p>
                     </div>
-                    {formData.countyId && (
-                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
-                            {formData.countyId}
-                        </div>
-                    )}
+                    <div id="admin-preview-program-content" className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
+                        {formData.days?.map((day, idx) => (
+                            <div key={idx} className="relative pl-6 border-l-2 border-gray-100 last:border-0 pb-2">
+                                {/* Day Header */}
+                                <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 border-white shadow-sm ring-1 ring-gray-100 ${idx === 0 ? 'bg-amber-400' : idx === 1 ? 'bg-emerald-400' : 'bg-blue-400'
+                                    }`}></div>
+                                <h4 className="text-xs font-black uppercase tracking-wider text-gray-400 mb-3 leading-none transform -translate-y-1">
+                                    {idx === 0 ? 'Péntek' : idx === 1 ? 'Szombat' : 'Vasárnap'}
+                                </h4>
+
+                                {/* Items */}
+                                <div className="space-y-3">
+                                    {day.items.length > 0 ? (
+                                        day.items.map((item, i) => (
+                                            <div key={i} className="flex gap-3 bg-gray-50/50 hover:bg-gray-50 rounded-lg p-2 border border-gray-100/50 hover:border-gray-200 transition-colors">
+                                                <span className="text-lg shrink-0">{item.icon}</span>
+                                                <div className="min-w-0">
+                                                    <div className="text-[10px] font-bold text-primary">{item.time}</div>
+                                                    <div className="text-xs font-bold text-gray-700 leading-tight truncate">{item.title}</div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-xs text-gray-300 italic pl-1">Még nincs program...</div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div id="admin-preview-program-footer" className="p-3 bg-gray-50 border-t border-gray-100 text-center text-[10px] text-gray-400 shrink-0">
+                        {formData.days?.reduce((acc, output) => acc + output.items.length, 0)} programpont összesen
+                    </div>
                 </div>
-                <div className="p-6">
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        {formData.tags?.length ? (
-                            formData.tags.map((tag, i) => (
-                                <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-md flex items-center gap-1">
-                                    {tag.icon} {tag.label}
-                                </span>
-                            ))
+            ) : (
+                // --- Standard Package Card Preview (Step 1 & 2) ---
+                <div id="admin-preview-standard-card" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 w-full max-w-sm mx-auto">
+                    <div id="admin-preview-card-image" className="h-56 overflow-hidden relative bg-gray-100">
+                        {formData.imageUrl ? (
+                            <img src={formData.imageUrl} alt={formData.title} className="w-full h-full object-cover" />
                         ) : (
-                            <span className="px-2 py-1 bg-gray-50 text-gray-300 text-xs font-bold rounded-md border border-dashed border-gray-200">
-                                #Címkék
-                            </span>
+                            <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-100">
+                                <span className="text-5xl">🖼️</span>
+                            </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-6">
+                            <h3 className="text-white font-bold text-xl leading-tight drop-shadow-md">
+                                {formData.title || <span className="opacity-50 italic">Csomag Neve...</span>}
+                            </h3>
+                        </div>
+                        {formData.countyId && (
+                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-gray-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
+                                {formData.countyId}
+                            </div>
                         )}
                     </div>
-                    <p className="text-gray-600 line-clamp-3 mb-6 text-sm leading-relaxed min-h-[3rem]">
-                        {formData.description || <span className="opacity-40 italic">Itt fog megjelenni a rövid leírás, amit a felhasználók látni fognak...</span>}
-                    </p>
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-                        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Becsült ár</span>
-                        <span className="font-black text-primary text-lg">
-                            {formData.estimatedCost && !isNaN(Number(formData.estimatedCost)) && Number(formData.estimatedCost) > 0
-                                ? `${Number(formData.estimatedCost).toLocaleString('hu-HU')} Ft`
-                                : '-'}
-                        </span>
+                    <div id="admin-preview-card-content" className="p-6">
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {formData.tags?.length ? (
+                                formData.tags.map((tag, i) => (
+                                    <span key={i} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-md flex items-center gap-1">
+                                        {tag.icon} {tag.label}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className="px-2 py-1 bg-gray-50 text-gray-300 text-xs font-bold rounded-md border border-dashed border-gray-200">
+                                    #Címkék
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-gray-600 line-clamp-3 mb-6 text-sm leading-relaxed min-h-[3rem]">
+                            {formData.description || <span className="opacity-40 italic">Itt fog megjelenni a rövid leírás, amit a felhasználók látni fognak...</span>}
+                        </p>
+                        <div id="admin-preview-card-footer" className="flex justify-between items-center pt-4 border-t border-gray-50">
+                            <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Becsült ár</span>
+                            <span className="font-black text-primary text-lg">
+                                {formData.estimatedCost && !isNaN(Number(formData.estimatedCost)) && Number(formData.estimatedCost) > 0
+                                    ? `${Number(formData.estimatedCost).toLocaleString('hu-HU')} Ft`
+                                    : '-'}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             <div className="text-center">
                 <p className="text-xs text-gray-400 leading-relaxed max-w-xs mx-auto">
-                    Így fog kinézni a kártya a felhasználók számára a választó képernyőn.
+                    {step === 3
+                        ? 'Itt láthatod a napok ívét és telítettségét.'
+                        : 'Így fog kinézni a kártya a felhasználók számára a választó képernyőn.'
+                    }
                 </p>
             </div>
         </div>
@@ -537,15 +653,23 @@ export const PackageBuilder: React.FC = () => {
     }
 
     return (
-        <div className="container mx-auto p-6 max-w-7xl">
+        <div id="admin-package-builder-root" className="container mx-auto p-6 max-w-7xl">
             {/* Main Header (All packages view) */}
             {!isEditing && (
-                <div className="flex justify-between items-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div id="admin-dashboard-header" className="flex justify-between items-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
                     <div>
                         <h1 className="text-4xl font-black text-gray-900 tracking-tight">Kalandor varázsló 🧙‍♂️</h1>
                         <p className="text-gray-500 mt-2 text-lg">Hozz létre felejthetetlen élményeket pár kattintással.</p>
+                        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 flex items-start gap-2 max-w-xl">
+                            <span className="text-lg">📱</span>
+                            <div>
+                                <span className="font-bold">Figyelem:</span> A szerkesztő felület használatához minimum <strong>600px</strong> széles képernyő szükséges!
+                                Mobil nézetben a megjelenés nem optimalizált.
+                            </div>
+                        </div>
                     </div>
                     <button
+                        id="admin-dashboard-new-adventure-button"
                         onClick={() => {
                             setSelectedPackage(null);
                             setIsEditing(true);
@@ -559,14 +683,14 @@ export const PackageBuilder: React.FC = () => {
             )}
 
             {isEditing ? (
-                <div className="flex flex-col lg:flex-row gap-8 items-start h-full">
+                <div id="admin-wizard-layout" className="flex flex-col lg:flex-row gap-8 items-start h-full">
                     {/* Left Side: Wizard Form */}
-                    <div className="flex-1 w-full">
-                        <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
+                    <div id="admin-wizard-form-container" className="flex-1 w-full">
+                        <div id="admin-wizard-card" className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
                             {/* Wizard Header */}
-                            <div className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-start sticky top-0 z-20">
+                            <div id="admin-wizard-header" className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-start sticky top-0 z-20">
                                 <div>
-                                    <div className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">
+                                    <div id="admin-wizard-steps-indicator" className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">
                                         <span className={`flex items-center gap-1 ${step >= 1 ? 'text-primary' : ''}`}>
                                             <span className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center text-xs">1</span>
                                             Alapok
@@ -582,27 +706,32 @@ export const PackageBuilder: React.FC = () => {
                                             Program
                                         </span>
                                     </div>
-                                    <h2 className="text-2xl font-black text-gray-900">
+                                    <h2 id="admin-wizard-step-title" className="text-2xl font-black text-gray-900">
                                         {step === 1 && 'Az alapok 📝'}
                                         {step === 2 && 'Hangulat és látvány 🎨'}
                                         {step === 3 && 'A program összeállítása 🗺️'}
                                     </h2>
                                 </div>
-                                <button onClick={handleBack} className="-mt-2 text-red-500 hover:text-red-600 font-bold transition-colors px-4 py-2 hover:bg-red-50 rounded-xl text-sm border border-transparent hover:border-red-100">
+                                <button
+                                    id="admin-wizard-exit-button"
+                                    onClick={handleBack}
+                                    className="-mt-2 text-red-500 hover:text-red-600 font-bold transition-colors px-4 py-2 hover:bg-red-50 rounded-xl text-sm border border-transparent hover:border-red-100"
+                                >
                                     Kilépés
                                 </button>
                             </div>
 
                             {/* Content Area */}
-                            <div className="p-8 lg:p-10 min-h-[500px] bg-white">
+                            <div id="admin-wizard-content-area" className="p-8 lg:p-10 min-h-[500px] bg-white">
                                 {step === 1 && renderStep1()}
                                 {step === 2 && renderStep2()}
                                 {step === 3 && renderStep3()}
                             </div>
 
                             {/* Footer Navigation */}
-                            <div className="bg-gray-50/80 backdrop-blur-sm px-8 py-6 border-t border-gray-100 flex justify-between items-center sticky bottom-0 z-20">
+                            <div id="admin-wizard-footer" className="bg-gray-50/80 backdrop-blur-sm px-8 py-6 border-t border-gray-100 flex justify-between items-center sticky bottom-0 z-20">
                                 <button
+                                    id={`admin-step${step}-back-button`}
                                     onClick={() => {
                                         if (step === 1) handleBack();
                                         else setStep(step - 1);
@@ -615,7 +744,8 @@ export const PackageBuilder: React.FC = () => {
 
                                 {step < 3 ? (
                                     <button
-                                        onClick={() => setStep(step + 1)}
+                                        id={`admin-step${step}-next-button`}
+                                        onClick={handleNextStep}
                                         className="px-8 py-4 rounded-xl font-black bg-gray-900 text-white hover:bg-black flex items-center gap-3 shadow-xl shadow-gray-200 hover:-translate-y-1 transition-all text-lg"
                                     >
                                         Tovább
@@ -623,12 +753,13 @@ export const PackageBuilder: React.FC = () => {
                                     </button>
                                 ) : (
                                     <button
+                                        id="admin-step3-save-button"
                                         onClick={() => handleSave(true)}
                                         disabled={isSaving}
                                         className="px-10 py-4 rounded-xl font-black bg-gradient-to-r from-primary-dark to-primary text-white hover:brightness-110 flex items-center gap-3 shadow-xl shadow-primary/30 hover:-translate-y-1 transition-all text-lg disabled:opacity-70"
                                     >
                                         <Save size={20} />
-                                        {isSaving ? 'Mentés...' : 'Kaland Mentése!'}
+                                        {isSaving ? 'Mentés...' : 'Kaland mentése!'}
                                     </button>
                                 )}
                             </div>
@@ -636,15 +767,16 @@ export const PackageBuilder: React.FC = () => {
                     </div>
 
                     {/* Right Side: Live Preview (Desktop Only) */}
-                    <div className="hidden lg:block w-96 shrink-0 animate-in fade-in slide-in-from-right-8 duration-700 delay-100">
+                    <div id="admin-wizard-preview-container" className="hidden lg:block w-96 shrink-0 animate-in fade-in slide-in-from-right-8 duration-700 delay-100">
                         <LivePreview />
                     </div>
                 </div>
             ) : (
                 /* Dashboard View - Package List */
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="admin-dashboard-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {/* Add New Card */}
                     <div
+                        id="admin-dashboard-card-new"
                         onClick={() => { setSelectedPackage(null); setIsEditing(true); }}
                         className="bg-white rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group min-h-[400px] text-center"
                     >
@@ -656,7 +788,12 @@ export const PackageBuilder: React.FC = () => {
                     </div>
 
                     {packages.map(pkg => (
-                        <div key={pkg.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col hover:-translate-y-2" onClick={() => { setSelectedPackage(pkg); setIsEditing(true); }}>
+                        <div
+                            key={pkg.id}
+                            id={`admin-dashboard-card-${pkg.id}`}
+                            className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group cursor-pointer hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-300 h-full flex flex-col hover:-translate-y-2"
+                            onClick={() => { setSelectedPackage(pkg); setIsEditing(true); }}
+                        >
                             <div className="h-48 overflow-hidden relative bg-gray-100">
                                 {pkg.imageUrl ? (
                                     <img src={pkg.imageUrl} alt={pkg.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -670,6 +807,7 @@ export const PackageBuilder: React.FC = () => {
                                     {pkg.countyId}
                                 </div>
                                 <button
+                                    id={`admin-dashboard-card-delete-${pkg.id}`}
                                     onClick={(e) => handleDeletePackageClick(pkg.id, e)}
                                     className="absolute top-4 left-4 bg-white hover:bg-red-50 text-gray-400 hover:text-red-500 p-2 rounded-full shadow-md backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                                     title="Törlés"
@@ -729,6 +867,14 @@ export const PackageBuilder: React.FC = () => {
                 onSave={() => handleSave(true)}
                 onDiscard={handleDiscard}
                 onCancel={() => setShowUnsavedModal(false)}
+            />
+
+            <StatusModal
+                isOpen={statusModal.isOpen}
+                onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
+                title={statusModal.title}
+                message={statusModal.message}
+                type={statusModal.type}
             />
         </div>
     );

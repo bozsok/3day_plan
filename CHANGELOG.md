@@ -3,61 +3,78 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 
+## [2.1.2] - 2026-02-16
+
+### UI/UX finomítások és űrlapvalidáció
+- **StatusModal (új komponens):**
+    - A natív, zavaró `alert()` ablakokat lecseréltük egy saját fejlesztésű, elegáns modális ablakra (`StatusModal`).
+    - Egységes visszajelzések: siker (zöld), hiba (piros), figyelmeztetés (sárga) és információ (kék) típusok saját ikonokkal.
+    - Teljes integráció: a mentési, törlési és feltöltési folyamatok már ezt használják.
+- **Továbbfejlesztett validáció (PackageBuilder):**
+    - **Lépésről lépésre ellenőrzés:** a "Tovább" gomb mostantól blokkolja a továbbhaladást, ha a kötelező mezők (cím, megye, borítókép) üresek.
+    - **Felhasználóbarát szabályok:** a "Becsült ár" és "Leírás" mezők az 1. lépésben opcionálissá váltak (a felhasználói visszajelzések alapján).
+    - **Vizuális visszajelzés:** hiányzó adatok esetén a `StatusModal` figyelmeztet a konkrét hibára.
+- **Reszponzív figyelmeztetés:**
+    - A Dashboard (csomagválasztó) főoldalán egy új figyelmeztető sáv jelzi, ha a képernyő szélessége nem éri el a 600px-et (mobilnézetben a szerkesztő nem optimalizált).
+- **Szövegezés és tördelés:**
+    - A 3. lépés (program-összeállítás) leírásában a "Tipp:" rész új sorba került a jobb olvashatóságért.
+    - Finomítottuk az 1. lépés (alapok) segédszövegeit ("Nem muszáj kitölteni").
+
 ## [2.1.1] - 2026-02-16
 
-### UI / UX Finomítások és Javítások
-- **Adminisztrációs Varázsló:**
-    - **Ár Kijelzés Javítása (Critical Fix):** A "Becsült ár" mező mostantól minden nézetben (Lista és Live Preview) helyesen jelenik meg. A korábbi `NaN Ft` vagy `0 Ft` hiba üres vagy érvénytelen érték esetén `-` jelre cserélve.
-    - **Biztonságos Törlés:** A programpontok törlésekor (kuka ikon) a natív, csúnya böngésző ablak helyett az egységes `ConfirmationModal` jelenik meg, illeszkedve az arculathoz.
-    - **Vizuális Igazítások:**
+### UI/UX finomítások és javítások
+- **Adminisztrációs varázsló:**
+    - **Árkijelzés javítása (critical fix):** a "Becsült ár" mező mostantól minden nézetben (lista és live preview) helyesen jelenik meg. A korábbi `NaN Ft` vagy `0 Ft` hiba üres vagy érvénytelen érték esetén `-` jelre cserélve.
+    - **Biztonságos törlés:** a programpontok törlésekor (kuka ikon) a natív, csúnya böngészőablak helyett az egységes `ConfirmationModal` jelenik meg, illeszkedve az arculathoz.
+    - **Vizuális igazítások:**
         - A "Kilépés" gomb szövege mostantól tökéletesen egy vonalban van a lépésjelzőkkel (a gomb paddingjának korrigálásával).
         - A fejlécben megnöveltük a távolságot a lépésjelző (breadcrumbs) és a cím között a jobb áttekinthetőségért.
-    - **Ikon Csere:** A programpont szerkesztés gomb ikonja a félrevezető Címke (Tag) helyett Ceruza (Pencil) lett.
-    - **Segítségnyújtás:** A 2. lépésnél (Hangulat) a borítókép feltöltésénél mostantól megjelenik az ajánlott képméret (800x600px).
+    - **Ikoncsere:** a programpont szerkesztés gomb ikonja a félrevezető "Címke" (Tag) helyett "Ceruza" (Pencil) lett.
+    - **Segítségnyújtás:** a 2. lépésnél (hangulat) a borítókép feltöltésénél mostantól megjelenik az ajánlott képméret (800x600px).
 - **Technikai:**
-    - **Build Javítás:** Eltávolítottuk a használaton kívüli `Tag` importot, ami fordítási hibát okozott.
+    - **Build-javítás:** eltávolítottuk a használaton kívüli `Tag` importot, ami fordítási hibát okozott.
 
 ## [2.1.0] - 2026-02-16
 
-### Javítások (Bugfix)
-- **Fájlfeltöltés (Upload):**
+### Javítások (bugfix)
+- **Fájlfeltöltés (upload):**
     - Javítva a "Blob" fájlnevek kezelése: a kiterjesztés nélküli fájlok mostantól automatikusan kapnak nevet és kiterjesztést.
     - Javítva az 500-as szerverhiba feltöltéskor: a `server/api/uploads` könyvtár hiánya vagy jogosultsági problémái lekezelve.
     - Javítva a 404-es képhiba: a feltöltött képek URL-je mostantól helyesen tartalmazza az API útvonalat (`/api/uploads/...`).
-- **Időzóna és Dátum:**
-    - Javítva az "56000 év" hiba a Részletes szavazatok táblázatban: az időbélyegek konverziója (ms vs sec) korrigálva.
-- **UI / UX:**
-    - **Ikonválasztó:** Az admin felületen az ikonok mostantól tökéletesen középre igazítva jelennek meg a választó háttéren.
-    - **Adminisztráció:** Biztonságosabb "admin" jelszó hash generálás.
+- **Időzóna és dátum:**
+    - Javítva az "56000 év" hiba a "Részletes szavazatok" táblázatban: az időbélyegek konverziója (ms vs sec) korrigálva.
+- **UI/UX:**
+    - **Ikonválasztó:** az admin felületen az ikonok mostantól tökéletesen középre igazítva jelennek meg a választó háttéren.
+    - **Adminisztráció:** biztonságosabb "admin" jelszóhash-generálás.
 - **Technikai:**
-    - TypeScript változónév ütközések feloldása (`PackageService.ts`).
-    - Verziószám szinkronizálása: Frontend és Backend egységesen 2.1.0.
+    - TypeScript-változónév ütközések feloldása (`PackageService.ts`).
+    - Verziószám-szinkronizálás: frontend és backend egységesen 2.1.0.
 
 ## [2.0.0] - 2026-02-16
 
-### Lightbox Galéria (Kiemelt Funkció)
-- **Teljes képernyős élmény (Portal):** A `ProgramTimeline` képei mostantól nem új böngészőfülön nyílnak meg, hanem egy elegáns, az alkalmazáson belül megjelenő "Lightbox" overlay-ben.
-- **Zavartalan nézet:** A `createPortal` technológiának köszönhetően a nagyított kép garantáltan lefedi a teljes képernyőt, függetlenül a szülő komponensek korlátaitól (z-index, overflow).
+### Lightbox galéria (kiemelt funkció)
+- **Teljes képernyős élmény (Portal):** a `ProgramTimeline` képei mostantól nem új böngészőfülön nyílnak meg, hanem egy elegáns, az alkalmazáson belül megjelenő "Lightbox" overlay-ben.
+- **Zavartalan nézet:** a `createPortal` technológiának köszönhetően a nagyított kép garantáltan lefedi a teljes képernyőt, függetlenül a szülő komponensek korlátaitól (z-index, overflow).
 - **Prémium megjelenés:**
     - Fekete, enyhén átlátszó és elmosott háttér (`backdrop-blur-md`).
     - Keretmentes, "lebegő" képkialakítás.
     - Finom animációk (fade-in, zoom-in) a megnyitáskor.
-- **Intuitív vezérlés:** A bezárás a jobb felső sarokban található 'X' gombbal vagy egyszerűen a kép mellé (a háttérre) kattintva lehetséges.
+- **Intuitív vezérlés:** a bezárás a jobb felső sarokban található 'X' gombbal vagy egyszerűen a kép mellé (a háttérre) kattintva lehetséges.
 
-### Adminisztrációs Eszközök
+### Adminisztrációs eszközök
 - **Csomagkezelés:**
-    - **Törlés funkció:** Minden csomagkártyára felkerült egy piros kuka ikon, amellyel (megerősítés után) véglegesen törölhető az adott csomag.
-    - **Képfeltöltés:** A csomagkészítő (`PackageBuilder`) mostantól támogatja a borítóképek feltöltését, és vizuális visszajelzést ad az ajánlott méretről (800x600 px).
-    - **Alapértelmezett értékek:** Az új programpontok létrehozásakor a rendszer mostantól életszerűbb default értékeket ajánl fel (08:00, "utazás" kategória, autó ikon), ezzel is gyorsítva az adminisztrálást.
+    - **Törlés funkció:** minden csomagkártyára felkerült egy piros kuka ikon, amellyel (megerősítés után) véglegesen törölhető az adott csomag.
+    - **Képfeltöltés:** a csomagkészítő (`PackageBuilder`) mostantól támogatja a borítóképek feltöltését, és vizuális visszajelzést ad az ajánlott méretről (800x600 px).
+    - **Alapértelmezett értékek:** az új programpontok létrehozásakor a rendszer mostantól életszerűbb default értékeket ajánl fel (08:00, "utazás" kategória, autó ikon), ezzel is gyorsítva az adminisztrálást.
 
-### UI Finomhangolás és Tisztítás
-- **Sidebar (3. Lépés):** Eltávolítottuk a redundáns "3 NAP / 2 ÉJ" jelvényt a bal oldali sávból a letisztultabb megjelenés érdekében (hiszen ez az információ a fejlécben is szerepel).
-- **ProgramTimeline:** A képgaléria elemei hoverre nagyulnak (`scale-105`) és `cursor-zoom-in` kurzort kaptak, jelezve a kattinthatóságot.
-- **Summary:** A rangsor szekciók közötti távolságot (`gap-12` -> `gap-8`) csökkentettük a kompaktabb nézetért.
+### UI-finomhangolás és tisztítás
+- **Sidebar (3. lépés):** eltávolítottuk a redundáns "3 NAP / 2 ÉJ" jelvényt a bal oldali sávból a letisztultabb megjelenés érdekében (hiszen ez az információ a fejlécben is szerepel).
+- **ProgramTimeline:** a képgaléria elemei hoverre nagyulnak (`scale-105`) és `cursor-zoom-in` kurzort kaptak, jelezve a kattinthatóságot.
+- **Summary:** a rangsor szekciók közötti távolságot (`gap-12` -> `gap-8`) csökkentettük a kompaktabb nézetért.
 
-### Technikai Stabilitás
-- **Git konfiguráció (Uploads):** A `server/public/uploads` mappa bekerült a `.gitignore`-ba `.gitkeep` kivétellel. Ez biztosítja, hogy a felhasználók által feltöltött nagyméretű médiafájlok ne kerüljenek be a verziókezelőbe, de a mappaszerkezet megmaradjon.
-- **Verziófrissítés:** A frontend és a backend verziószáma egységesen **2.0.0**-ra emelkedett, jelezve a funkcionális mérföldkövet.
+### Technikai stabilitás
+- **Git-konfiguráció (uploads):** a `server/public/uploads` mappa bekerült a `.gitignore`-ba `.gitkeep` kivétellel. Ez biztosítja, hogy a felhasználók által feltöltött nagyméretű médiafájlok ne kerüljenek be a verziókezelőbe, de a mappaszerkezet megmaradjon.
+- **Verziófrissítés:** a frontend és a backend verziószáma egységesen **2.0.0**-ra emelkedett, jelezve a funkcionális mérföldkövet.
 
 ## [1.1.0] - 2026-02-15
 

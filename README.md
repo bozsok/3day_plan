@@ -45,8 +45,14 @@ Az alkalmazás legújabb verziója (v1.1+) a vizuális tökéletességre, az egy
 
 A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is. Részletes útmutatót az egyes mappákban (`server`, `root`) található fájlokban találsz.
 
-## Adminisztráció 🛠️
+## Adminisztráció és csomagkészítő 🛠️
 
-A rendszer tartalmaz egy rejtett adminisztrációs felületet a szervezők számára. Az **Összegzés** oldalon a "Közös Tervezés" címre való **5 gyors kattintással** érhető el a vezérlőpult, ahol az adatbázis tisztítása vagy egyes felhasználók kezelése végezhető el.
+A rendszer tartalmaz egy rejtett adminisztrációs felületet a szervezők számára. Az **összegzés** oldalon a "Közös tervezés" címre való **5 gyors kattintással** érhető el a vezérlőpult, ahol az adatbázis tisztítása vagy egyes felhasználók kezelése végezhető el.
+
+### Kalandor varázsló (új!) 🧙‍♂️
+A 2.1-es verziótól elérhető egy teljesen új, narratív alapú csomagkészítő felület, ahol lépésről lépésre (wizard) állíthatók össze az új 3 napos tervek.
+- **Interaktív szerkesztő:** drag & drop programrendezés és élő előnézet.
+- **Egységes visszajelzések:** a rendszer minden fontos interakciónál (mentés, törlés, hiba) saját, stílusos modális ablakokon (`StatusModal`) keresztül kommunikál a felhasználóval.
+- **Követelmény:** a komplex felület miatt használata **minimum 600px széles képernyőn** (tablet/desktop) támogatott.
 
 Jó tervezést és még jobb kikapcsolódást kívánunk!
