@@ -3,6 +3,22 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 
+
+## [2.2.0] - 2026-02-16
+
+### Fontos javítások és Adminisztráció
+- **Adminisztrációs hibajavítás (Reset Vote):** Kijavítottuk a szavazatok visszavonásának logikáját. Mostantól a "Visszavon" gomb nemcsak az ideiglenes haladást, hanem a végleges adatbázisból (`db.json` / SQLite) is maradéktalanul törli a felhasználó szavazatait és dátumait.
+- **Node.js szerver szinkronizáció:** Implementáltuk a hiányzó adminisztrációs végpontokat a fejlesztői szerveren is, így a projekt minden környezetben (PHP és Node.js) azonos módon működik.
+- **Tiszta törlés:** A felhasználók törlésekor mostantól az ideiglenes fájlok és haladási naplók is automatikusan törlődnek.
+
+### Arculat és Megjelenés
+- **Egyedi Favicon (új):** Az alkalmazás megkapta a végleges, modern arculathoz illeszkedő ikonját. A 3-szegmensű, az alkalmazás színeit (kék, narancs, türkiz) használó SVG ikon minden felbontáson élesen jelenik meg a böngésző fülén.
+- **UI Finomítás (PackageBuilder):** Pontosítottuk a programpontok kezelésének leírását az admin felületen (szerkeszthetőség, törölhetőség és húzhatóság jelzése).
+
+### Technikai
+- **Azonnali frissítés (Live Refetch):** Az adminisztrátori műveletek (törlés, reset) után a felület mostantól azonnal, kényszerített módon újratölti az adatokat a szerverről.
+- **Verziófrissítés:** Verziószám-szinkronizálás az egész projektben (v2.2.0).
+
 ## [2.1.2] - 2026-02-16
 
 ### UI/UX finomítások és űrlapvalidáció

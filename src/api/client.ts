@@ -136,6 +136,14 @@ export const api = {
             if (!res.ok) throw new Error('Admin reset failed');
             return res.json();
         },
+        resetUserVote: async (id: number) => {
+            const url = import.meta.env.PROD
+                ? `${API_URL}/admin.php?action=reset_user_vote&id=${id}`
+                : `${API_URL}/admin/users/${id}/reset_vote`;
+            const res = await fetch(url, { method: 'POST' });
+            if (!res.ok) throw new Error('Admin reset user vote failed');
+            return res.json();
+        },
         deleteUser: async (id: number) => {
             const url = import.meta.env.PROD
                 ? `${API_URL}/admin.php?action=delete_user&id=${id}` // action param is ignored by standard REST but good for doc, id is crucial

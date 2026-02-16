@@ -15,6 +15,7 @@ import { VoteManagementModal } from '../modals/VoteManagementModal';
 import { RankingSection } from '../summary/RankingSection';
 import { RankingCard } from '../summary/RankingCard';
 import { DesignerStatus } from '../summary/DesignerStatus';
+import { SummaryAdminModal } from '../modals/SummaryAdminModal';
 
 interface SummaryData {
     topIntervals: { start: string; end: string; count: number; users: string[] }[];
@@ -47,7 +48,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     );
 
     // TanStack Query: Összegzés adatok lekérése és polling
-    const { data, isLoading } = useQuery<SummaryData>({
+    const { data, isLoading, refetch } = useQuery<SummaryData>({
         queryKey: ['summary'],
         queryFn: api.summary.get,
         refetchInterval: 2000,
@@ -76,6 +77,8 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
         }
     };
 
+
+
     const handleAdminDeleteUser = async (id: number) => {
         try {
             await api.admin.deleteUser(id);
@@ -83,7 +86,8 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             if (user && user.id === id) {
                 logout();
             }
-            setAdminStatus(null);
+            refetch(); // Azonnali frissítés
+            setTimeout(() => setAdminStatus(null), 3000);
         } catch (e) {
             setAdminStatus('❌ Hiba a törlés során!');
         }
@@ -227,58 +231,28 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
             />
 
             {/* ADMIN PANEL OVERLAY */}
-            {adminMode && (
-                <div id="summary-admin-overlay" className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4" onClick={(e) => e.target === e.currentTarget && setAdminMode(false)}>
-                    <div id="summary-admin-panel" className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-4 border-red-500">
-                        <div id="summary-admin-header" className="flex justify-between items-center mb-6">
-                            <h2 id="summary-admin-title" className="text-2xl font-bold text-red-600 flex items-center gap-2">
-                                🛠️ RENDSZERGAZDA
-                            </h2>
-                            <button
-                                id="summary-admin-close-btn"
-                                onClick={() => { setAdminMode(false); setAdminStatus(null); }}
-                                className="text-gray-500 hover:text-gray-900 font-bold"
-                            >
-                                BEZÁRÁS
-                            </button>
-                        </div>
-
-                        {adminStatus && (
-                            <div id="summary-admin-status-msg" className="mb-4 p-3 bg-gray-100 border border-gray-300 rounded-lg text-center font-bold text-gray-800">
-                                {adminStatus}
-                            </div>
-                        )}
-
-                        <div id="summary-admin-actions" className="space-y-4">
-                            <button
-                                id="summary-admin-reset-btn"
-                                onClick={handleAdminReset}
-                                className="w-full font-bold py-3 rounded-xl shadow-lg transform active:scale-95 transition-all bg-red-600 hover:bg-red-700 text-white hover:scale-105"
-                            >
-                                ☢️ ADATBÁZIS TÖRLÉS
-                            </button>
-
-                            <div id="summary-admin-user-list" className="border-t border-gray-200 pt-4 mt-4">
-                                <h3 className="font-bold text-gray-700 mb-2">Felhasználók törlése:</h3>
-                                <div className="max-h-60 overflow-y-auto space-y-2">
-                                    {data?.userStatuses.map(u => (
-                                        <div key={u.id} className="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-200">
-                                            <span className="font-medium text-gray-800">{u.name} (ID: {u.id})</span>
-                                            <button
-                                                id={`summary-admin-delete-user-btn-${u.id}`}
-                                                onClick={() => handleAdminDeleteUser(u.id)}
-                                                className="px-3 py-1 rounded text-xs font-bold transition-colors bg-white text-red-500 hover:bg-red-50 border border-red-200"
-                                            >
-                                                🗑️ Törlés
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* ADMIN PANEL OVERLAY (Portal-based) */}
+            <SummaryAdminModal
+                isOpen={adminMode}
+                onClose={() => { setAdminMode(false); setAdminStatus(null); }}
+                onReset={handleAdminReset}
+                onDeleteVote={async (userId) => {
+                    try {
+                        await api.admin.resetUserVote(userId);
+                        setAdminStatus(`✅ Szavazat visszavonva (User ID: ${userId})`);
+                        refetch(); // Azonnali frissítés
+                        setTimeout(() => setAdminStatus(null), 3000);
+                    } catch (e) {
+                        setAdminStatus('❌ Hiba a szavazat törlésekor!');
+                    }
+                }}
+                onDeleteUser={handleAdminDeleteUser}
+                adminStatus={adminStatus}
+                detailedVotes={data.detailedVotes || []}
+                userStatuses={data.userStatuses || []}
+                allPackages={allPackages}
+                counties={counties}
+            />
         </>
     );
 }

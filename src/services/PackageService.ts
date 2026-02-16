@@ -77,10 +77,11 @@ export const PackageService = {
             }
             const data = await response.json();
 
-            // Ha üres a szerver válasz (pl. első indítás), fallback a mock adatokra
-            if (!Array.isArray(data) || data.length === 0) {
-                console.warn('Server returned empty package list, using mock data.');
-                return mockPackages;
+            // Ha üres a szerver válasz (pl. admin törölt mindent), akkor üres tömböt adunk vissza.
+            // NEM fallbackelünk mock adatokra, mert akkor nem lehetne kiüríteni a rendszert.
+            if (!Array.isArray(data)) {
+                console.warn('Server returned non-array:', data);
+                return [];
             }
 
             // MIGRÁCIÓ: Régi ikonok cseréje emojikra (csak a megjelenítéshez, a DB marad változatlan egyelőre)

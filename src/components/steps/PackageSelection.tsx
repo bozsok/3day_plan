@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { packages as packagesMock } from '../../data/mockData';
+
 import { usePackages } from '../../hooks/usePackages';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
@@ -53,13 +53,9 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
     // API adatok betöltése
     const { packages: apiPackages, isLoading } = usePackages();
 
-    // Egyesítjük a mock és valós adatokat, de a valósak (API) legyenek elöl/fontosabbak.
-    // Ha az adatbázisban van, azt használjuk.
-    const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
-        index === self.findIndex((t) => (
-            t.id === p.id
-        ))
-    );
+    // Modosítva: Csak az API-ból jövő csomagokat használjuk, nem keverjük a mock adatokkal.
+    // Így ha az admin töröl mindent, akkor üres lista jelenik meg, nem a "szellem" mock adatok.
+    const allPackages = apiPackages;
 
     // Filter packages by county (passed as regionId prop from App.tsx)
     const availablePackages = allPackages.filter(p => p.countyId === regionId);

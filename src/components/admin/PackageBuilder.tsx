@@ -483,7 +483,7 @@ export const PackageBuilder: React.FC = () => {
                     Szervezzük meg a hétvégét!
                 </h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                    Hozd létre a programpontokat a megfelelő naphoz, vagy húzd át a meglévőket.<br />
+                    Hozd létre a programpontokat a megfelelő naphoz a PLUSZ jellel. A programpontok szerkeszthetők, törölhetők, húzhatók.<br />
                     <span className="font-bold"> Tipp:</span> Egy jó 3 napos terv változatos és nem túl zsúfolt.
                 </p>
             </div>
@@ -674,7 +674,7 @@ export const PackageBuilder: React.FC = () => {
                             setSelectedPackage(null);
                             setIsEditing(true);
                         }}
-                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:scale-105 active:scale-95"
+                        className="flex items-center gap-2 bg-primary text-white px-6 h-14 rounded-2xl font-bold hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 hover:scale-105 active:scale-95"
                     >
                         <Plus size={24} />
                         Új kaland tervezése
@@ -746,7 +746,7 @@ export const PackageBuilder: React.FC = () => {
                                     <button
                                         id={`admin-step${step}-next-button`}
                                         onClick={handleNextStep}
-                                        className="px-8 py-4 rounded-xl font-black bg-gray-900 text-white hover:bg-black flex items-center gap-3 shadow-xl shadow-gray-200 hover:-translate-y-1 transition-all text-lg"
+                                        className="px-8 py-4 rounded-xl font-black bg-primary text-white hover:bg-primary/90 flex items-center gap-3 shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all text-lg"
                                     >
                                         Tovább
                                         <ArrowRight size={20} />
