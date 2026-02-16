@@ -73,7 +73,7 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], o
             datesDisplay,
             regionDisplay: regionName,
             packageDisplay: packageName,
-            timestamp: typeof vote.timestamp === 'string' ? new Date(vote.timestamp).getTime() : vote.timestamp * 1000
+            timestamp: typeof vote.timestamp === 'string' ? new Date(vote.timestamp).getTime() : vote.timestamp
         });
     });
 

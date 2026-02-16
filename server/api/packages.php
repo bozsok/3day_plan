@@ -6,7 +6,23 @@ handleOptions();
 sendHeaders();
 
 // 2. Útvonalak meghatározása
-$PACKAGES_FILE = __DIR__ . '/../data/packages.json';
+$DATA_DIR = __DIR__ . '/../data';
+$PACKAGES_FILE = $DATA_DIR . '/packages.json';
+
+// Ensure data directory exists
+if (!file_exists($DATA_DIR)) {
+    if (!@mkdir($DATA_DIR, 0777, true)) {
+        // Try alternative path if structure is flat
+        $DATA_DIR = __DIR__ . '/data';
+        $PACKAGES_FILE = $DATA_DIR . '/packages.json';
+        if (!file_exists($DATA_DIR)) {
+            if (!@mkdir($DATA_DIR, 0777, true)) {
+                // Log error but continue to return empty array for GET
+                error_log("Failed to create data directory: " . $DATA_DIR);
+            }
+        }
+    }
+}
 
 // 3. GET: Csomagok lekérése
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {

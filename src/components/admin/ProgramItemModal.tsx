@@ -168,7 +168,7 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
                                                     setFormData(prev => ({ ...prev, icon }));
                                                     setIsIconPickerOpen(false);
                                                 }}
-                                                className={`text-xl p-2 rounded-lg hover:bg-gray-100 transition-colors ${formData.icon === icon ? 'bg-blue-50 ring-2 ring-blue-500/20' : ''}`}
+                                                className={`text-xl p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center aspect-square ${formData.icon === icon ? 'bg-blue-50 ring-2 ring-blue-500/20' : ''}`}
                                             >
                                                 {icon}
                                             </button>

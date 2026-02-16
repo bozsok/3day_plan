@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Compass, Calendar, MapPin, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { StepCard } from '../common/StepCard';
 
@@ -35,14 +35,14 @@ export function Hero({ }: HeroProps) {
     return (
         <StepCard id="hero-root-card" className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12">
             <div className="absolute top-4 right-4 z-20">
-                <a
-                    href="/#/admin"
+                <Link
+                    to="/admin"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-white/50 hover:bg-white text-gray-500 hover:text-primary text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition-all shadow-sm border border-transparent hover:border-gray-100 flex items-center gap-1"
                 >
                     ⚙️ Admin
-                </a>
+                </Link>
             </div>
 
             {/* Dekorációs háttérelemek */}

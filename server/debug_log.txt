@@ -1,0 +1,5 @@
+[2026-02-16 07:05:41] Request started. Method: POST
+[2026-02-16 07:05:41] Content-Length: 59224, post_max_size: 128M, upload_max_filesize: 127M
+[2026-02-16 07:05:41] Upload dir missing, trying mkdir: /var/www/petofink.edu.hu/www/3nap/server/api/uploads/
+[2026-02-16 07:05:41] Processing 1 files...
+[2026-02-16 07:05:41] ERROR: Invalid file type: 

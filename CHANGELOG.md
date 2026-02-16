@@ -3,6 +3,22 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
 
+## [2.1.0] - 2026-02-16
+
+### Javítások (Bugfix)
+- **Fájlfeltöltés (Upload):**
+    - Javítva a "Blob" fájlnevek kezelése: a kiterjesztés nélküli fájlok mostantól automatikusan kapnak nevet és kiterjesztést.
+    - Javítva az 500-as szerverhiba feltöltéskor: a `server/api/uploads` könyvtár hiánya vagy jogosultsági problémái lekezelve.
+    - Javítva a 404-es képhiba: a feltöltött képek URL-je mostantól helyesen tartalmazza az API útvonalat (`/api/uploads/...`).
+- **Időzóna és Dátum:**
+    - Javítva az "56000 év" hiba a Részletes szavazatok táblázatban: az időbélyegek konverziója (ms vs sec) korrigálva.
+- **UI / UX:**
+    - **Ikonválasztó:** Az admin felületen az ikonok mostantól tökéletesen középre igazítva jelennek meg a választó háttéren.
+    - **Adminisztráció:** Biztonságosabb "admin" jelszó hash generálás.
+- **Technikai:**
+    - TypeScript változónév ütközések feloldása (`PackageService.ts`).
+    - Verziószám szinkronizálása: Frontend és Backend egységesen 2.1.0.
+
 ## [2.0.0] - 2026-02-16
 
 ### Lightbox Galéria (Kiemelt Funkció)
