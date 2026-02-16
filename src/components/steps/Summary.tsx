@@ -6,9 +6,10 @@ import { hu } from 'date-fns/locale';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { StepCard } from '../common/StepCard';
+import { usePackages } from '../../hooks/usePackages';
 import { api } from '../../api/client';
 import { useUser } from '../../context/UserContext';
-import { counties, packages } from '../../data/mockData';
+import { counties, packages as packagesMock } from '../../data/mockData';
 import { Trophy, Calendar as CalendarIcon, ArrowRight, ChevronLeft } from 'lucide-react';
 import { VoteManagementModal } from '../modals/VoteManagementModal';
 import { RankingSection } from '../summary/RankingSection';
@@ -35,6 +36,15 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
     const [adminMode, setAdminMode] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
     const [adminStatus, setAdminStatus] = useState<string | null>(null);
+
+    const { packages: apiPackages } = usePackages();
+
+    // Adatok összefésülése a Summary-hoz is, hogy a nevek (UUID helyett) megjelenjenek
+    const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
+        index === self.findIndex((t) => (
+            t.id === p.id
+        ))
+    );
 
     // TanStack Query: Összegzés adatok lekérése és polling
     const { data, isLoading } = useQuery<SummaryData>({
@@ -129,7 +139,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     </div>
                 </div>
 
-                <div id="summary-ranking-container" className="flex flex-col gap-12 mb-12">
+                <div id="summary-ranking-container" className="flex flex-col gap-8 mb-12">
                     {/* 1. Dátum Intervallumok (Mikor menjünk?) */}
                     <RankingSection
                         id="summary-ranking-dates"
@@ -171,7 +181,8 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                             const regionName = county?.name ?? item.regionId;
 
                             // Megkeressük az első csomagot ehhez a régióhoz, hogy kinyerjük a képet, leírást és tageket
-                            const relatedPackage = packages.find(p => p.countyId === item.regionId);
+                            // Itt már az allPackages-ben keresünk, így megtalálja az újakat is
+                            const relatedPackage = allPackages.find(p => p.countyId === item.regionId);
 
                             const regionImage = relatedPackage?.imageUrl
                                 || `https://placehold.co/600x400/EEE/31343C/png?text=${encodeURIComponent(regionName)}`;
@@ -205,6 +216,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                     userProgress={data.userProgress}
                     detailedVotes={data.detailedVotes || []}
                     onManageVotes={() => setShowVoteModal(true)}
+                    allPackages={allPackages} // Átadjuk az egyesített listát
                 />
             </StepCard>
 

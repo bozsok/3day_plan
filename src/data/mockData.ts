@@ -42,6 +42,8 @@ export interface ProgramItem {
     icon: string;
     category: string;
     imageUrl?: string;
+    marketingLabel?: string; // Marketing szöveg (pl. "Kihagyhatatlan!")
+    galleryImages?: string[]; // Galéria képek (relatív útvonalak)
 }
 
 export interface DailyProgram {

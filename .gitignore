@@ -31,3 +31,9 @@ dist-ssr
 
 # Source material
 Source/
+
+# Uploads (User generated content)
+server/public/uploads/*
+!server/public/uploads/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep

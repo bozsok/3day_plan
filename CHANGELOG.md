@@ -2,6 +2,33 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+
+## [2.0.0] - 2026-02-16
+
+### Lightbox Galéria (Kiemelt Funkció)
+- **Teljes képernyős élmény (Portal):** A `ProgramTimeline` képei mostantól nem új böngészőfülön nyílnak meg, hanem egy elegáns, az alkalmazáson belül megjelenő "Lightbox" overlay-ben.
+- **Zavartalan nézet:** A `createPortal` technológiának köszönhetően a nagyított kép garantáltan lefedi a teljes képernyőt, függetlenül a szülő komponensek korlátaitól (z-index, overflow).
+- **Prémium megjelenés:**
+    - Fekete, enyhén átlátszó és elmosott háttér (`backdrop-blur-md`).
+    - Keretmentes, "lebegő" képkialakítás.
+    - Finom animációk (fade-in, zoom-in) a megnyitáskor.
+- **Intuitív vezérlés:** A bezárás a jobb felső sarokban található 'X' gombbal vagy egyszerűen a kép mellé (a háttérre) kattintva lehetséges.
+
+### Adminisztrációs Eszközök
+- **Csomagkezelés:**
+    - **Törlés funkció:** Minden csomagkártyára felkerült egy piros kuka ikon, amellyel (megerősítés után) véglegesen törölhető az adott csomag.
+    - **Képfeltöltés:** A csomagkészítő (`PackageBuilder`) mostantól támogatja a borítóképek feltöltését, és vizuális visszajelzést ad az ajánlott méretről (800x600 px).
+    - **Alapértelmezett értékek:** Az új programpontok létrehozásakor a rendszer mostantól életszerűbb default értékeket ajánl fel (08:00, "utazás" kategória, autó ikon), ezzel is gyorsítva az adminisztrálást.
+
+### UI Finomhangolás és Tisztítás
+- **Sidebar (3. Lépés):** Eltávolítottuk a redundáns "3 NAP / 2 ÉJ" jelvényt a bal oldali sávból a letisztultabb megjelenés érdekében (hiszen ez az információ a fejlécben is szerepel).
+- **ProgramTimeline:** A képgaléria elemei hoverre nagyulnak (`scale-105`) és `cursor-zoom-in` kurzort kaptak, jelezve a kattinthatóságot.
+- **Summary:** A rangsor szekciók közötti távolságot (`gap-12` -> `gap-8`) csökkentettük a kompaktabb nézetért.
+
+### Technikai Stabilitás
+- **Git konfiguráció (Uploads):** A `server/public/uploads` mappa bekerült a `.gitignore`-ba `.gitkeep` kivétellel. Ez biztosítja, hogy a felhasználók által feltöltött nagyméretű médiafájlok ne kerüljenek be a verziókezelőbe, de a mappaszerkezet megmaradjon.
+- **Verziófrissítés:** A frontend és a backend verziószáma egységesen **2.0.0**-ra emelkedett, jelezve a funkcionális mérföldkövet.
+
 ## [1.1.0] - 2026-02-15
 
 ### Vizuális tisztaság és Ikonrendszer váltás

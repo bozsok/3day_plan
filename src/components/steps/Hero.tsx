@@ -34,6 +34,17 @@ export function Hero({ }: HeroProps) {
 
     return (
         <StepCard id="hero-root-card" className="text-center" padding="p-[15px] min-[440px]:p-8 md:p-12">
+            <div className="absolute top-4 right-4 z-20">
+                <a
+                    href="/#/admin"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white/50 hover:bg-white text-gray-500 hover:text-primary text-xs font-bold px-3 py-1.5 rounded-full backdrop-blur-sm transition-all shadow-sm border border-transparent hover:border-gray-100 flex items-center gap-1"
+                >
+                    ⚙️ Admin
+                </a>
+            </div>
+
             {/* Dekorációs háttérelemek */}
             <div id="hero-bg-blob-top" className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50" />
             <div id="hero-bg-blob-bottom" className="absolute bottom-0 left-0 -mb-20 -ml-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl opacity-50" />

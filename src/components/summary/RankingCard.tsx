@@ -55,8 +55,8 @@ export function RankingCard({
     const baseClasses = "relative flex-shrink-0 flex flex-col transition-all duration-300 rounded-2xl border border-gray-200 snap-center select-none overflow-hidden group bg-white hover:shadow-lg";
 
     const sizeClasses = variant === 'date'
-        ? (isFirst ? "w-[120px] h-[170px] border-gray-200 scale-110 z-10" : "w-[120px] h-[170px] border-gray-100 bg-gray-50/50")
-        : (isFirst ? "w-[240px] border-gray-200 scale-110 z-10" : "w-[240px] border-gray-100");
+        ? "w-[140px] h-[170px] border-gray-100 bg-gray-50/50"
+        : "w-[240px] border-gray-100";
 
     // 1. DÁTUM KÁRTYA TARTALOM (Mikor menjünk? - Átvéve a Location Card stílusát)
     const dateCardContent = (

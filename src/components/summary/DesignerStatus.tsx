@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { hu } from 'date-fns/locale';
-import { counties, packages } from '../../data/mockData';
+import { counties } from '../../data/mockData';
 
 interface UserStatus {
     id: number;
@@ -32,6 +31,7 @@ interface DesignerStatusProps {
     userProgress?: Record<number, UserProgress>;
     detailedVotes?: DetailedVote[];
     onManageVotes?: () => void;
+    allPackages: any[]; // Fogadjuk az egyesített csomaglistát
 }
 
 // Egységesített sor az összesítéshez
@@ -47,7 +47,7 @@ interface TableRow {
     timestamp: number;
 }
 
-export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], onManageVotes, id }: DesignerStatusProps & { id?: string }) {
+export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], onManageVotes, id, allPackages }: DesignerStatusProps & { id?: string }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     // 1. ADATELŐKÉSZÍTÉS: Sorok generálása
@@ -63,7 +63,7 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], o
         }
 
         const regionName = vote.regionId ? (counties.find(c => c.id === vote.regionId)?.name || vote.regionId) : '';
-        const packageName = vote.packageId ? (packages.find(p => p.id === vote.packageId)?.title || vote.packageId) : '';
+        const packageName = vote.packageId ? (allPackages.find(p => p.id === vote.packageId)?.title || vote.packageId) : '';
 
         rows.push({
             id: `vote-${vote.id}`,
@@ -93,7 +93,7 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], o
 
         if (hasVisibleProgress) {
             const regionName = progress.regionId ? (counties.find(c => c.id === progress.regionId)?.name || progress.regionId) : '';
-            const packageName = progress.packageId ? (packages.find(p => p.id === progress.packageId)?.title || progress.packageId) : '';
+            const packageName = progress.packageId ? (allPackages.find(p => p.id === progress.packageId)?.title || progress.packageId) : '';
 
             let datesDisplay = '';
             if (progress.dates && Array.isArray(progress.dates) && progress.dates.length > 0) {
@@ -150,13 +150,14 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], o
                             <th className="p-5">Időpont</th>
                             <th className="p-5">Helyszín</th>
                             <th className="p-5">Csomag</th>
+                            <th className="p-5">Aktivitás</th>
                             <th className="p-5 text-right">Státusz</th>
                         </tr>
                     </thead>
                     <tbody id="designer-status-tbody" className="divide-y divide-border-subtle text-sm bg-gray-50/50">
                         {displayedRows.length === 0 ? (
                             <tr id="designer-status-empty-row">
-                                <td colSpan={5} className="p-8 text-center text-content-muted italic">
+                                <td colSpan={6} className="p-8 text-center text-content-muted italic">
                                     Még nem érkezett szavazat, de a tervezés már elindult...
                                 </td>
                             </tr>
@@ -182,6 +183,10 @@ export function DesignerStatus({ users, userProgress = {}, detailedVotes = [], o
 
                                     <td id={`designer-status-cell-package-${row.userId}`} className="p-5 text-content-muted font-medium">
                                         {row.packageDisplay || <span className="opacity-20">-</span>}
+                                    </td>
+
+                                    <td id={`designer-status-cell-activity-${row.userId}`} className="p-5 text-content-muted font-medium text-xs">
+                                        {formatDistanceToNow(new Date(row.timestamp), { addSuffix: true, locale: hu })}
                                     </td>
 
                                     <td id={`designer-status-cell-status-${row.userId}`} className="p-5 text-right flex justify-end">

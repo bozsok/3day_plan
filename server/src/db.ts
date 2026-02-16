@@ -60,7 +60,17 @@ export async function initDatabase(): Promise<Database> {
             has_dates  INTEGER DEFAULT 0,
             region_id  TEXT,
             package_id TEXT,
-            last_active INTEGER
+            last_active INTEGER,
+            dates      TEXT -- JSON string
+        );
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS packages (
+            id         TEXT PRIMARY KEY,
+            data       TEXT NOT NULL, -- Teljes JSON objektum (Package interface)
+            created_at TEXT DEFAULT (datetime('now')),
+            updated_at TEXT DEFAULT (datetime('now'))
         );
     `);
 

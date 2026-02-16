@@ -9,6 +9,8 @@ import datesRouter from './routes/dates.js';
 import votesRouter from './routes/votes.js';
 import summaryRouter from './routes/summary.js';
 import adminRouter from './routes/admin.js'; // [NEW]
+import packagesRouter from './routes/packages.js'; // [NEW]
+import uploadRouter from './routes/upload.js'; // [NEW]
 import progressRouter from './routes/progress.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,12 +28,17 @@ async function main() {
     app.use(cors());
     app.use(express.json());
 
+    // Serve static files from 'public' directory (for uploads)
+    app.use(express.static(path.join(__dirname, '..', 'public')));
+
     // API routes
     app.use('/api/users', usersRouter);
     app.use('/api/dates', datesRouter);
     app.use('/api/votes', votesRouter);
     app.use('/api/summary', summaryRouter);
     app.use('/api/admin', adminRouter); // [NEW]
+    app.use('/api/packages', packagesRouter); // [NEW]
+    app.use('/api/upload', uploadRouter); // [NEW]
     app.use('/api/progress', progressRouter);
 
     // Production: statikus frontend kiszolgálás

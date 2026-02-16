@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { packages } from '../../data/mockData';
+import { packages as packagesMock } from '../../data/mockData';
+import { usePackages } from '../../hooks/usePackages';
 import { NavButton } from '../common/NavButton';
 import { StepHeader } from '../common/StepHeader';
 import { ArrowRight, ChevronLeft, Flag, Palmtree, Sun, Mountain, Trees, Waves, Wine, Utensils, Footprints, Landmark, Castle, Ship, Star } from 'lucide-react';
@@ -17,6 +18,13 @@ interface PackageSelectionProps {
 // Segédfüggvény a Material icon nevek Lucide-re fordításához
 const getLucideIcon = (iconName: string, size: number = 14) => {
     const iconProps = { size, className: "shrink-0" };
+
+    // Ha emoji (vagy nem a predefined kulcsszavak egyike, és rövid string), akkor rendereljük szövegként
+    // Egyszerű ellenőrzés: ha nem csak angol kisbetűk vannak benne, vagy tartalmaz nem-ASCII karaktert
+    if (/[^\x00-\x7F]+/.test(iconName) || iconName.length <= 2) {
+        return <span style={{ fontSize: size, lineHeight: 1 }}>{iconName}</span>;
+    }
+
     switch (iconName) {
         case 'flag': return <Flag {...iconProps} />;
         case 'spa': return <Palmtree {...iconProps} />;
@@ -42,8 +50,19 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
     const { user } = useUser();
     const [filter, setFilter] = useState('Összes');
 
+    // API adatok betöltése
+    const { packages: apiPackages, isLoading } = usePackages();
+
+    // Egyesítjük a mock és valós adatokat, de a valósak (API) legyenek elöl/fontosabbak.
+    // Ha az adatbázisban van, azt használjuk.
+    const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
+        index === self.findIndex((t) => (
+            t.id === p.id
+        ))
+    );
+
     // Filter packages by county (passed as regionId prop from App.tsx)
-    const availablePackages = packages.filter(p => p.countyId === regionId);
+    const availablePackages = allPackages.filter(p => p.countyId === regionId);
 
     const filters = ['Összes', 'Aktív kikapcsolódás', 'Gasztronómia', 'Családi', 'Romantikus', 'Wellness'];
 
@@ -97,9 +116,14 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                 ))}
             </div>
 
-            {/* Csomag kártyák */}
+            {/* Loading / Csomag kártyák */}
             <div id="package-selection-cards-list" className="space-y-6">
-                {availablePackages.length === 0 ? (
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                        <p className="text-gray-500">Csomagok betöltése...</p>
+                    </div>
+                ) : availablePackages.length === 0 ? (
                     <div id="package-selection-no-results" className="text-center py-12 text-gray-400">
                         <p>Ehhez a megyéhez jelenleg nem tartozik elérhető csomag.</p>
                         <button

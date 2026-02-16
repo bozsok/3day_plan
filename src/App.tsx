@@ -9,6 +9,7 @@ import { MapSelection } from './components/steps/MapSelection';
 import { ProgramTimeline } from './components/steps/ProgramTimeline';
 import { Summary } from './components/steps/Summary';
 import { PackageSelection } from './components/steps/PackageSelection';
+import { PackageBuilder } from './components/admin/PackageBuilder';
 import { StepIndicator } from './components/common/StepIndicator';
 import { useState, useEffect } from 'react';
 
@@ -170,6 +171,7 @@ function App() {
                       resetSelection();
                     }} onRegionSelect={setSelectedRegion} />
                   } />
+                  <Route path="/admin" element={<PackageBuilder />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </motion.div>

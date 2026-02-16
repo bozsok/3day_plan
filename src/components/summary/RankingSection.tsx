@@ -23,7 +23,7 @@ export function RankingSection({
                 <h2 id="ranking-section-title" className="text-xl font-bold text-gray-900">{title}</h2>
             </div>
 
-            <div id="ranking-section-items-scroller" className="flex overflow-x-auto py-8 -mx-6 px-6 gap-6 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+            <div id="ranking-section-items-scroller" className="flex overflow-x-auto py-8 gap-6 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                 {isEmpty ? (
                     <p className="text-gray-400 text-sm italic w-full text-center py-8">{emptyText}</p>
                 ) : (
