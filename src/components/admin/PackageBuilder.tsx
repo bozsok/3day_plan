@@ -11,10 +11,12 @@ import { UnsavedChangesModal } from '../common/UnsavedChangesModal';
 import { PackageTagsEditor } from './PackageTagsEditor';
 import { compressImages } from '../../utils/imageUtils';
 import { StatusModal, type StatusModalType } from '../common/StatusModal';
+import { useUser } from '../../context/UserContext';
 
 import { HUNGARIAN_COUNTIES } from '../../utils/constants';
 
 export const PackageBuilder: React.FC = () => {
+    const { user } = useUser();
     const { packages, isLoading, savePackages, isSaving, uploadImages } = usePackages();
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -154,7 +156,8 @@ export const PackageBuilder: React.FC = () => {
         const packageToSave = {
             ...formData,
             id: formData.id || `pkg_${Date.now()}`,
-            days: formData.days || []
+            days: formData.days || [],
+            authorName: formData.authorName || user?.name // Assign current user as author if not already set
         } as Package;
 
         try {
@@ -652,6 +655,26 @@ export const PackageBuilder: React.FC = () => {
         );
     }
 
+    if (!user) {
+        return (
+            <div id="admin-access-denied-container" className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 bg-white rounded-3xl border-2 border-dashed border-gray-100 animate-in fade-in zoom-in duration-500">
+                <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mb-6 text-red-500 shadow-sm">
+                    <Trash2 size={40} />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900 mb-4">Ajjaj! Nem vagy bejelentkezve... 🛑</h2>
+                <p className="text-gray-500 max-w-md mb-8 text-lg">
+                    Programcsomagot csak létező, névvel rendelkező résztvevő készíthet. Kérlek, térj vissza a kezdőlapra és írd be a neved a folytatáshoz!
+                </p>
+                <button
+                    onClick={() => window.location.href = '#/'}
+                    className="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all text-xl"
+                >
+                    Vissza a kezdőlapra
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div id="admin-package-builder-root" className="container mx-auto p-6 max-w-7xl">
             {/* Main Header (All packages view) */}
@@ -711,6 +734,12 @@ export const PackageBuilder: React.FC = () => {
                                         {step === 2 && 'Hangulat és látvány 🎨'}
                                         {step === 3 && 'A program összeállítása 🗺️'}
                                     </h2>
+                                    {user && (
+                                        <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">
+                                            <span className="opacity-70">Létrehozó:</span>
+                                            <span>{user.name}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <button
                                     id="admin-wizard-exit-button"
@@ -817,7 +846,14 @@ export const PackageBuilder: React.FC = () => {
                             </div>
                             <div className="p-6 flex-1 flex flex-col">
                                 <h3 className="text-xl font-black text-gray-900 mb-2 leading-tight group-hover:text-primary transition-colors">{pkg.title}</h3>
-                                <p className="text-gray-500 line-clamp-3 mb-6 flex-1 text-sm leading-relaxed">{pkg.description}</p>
+                                <p className="text-gray-500 line-clamp-3 mb-4 flex-1 text-sm leading-relaxed">{pkg.description}</p>
+
+                                {pkg.authorName && (
+                                    <div className="flex items-center gap-1.5 mb-4">
+                                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Készítette:</span>
+                                        <span className="text-xs font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{pkg.authorName}</span>
+                                    </div>
+                                )}
 
                                 <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
                                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Becsült ár</span>

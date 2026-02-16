@@ -66,6 +66,7 @@ export interface Package {
     tags: PackageTag[]; // Kártya címkék (pl. Túra, Bor, Wellness)
     estimatedCost: string;
     days: DailyProgram[];
+    authorName?: string;
 }
 
 export const packages: Package[] = [

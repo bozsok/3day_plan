@@ -2,18 +2,31 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
-
-
+ 
+ ## [2.2.1] - 2026-02-16
+ 
+ ### Biztonság és közösség
+ - **Felhasználóhoz kötött csomagok:** A programcsomagok készítése és módosítása mostantól névhez kötött. Csak bejelentkezett résztvevők érhetik el a szerkesztőt.
+ - **Alkotói aláírás:** Minden újonnan létrehozott csomag automatikusan rögzíti a készítő nevét, amely láthatóvá válik a csomagválasztó kártyákon ("Készítette: [Név]") és az adminisztrációs felületen is.
+ 
+ ### UI/UX finomítások
+ - **Intelligens Admin hozzáférés:** Az Admin gomb mostantól előzetes ellenőrzést végez. Ha nincs bejelentkezett felhasználó, nem nyit meg új lapot, hanem a meglévő oldalon egy elegáns `StatusModal` figyelmezteti a látogatót.
+ - **Konzisztens értesítések:** Megszüntettük a felesleges kontextusváltásokat a jogosultsági hibaüzeneteknél.
+ 
+ ### Technikai
+ - **Adatmodell bővítés:** A `Package` interfész kiegészült az `authorName` mezővel.
+ - **Kódminőség:** Eltávolítottuk a használaton kívüli importokat és optimalizáltuk a navigációs logikát.
+ 
 ## [2.2.0] - 2026-02-16
 
-### Fontos javítások és Adminisztráció
+### Fontos javítások és adminisztráció
 - **Adminisztrációs hibajavítás (Reset Vote):** Kijavítottuk a szavazatok visszavonásának logikáját. Mostantól a "Visszavon" gomb nemcsak az ideiglenes haladást, hanem a végleges adatbázisból (`db.json` / SQLite) is maradéktalanul törli a felhasználó szavazatait és dátumait.
 - **Node.js szerver szinkronizáció:** Implementáltuk a hiányzó adminisztrációs végpontokat a fejlesztői szerveren is, így a projekt minden környezetben (PHP és Node.js) azonos módon működik.
 - **Tiszta törlés:** A felhasználók törlésekor mostantól az ideiglenes fájlok és haladási naplók is automatikusan törlődnek.
 
-### Arculat és Megjelenés
+### Arculat és megjelenés
 - **Egyedi Favicon (új):** Az alkalmazás megkapta a végleges, modern arculathoz illeszkedő ikonját. A 3-szegmensű, az alkalmazás színeit (kék, narancs, türkiz) használó SVG ikon minden felbontáson élesen jelenik meg a böngésző fülén.
-- **UI Finomítás (PackageBuilder):** Pontosítottuk a programpontok kezelésének leírását az admin felületen (szerkeszthetőség, törölhetőség és húzhatóság jelzése).
+- **UI finomítás (PackageBuilder):** Pontosítottuk a programpontok kezelésének leírását az admin felületen (szerkeszthetőség, törölhetőség és húzhatóság jelzése).
 
 ### Technikai
 - **Azonnali frissítés (Live Refetch):** Az adminisztrátori műveletek (törlés, reset) után a felület mostantól azonnal, kényszerített módon újratölti az adatokat a szerverről.

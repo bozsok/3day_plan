@@ -170,6 +170,12 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                     <p id="package-card-description" className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
                                         {pkg.description}
                                     </p>
+                                    {pkg.authorName && (
+                                        <div className="flex items-center gap-1.5 mb-4">
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Készítette:</span>
+                                            <span className="text-xs font-black text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full">{pkg.authorName}</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div id="package-card-footer" className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">

@@ -15,44 +15,44 @@ A tervezés nálunk egy játékos, gördülékeny folyamat, ahol az oldalak köz
 
 ## Modern felhasználói élmény
 
-Az alkalmazás legújabb verziója (v1.1+) a vizuális tökéletességre, az egységes ikonrendszerre (Lucide) és a technikai stabilitásra fókuszál:
+Az alkalmazás legújabb verziója (**v2.2.1**) a vizuális tökéletességre, a közösségi élményre és a biztonságos adminisztrációra fókuszál:
 
-- **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az `element_id_map.md` fájlban. Ez lehetővé teszi a könnyű automatizált tesztelést és az elemek pontos beazonosítását.
-
-- **Gördülékeny navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz. A böngésző "Vissza" gombja is pontosan úgy működik, ahogy elvárod.
-- **Intelligens adatkezelés:** A **TanStack Query** biztosítja, hogy minden szavazat és dátumválasztás azonnal és hibabiztosan célba érjen. A rendszer a háttérben folyamatosan szinkronizál, így mindig a legfrissebb eredményeket látod te és a barátaid is.
-- **Élő folyamat-visszajelzés (v0.11.0):** Valós idejű kommunikáció a résztvevők között már a naptárnál is. Ha valaki épp kijelöl egy időszakot, a többiek azonnal látják az aktív státuszt.
-- **Intelligens állapotkezelés:** Ha visszalépsz a kezdőlapra, a rendszer tudja, hogy újra szeretnéd kezdeni a tervezést, és automatikusan törli a szerverről a korábbi próbálkozásaidat, így mindig tiszta lappal indulsz.
-- **Ponthű dizájn:** A felületvisszaállítása során minden lekerekítés, margó és gombméret a helyére került. Legyen szó asztali monitorról vagy egy apró mobilról, a design konzisztens és prémium érzetet nyújt.
-- **Atomic design alapok:** A motorháztető alatt az alkalmazást jól elkülönített, moduláris egységekre bontottuk, ami villámgyors működést és könnyű bővíthetőséget garantál.
+- **Személyre szabott csomagok (v2.2.1):** A programcsomagok készítése mostantól névhez kötött. Csak bejelentkezett résztvevők használhatják a szerkesztőt, és minden csomagon látható az alkotó neve ("Készítette: [Név]").
+- **Intelligens hozzáférés-kezelés:** Az Admin gomb előzetes ellenőrzést végez — ha nem vagy bejelentkezve, nem nyitunk feleslegesen új lapot, hanem helyben figyelmeztetünk a hiányzó adatokra.
+- **Egyedi Favicon:** Az alkalmazás saját, modern arculatát tükröző 3-szegmensű ikonnal rendelkezik, amely minden böngészőfülön professzionális megjelenést nyújt.
+- **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az [element_id_map.md](file:///C:/Users/Bozsó%20Krisztián/.gemini/antigravity/brain/90a6e7d7-da1d-47ba-848d-4a1e225a3634/element_id_map.md) fájlban.
+- **Gördülékeny navigáció:** A **React Router** és a **Framer Motion** integrációjának köszönhetően az oldalak között sima, professzionális áttűnésekkel mozoghatsz.
+- **Intelligens adatkezelés:** A **TanStack Query** biztosítja a valós idejű szinkronizációt a résztvevők között, így az eredmények azonnal frissülnek mindenkinél.
 
 ## Technológiai háttér
 
 ### Frontend
-- **React 19** + **TypeScript** — a legmodernebb komponensalapú architektúra
-- **React Router 7** — stabil, URL alapú útvonalkezelés
+- **React 19** + **TypeScript** — modern komponens architektúra
+- **React Router 7** — stabil útvonalkezelés
 - **TanStack Query** — robusztus szerver állapotkezelés és polling
-- **Framer Motion** — magas minőségű UI animációk és áttűnések
-- **Tailwind CSS v4** — utility-first stílusozás, egyedi `@theme` konfiguráció
-- **Interaktív SVG-térkép** — dinamikus `hu.svg` betöltés megyékkel és turisztikai régiókkal
+- **Framer Motion** — prémium UI animációk és áttűnések
+- **Tailwind CSS v4** — utility-first stílusozás
+- **Interaktív SVG-térkép** — dinamikus megye- és régiókezelés
 
 ### Backend
-- **PHP 8 / Node.js Express** — rugalmasan választható szerveroldali implementáció
-- **SQLite** — megbízható, hordozható adatbázis
-- **Többfelhasználós támogatás** — valós idejű közös tervezés és szavazatszámlálás
+- **PHP 8 / Node.js Express** — választható szerveroldali implementáció
+- **SQLite / JSON** — megbízható adatperzisztencia
+- **Többfelhasználós támogatás** — valós idejű közös tervezés
 
 ## Fejlesztés és futtatás
 
-A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is. Részletes útmutatót az egyes mappákban (`server`, `root`) található fájlokban találsz.
+A projekt futtatásához indítsd el külön terminálban a backend és a frontend szervert is.
+- **Frontend:** `npm run dev` a gyökérmappában.
+- **Backend (Node):** `npm run dev` a `server` mappában.
 
 ## Adminisztráció és csomagkészítő 🛠️
 
-A rendszer tartalmaz egy rejtett adminisztrációs felületet a szervezők számára. Az **összegzés** oldalon a "Közös tervezés" címre való **5 gyors kattintással** érhető el a vezérlőpult, ahol az adatbázis tisztítása vagy egyes felhasználók kezelése végezhető el.
+A rendszer egy rejtett adminisztrációs felületet is tartalmaz. Az **összegzés** oldalon a "Közös tervezés" címre való **5 gyors kattintással** érhető el a vezérlőpult.
 
-### Kalandor varázsló (új!) 🧙‍♂️
-A 2.1-es verziótól elérhető egy teljesen új, narratív alapú csomagkészítő felület, ahol lépésről lépésre (wizard) állíthatók össze az új 3 napos tervek.
-- **Interaktív szerkesztő:** drag & drop programrendezés és élő előnézet.
-- **Egységes visszajelzések:** a rendszer minden fontos interakciónál (mentés, törlés, hiba) saját, stílusos modális ablakokon (`StatusModal`) keresztül kommunikál a felhasználóval.
-- **Követelmény:** a komplex felület miatt használata **minimum 600px széles képernyőn** (tablet/desktop) támogatott.
+### Kalandor varázsló (v2.1+) 🧙‍♂️
+Egy narratív alapú csomagkészítő felület, ahol lépésről lépésre állíthatók össze az új tervek.
+- **Névhez kötöttség (Új):** A szerkesztő csak névvel érhető el, a mentett csomagok pedig őrzik az alkotójuk nevét.
+- **Interaktív szerkesztő:** Drag & drop programrendezés és élő előnézet.
+- **StatusModal:** Minden fontos visszajelzés (mentés, törlés, hiba) egységes, elegáns modális ablakokon keresztül érkezik.
 
-Jó tervezést és még jobb kikapcsolódást kívánunk!
+Jó tervezést és kikapcsolódást kívánunk!
