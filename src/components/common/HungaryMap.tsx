@@ -70,11 +70,13 @@ export function HungaryMap({ selectedRegionId, hoveredRegionId, onRegionClick, o
                     const classList = el.getAttribute('class') || '';
                     const isSpecialLocation = /sm_location_\d+/.test(classList);
 
-                    // Csak a nem speciális helyekről vesszük le a stílust
-                    if (!isSpecialLocation) {
-                        el.removeAttribute('fill');
-                        el.removeAttribute('stroke');
-                    }
+                    // Minden elemről levesszük az eredeti stílust, hogy a CSS uralkodjon
+                    el.removeAttribute('fill');
+                    el.removeAttribute('stroke');
+                    el.removeAttribute('style');
+                    el.removeAttribute('opacity');
+                    el.removeAttribute('fill-opacity');
+                    el.removeAttribute('stroke-opacity');
 
                     // 1. Állapot/Megye (sm_state_XXXX)
                     const stateMatch = classList.match(/sm_state_(HU[A-Z]{2})/);
@@ -108,20 +110,25 @@ export function HungaryMap({ selectedRegionId, hoveredRegionId, onRegionClick, o
 
                         if (!isSpecialLocation) {
                             el.classList.add('county-path');
+                            // Ha a pathId szerepel a cityToCountyMap-ben, akkor ez egy város/megyeszékhely
+                            const stateMatch = el.getAttribute('class')?.match(/sm_state_(HU[A-Z]{2})/);
+                            if (stateMatch && cityToCountyMap[stateMatch[1]]) {
+                                el.classList.add('city-path');
+                            }
                         } else {
-                            // Speciális helyszínek (rect): megtartják a színüket, de klikkelhetők
-                            el.style.cursor = 'pointer';
-                            // Hozzáadunk egy osztályt a könnyebb hibakereséshez/kezeléshez
+                            // Speciális helyszínek (rect): kattinthatók és LÁTHATÓK kell maradjanak
+                            el.setAttribute('style', 'cursor: pointer');
                             el.classList.add('special-location');
+                            // NEM adjuk hozzá a city-path-t, mert azt elrejtjük!
                         }
                     }
                 });
 
-                // Z-index javítás: a rect elemeket a végére rakjuk, hogy felül legyenek
-                const rects = svg.querySelectorAll('rect');
-                rects.forEach(rect => {
-                    svg.appendChild(rect);
-                });
+                // Z-index / Layering javítás: 
+                // A városokat (city-path) a végére rakjuk, hogy mindenképpen a megyék (county-path) felett legyenek.
+                // Így a rajtuk lévő vastag 'stroke' el tudja takarni a megye belső szürke éleit (lyukait).
+                const cities = svg.querySelectorAll('.city-path');
+                cities.forEach(c => svg.appendChild(c));
 
                 containerRef.current.innerHTML = '';
                 containerRef.current.appendChild(svg);
@@ -151,26 +158,13 @@ export function HungaryMap({ selectedRegionId, hoveredRegionId, onRegionClick, o
             const rid = el.getAttribute('data-region');
             const isSpecial = el.classList.contains('special-location');
 
-            // Speciális elemeknél (rect) másképp kezeljük a kijelölést/hovert,
-            // hogy ne menjen tönkre az eredeti színük
             if (!isSpecial) {
                 el.classList.toggle('selected', cid === selectedRegionId);
                 el.classList.toggle('hovered', cid === hoveredRegionId);
 
-                // Régió highlight: ha egyezik a régió, de nem a konkrétan hoverelt megye (opcionális: a hoverelt is kaphatja)
-                // Itt most mindegyik megkapja a régión belül
+                // Régió highlight minden elemnek (path és rect is)
                 if (activeRegionId && rid === activeRegionId) {
                     el.classList.add('region-hover');
-                }
-            } else {
-                // Opcionális: a speciális elem kaphat-e opacitás változást hoverre?
-                // Most csak logikailag kötjük be
-                if (cid === selectedRegionId || cid === hoveredRegionId) {
-                    el.style.opacity = '1';
-                    el.style.stroke = '#fff'; // Kiemelés fehér kerettel
-                } else {
-                    el.style.opacity = '0.8'; // Alapből kicsit átlátszó
-                    el.style.stroke = 'none';
                 }
             }
         });

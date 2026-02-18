@@ -3,6 +3,23 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
  
+ ## [2.2.2] - 2026-02-18
+ 
+ ### Térkép stílus és megyeszékhelyek elrejtése
+ - **Tökéletes elfedés:** Bevezetésre került a `.city-path` osztály és egy 1.5px-es speciális keret, amely minden állapotban (hover, selected) hajszálpontosan elrejti a megyék belső szürke éleit.
+ - **SVG Layering:** A megyeszékhelyek és városok mostantól automatikusan a legfelső rétegre kerülnek az SVG DOM-ban, biztosítva a hibátlan takarást.
+ - **Központi színkezelés:** Új CSS változók (`--map-hover`, `--map-region`, `--map-selected`) biztosítják, hogy a megyék és a rajtuk lévő városok színe minden nézetben (világos és sötét mód) 100%-ban megegyezzen.
+ - **Sötét mód korrekció:** Kijavítottuk a megyék keretszínét sötét módban, így már nem üt át a városok alatt a világosabb zöld árnyalat.
+ 
+ ### Speciális helyszínek (Budapest, Nagykőrös)
+ - **Helyreállított láthatóság:** Budapest (piros) és Nagykőrös (zöld) jelölőnégyzetei újra láthatóak a térképen.
+ - **Statikus jelölők:** Eltávolítottunk minden szükségtelen interakciót (hover effekt, nagyítás, kijelölhetőség), így a jelölők az eredeti, fix méretükben szolgálnak támpontként.
+ - **Zavartalan interakció:** A `pointer-events: none` használatával a jelölők nem akadályozzák a megyékre való kattintást.
+ 
+ ### Technikai
+ - **Kódtisztítás:** Eltávolítottunk minden redundáns SVG attribútumot (opacity, fill, stroke) a JS oldalon, teljesen a CSS-re bízva az arculatot.
+ - **Lint javítás:** Megszüntettük a használaton kívüli változók és típuskonverziós hibák miatti figyelmeztetéseket a `HungaryMap.tsx` fájlban.
+ 
  ## [2.2.1] - 2026-02-16
  
  ### Biztonság és közösség

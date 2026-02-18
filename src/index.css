@@ -19,6 +19,11 @@
 
     --bg-hover: #f8fafc;
     --bg-alt: #f1f5f9;
+
+    /* Térkép specifikus színek a tökéletes egyezésért */
+    --map-hover: #dcfce7;
+    --map-region: #f0fdf4;
+    --map-selected: var(--color-primary);
 }
 
 .dark {
@@ -62,6 +67,11 @@
 
     /* Speciális felülbírálás a fehér háttérre */
     --color-white: #0f172a;
+
+    /* Térkép specifikus színek sötét módban */
+    --map-hover: #064e3b;
+    --map-region: #022c22;
+    --map-selected: var(--color-primary);
 }
 
 @theme {
@@ -106,32 +116,91 @@ button {
    ============================================= */
 .region-path,
 .county-path {
-    fill: var(--bg-card);
-    /* Fehér helyett kártya szín */
-    stroke: var(--border-nav);
+    fill: var(--bg-hover);
+    stroke: var(--text-muted);
     stroke-width: 1;
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
+/* 1. Alap állapot és Régió highlight */
+.region-path.region-hover,
+.county-path.region-hover,
+.city-path.region-hover {
+    fill: var(--map-region) !important;
+    stroke: var(--color-primary-dark) !important;
+}
+
+/* 2. Hover állapot: Megye és város szigorú szinkronja */
 .region-path:hover,
 .region-path.hovered,
 .county-path:hover,
-.county-path.hovered {
-    fill: var(--bg-hover);
-    stroke: var(--text-muted);
+.county-path.hovered,
+.city-path.hovered {
+    fill: var(--map-hover) !important;
+    stroke: var(--color-primary-dark) !important;
 }
 
-.county-path.region-hover {
-    fill: var(--bg-alt);
-    stroke: var(--text-muted);
+.dark .region-path:hover,
+.dark .region-path.hovered,
+.dark .county-path:hover,
+.dark .county-path.hovered,
+.dark .city-path.hovered {
+    stroke: var(--color-primary-dark) !important;
 }
 
+/* 3. Kiválasztott állapot */
 .region-path.selected,
-.county-path.selected {
-    fill: var(--color-primary);
-    stroke: var(--color-primary-dark);
+.county-path.selected,
+.city-path.selected,
+.city-path.selected.hovered {
+    fill: var(--map-selected) !important;
+    stroke: var(--color-primary-dark) !important;
 }
+
+/* Városok/Megyeszékhelyek elrejtése - SPECIÁLIS LOGIKA */
+/* A város kerete mindig kövesse a kitöltő színt, hogy elfedje a megye lyukát. */
+.city-path {
+    stroke-width: 1.5px !important;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+    fill: var(--bg-hover) !important;
+    stroke: var(--bg-hover) !important;
+    pointer-events: all;
+}
+
+/* Speciális override-ok a városok kereteinek elrejtéséhez minden állapotban */
+.city-path.region-hover {
+    stroke: var(--map-region) !important;
+}
+
+.city-path.hovered {
+    stroke: var(--map-hover) !important;
+}
+
+.city-path.selected {
+    stroke: var(--map-selected) !important;
+}
+
+/* 4. Speciális helyszínek (Budapest, Nagykőrös négyzetek) */
+.special-location {
+    stroke: white !important;
+    stroke-width: 1px !important;
+    opacity: 1 !important;
+    transition: none;
+    pointer-events: none;
+    /* Ne legyen interaktív, csak jelölő */
+}
+
+/* Budapest piros négyzete */
+[data-county="budapest"].special-location {
+    fill: #ef4444 !important;
+}
+
+/* Nagykőrös zöld négyzete */
+[data-county="pest"].special-location {
+    fill: #10b981 !important;
+}
+
 
 /* =============================================
    ProgramTimeline pseudo-elemek
