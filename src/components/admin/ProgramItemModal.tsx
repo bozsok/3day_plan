@@ -209,8 +209,8 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
                                 <label className="block text-sm font-bold text-gray-700">Marketing Címke</label>
                                 <HelpTooltip text="Rövid, figyelemfelkeltő szöveg, pl. 'Kihagyhatatlan', 'Ingyenes'. Kiemelten jelenik meg." />
                             </div>
-                            <input id="admin-modal-program-input-marketing" type="text" name="marketingLabel" value={formData.marketingLabel || ''} onChange={handleChange} className="w-full rounded-lg border-gray-300 border p-2.5 placeholder-gray-400" placeholder="Pl. 'Kihagyhatatlan', 'Családbarát', 'Ingyenes'" />
-                            <p className="text-xs text-gray-400 mt-1">Ez a szöveg kiemelten jelenik meg a kártyán.</p>
+                            <input id="admin-modal-program-input-marketing" type="text" name="marketingLabel" value={formData.marketingLabel || ''} onChange={handleChange} maxLength={20} className="w-full rounded-lg border-gray-300 border p-2.5 placeholder-gray-400" placeholder="Pl. 'Kihagyhatatlan', 'Családbarát', 'Ingyenes'" />
+                            <p className="text-xs text-gray-400 mt-1">Ez a szöveg kiemelten jelenik meg a kártyán. (Max 20 karakter)</p>
                         </div>
 
                         <div>

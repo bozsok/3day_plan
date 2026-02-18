@@ -178,10 +178,10 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                     )}
                                 </div>
 
-                                <div id="package-card-footer" className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
-                                    <div id="package-card-tags-list" className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+                                <div id="package-card-footer" className="flex flex-wrap items-end justify-between mt-auto pt-3 border-t border-gray-50 gap-4">
+                                    <div id="package-card-tags-list" className="flex flex-wrap gap-x-3 gap-y-2">
                                         {pkg.tags.map((tag, idx) => (
-                                            <div key={idx} id={`package-card-tag-item-${idx}`} className="flex items-center gap-1 text-gray-500 shrink-0">
+                                            <div key={idx} id={`package-card-tag-item-${idx}`} className="flex items-center gap-1 text-gray-500">
                                                 <span className="text-primary flex items-center">
                                                     {getLucideIcon(tag.icon, 14)}
                                                 </span>

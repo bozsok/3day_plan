@@ -250,9 +250,16 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                                                 {item.category}
                                             </span>
                                         </div>
-                                        <h3 id="program-timeline-item-title" className="text-xl font-bold text-gray-900 mb-2">
-                                            {item.title}
-                                        </h3>
+                                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                                            <h3 id="program-timeline-item-title" className="text-xl font-bold text-gray-900 leading-tight">
+                                                {item.title}
+                                            </h3>
+                                            {item.marketingLabel && (
+                                                <span id="program-timeline-item-marketing-badge" className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-tighter rounded border border-amber-200 shrink-0">
+                                                    {item.marketingLabel}
+                                                </span>
+                                            )}
+                                        </div>
                                         <p id="program-timeline-item-description" className="text-gray-600 leading-relaxed">
                                             {item.description}
                                         </p>

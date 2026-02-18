@@ -11,6 +11,14 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
  - **Központi színkezelés:** Új CSS változók (`--map-hover`, `--map-region`, `--map-selected`) biztosítják, hogy a megyék és a rajtuk lévő városok színe minden nézetben (világos és sötét mód) 100%-ban megegyezzen.
  - **Sötét mód korrekció:** Kijavítottuk a megyék keretszínét sötét módban, így már nem üt át a városok alatt a világosabb zöld árnyalat.
  
+ ### Csomagkártya UI finomítás
+ - **Címke tördelés:** Megszüntettük a csomagkártyák alján a zavaró vízszintes görgetést a címkéknél (tags). Mostantól a címkék intelligensen több sorba törnek, ha nem férnek el egy sorban, így minden információ azonnal látható marad.
+ - **Rugalmas lábléc:** A kártyák lábléce (footer) `flex-wrap` elrendezést kapott, így a "Kiválasztás" gomb pozíciója stabil marad a többsoros címkék mellett is.
+ 
+ ### Marketing címke fejlesztése
+ - **Vizuális megjelenítés:** A programcsomag készítésekor megadható "Marketing Címke" (pl. "Kihagyhatatlan", "Ingyenes") mostantól stílusos, borostyánsárga badge formájában látható a programpontok címe mellett az idővonalon.
+ - **Beviteli korlátozás:** Az admin felületen lekorlátoztuk a marketing címke hosszát maximum 20 karakterre, megelőzve ezzel a dizájn szétcsúszását és a félreértéseket (a hosszabb megjegyzéseknek külön mező készül).
+ 
  ### Speciális helyszínek (Budapest, Nagykőrös)
  - **Helyreállított láthatóság:** Budapest (piros) és Nagykőrös (zöld) jelölőnégyzetei újra láthatóak a térképen.
  - **Statikus jelölők:** Eltávolítottunk minden szükségtelen interakciót (hover effekt, nagyítás, kijelölhetőség), így a jelölők az eredeti, fix méretükben szolgálnak támpontként.
