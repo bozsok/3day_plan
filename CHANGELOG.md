@@ -3,21 +3,29 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
  
- ## [2.2.2] - 2026-02-18
+  ## [2.3.0] - 2026-02-18
+  
+  ### Marketing címke fejlesztése
+  - **Vizuális megjelenítés:** A programcsomag készítésekor megadható "Marketing Címke" (pl. "Kihagyhatatlan", "Ingyenes") mostantól stílusos, borostyánsárga badge formájában látható a programpontok címe mellett az idővonalon.
+  - **Beviteli korlátozás:** Az admin felületen lekorlátoztuk a marketing címke hosszát maximum 20 karakterre, megelőzve ezzel a dizájn szétcsúszását és a félreértéseket (a hosszabb megjegyzéseknek külön mező készül).
+  
+  ### Megjegyzés (Accordion) funkció
+  - **Extra információk:** Bevezettük a "Megjegyzés" mezőt a programpontokhoz. Ez lehetővé teszi részletesebb tippek, parkolási információk vagy technikai adatok rögzítését, anélkül, hogy a marketing szöveget túlterhelnénk.
+  - **Interaktív Idővonal:** A megjegyzések diszkrét, "Hasznos információk" feliratú lenyíló fülként (accordion) jelennek meg a programpontok képei alatt, így csak akkor foglalnak helyet, ha a felhasználó kíváncsi rájuk.
+  - **Admin korrekció:** Az adminisztrációs felületen az új textarea mező használatával könnyen szétválaszthatóak a marketing üzenetek és a konkrét tudnivalók.
  
- ### Térkép stílus és megyeszékhelyek elrejtése
- - **Tökéletes elfedés:** Bevezetésre került a `.city-path` osztály és egy 1.5px-es speciális keret, amely minden állapotban (hover, selected) hajszálpontosan elrejti a megyék belső szürke éleit.
- - **SVG Layering:** A megyeszékhelyek és városok mostantól automatikusan a legfelső rétegre kerülnek az SVG DOM-ban, biztosítva a hibátlan takarást.
- - **Központi színkezelés:** Új CSS változók (`--map-hover`, `--map-region`, `--map-selected`) biztosítják, hogy a megyék és a rajtuk lévő városok színe minden nézetben (világos és sötét mód) 100%-ban megegyezzen.
- - **Sötét mód korrekció:** Kijavítottuk a megyék keretszínét sötét módban, így már nem üt át a városok alatt a világosabb zöld árnyalat.
+  ## [2.2.2] - 2026-02-18
+  
+  ### Térkép stílus és megyeszékhelyek elrejtése
+  - **Tökéletes elfedés:** Bevezetésre került a `.city-path` osztály és egy 1.5px-es speciális keret, amely minden állapotban (hover, selected) hajszálpontosan elrejti a megyék belső szürke éleit.
+  - **SVG Layering:** A megyeszékhelyek és városok mostantól automatikusan a legfelső rétegre kerülnek az SVG DOM-ban, biztosítva a hibátlan takarást.
+  - **Központi színkezelés:** Új CSS változók (`--map-hover`, `--map-region`, `--map-selected`) biztosítják, hogy a megyék és a rajtuk lévő városok színe minden nézetben (világos és sötét mód) 100%-ban megegyezzen.
+  - **Sötét mód korrekció:** Kijavítottuk a megyék keretszínét sötét módban, így már nem üt át a városok alatt a világosabb zöld árnyalat.
  
  ### Csomagkártya UI finomítás
  - **Címke tördelés:** Megszüntettük a csomagkártyák alján a zavaró vízszintes görgetést a címkéknél (tags). Mostantól a címkék intelligensen több sorba törnek, ha nem férnek el egy sorban, így minden információ azonnal látható marad.
  - **Rugalmas lábléc:** A kártyák lábléce (footer) `flex-wrap` elrendezést kapott, így a "Kiválasztás" gomb pozíciója stabil marad a többsoros címkék mellett is.
  
- ### Marketing címke fejlesztése
- - **Vizuális megjelenítés:** A programcsomag készítésekor megadható "Marketing Címke" (pl. "Kihagyhatatlan", "Ingyenes") mostantól stílusos, borostyánsárga badge formájában látható a programpontok címe mellett az idővonalon.
- - **Beviteli korlátozás:** Az admin felületen lekorlátoztuk a marketing címke hosszát maximum 20 karakterre, megelőzve ezzel a dizájn szétcsúszását és a félreértéseket (a hosszabb megjegyzéseknek külön mező készül).
  
  ### Speciális helyszínek (Budapest, Nagykőrös)
  - **Helyreállított láthatóság:** Budapest (piros) és Nagykőrös (zöld) jelölőnégyzetei újra láthatóak a térképen.

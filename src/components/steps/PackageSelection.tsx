@@ -8,6 +8,7 @@ import { ArrowRight, ChevronLeft, Flag, Palmtree, Sun, Mountain, Trees, Waves, W
 import { StepCard } from '../common/StepCard';
 import { useUser } from '../../context/UserContext';
 import { api } from '../../api/client';
+import { FormattedText } from '../common/FormattedText';
 
 interface PackageSelectionProps {
     regionId: string | undefined;
@@ -167,9 +168,11 @@ export function PackageSelection({ regionId, onSelect, selectedPackageId }: Pack
                                             </span>
                                         </div>
                                     </div>
-                                    <p id="package-card-description" className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
-                                        {pkg.description}
-                                    </p>
+                                    <FormattedText
+                                        id="package-card-description"
+                                        className="text-gray-600 mb-4 line-clamp-3 leading-relaxed"
+                                        text={pkg.description}
+                                    />
                                     {pkg.authorName && (
                                         <div className="flex items-center gap-1.5 mb-4">
                                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Készítette:</span>

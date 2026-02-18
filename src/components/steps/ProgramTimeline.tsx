@@ -11,7 +11,9 @@ import { usePackages } from '../../hooks/usePackages';
 import { packages as packagesMock, counties } from '../../data/mockData';
 import { useUser } from '../../context/UserContext';
 import { api, type VoteBlock } from '../../api/client';
-import { ChevronLeft, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ArrowRight, ChevronDown, Lightbulb } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FormattedText } from '../common/FormattedText';
 
 interface ProgramTimelineProps {
     regionId: string | undefined;
@@ -29,6 +31,25 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
     const [activeDay, setActiveDay] = useState(1);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+    // Adatok egyesítése és származtatása
+    const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
+        index === self.findIndex((t) => (
+            t.id === p.id
+        ))
+    );
+    const selectedPackage = allPackages.find(p => p.id === packageId);
+    const county = counties.find(c => c.id === regionId);
+    const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
+
+    // User votes hook
+    const { data: userVotes = [] } = useQuery<VoteBlock[]>({
+        queryKey: ['userVotes', user?.id],
+        queryFn: () => user ? api.votes.list(user.id) : Promise.resolve([]),
+        enabled: !!user,
+    });
+
+    // ── EFFECTS (Feltételes visszatérések ELŐTT) ──
+
     // Redirect if no package selected
     useEffect(() => {
         if (!packageId) {
@@ -36,28 +57,26 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         }
     }, [packageId, navigate]);
 
-    // Egyesítjük a mock és valós adatokat
-    const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
-        index === self.findIndex((t) => (
-            t.id === p.id
-        ))
-    );
+    // Debug naplózás
+    useEffect(() => {
+        if (selectedPackage) {
+            console.group('ProgramTimeline Debug');
+            console.log('Selected Package ID:', packageId);
+            console.log('Package Title:', selectedPackage.title);
+            console.log('API version:', apiPackages.find(p => p.id === packageId) ? 'YES' : 'NO (Using Mock)');
+            console.groupEnd();
+        }
+    }, [selectedPackage, packageId, apiPackages]);
 
-    const selectedPackage = allPackages.find(p => p.id === packageId);
-    const county = counties.find(c => c.id === regionId);
-
-    // User votes to show forward button
-    const { data: userVotes = [] } = useQuery<VoteBlock[]>({
-        queryKey: ['userVotes', user?.id],
-        queryFn: () => user ? api.votes.list(user.id) : Promise.resolve([]),
-        enabled: !!user,
-    });
+    // ── EVENT HANDLERS ──
 
     const hasAnyVote = userVotes.length > 0;
 
     const handleVote = () => {
         navigate('/terv/idopont');
     };
+
+    // ── EARLY RETURNS ──
 
     if (isLoading && !selectedPackage) {
         return (
@@ -69,8 +88,6 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
     }
 
     if (!selectedPackage) return null;
-
-    const sortedDates = dates ? [...dates].sort((a, b) => a.getTime() - b.getTime()) : [];
 
     // Alapértelmezett napnevek, ha még nincs választva dátum, vagy nem teljes a 3 nap
     const defaultDayNames = ['Péntek', 'Szombat', 'Vasárnap'];
@@ -260,9 +277,11 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                                                 </span>
                                             )}
                                         </div>
-                                        <p id="program-timeline-item-description" className="text-gray-600 leading-relaxed">
-                                            {item.description}
-                                        </p>
+                                        <FormattedText
+                                            id="program-timeline-item-description"
+                                            className="text-gray-600 leading-relaxed"
+                                            text={item.description}
+                                        />
 
                                         {/* Képgaléria megjelenítése */}
                                         {item.galleryImages && item.galleryImages.length > 0 && (
@@ -276,6 +295,13 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                                                         <img src={img} alt={`${item.title} - ${imgIdx + 1}`} className="w-full h-full object-cover" loading="lazy" />
                                                     </div>
                                                 ))}
+                                            </div>
+                                        )}
+
+                                        {/* Megjegyzés Accordion */}
+                                        {item.notes && (
+                                            <div className="mt-4">
+                                                <ProgramNote content={item.notes} />
                                             </div>
                                         )}
                                     </div>
@@ -313,5 +339,46 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 document.body
             )}
         </>
+    );
+}
+
+// Belső komponens a Megjegyzés Accordionhoz
+function ProgramNote({ content }: { content: string }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div id="program-note-wrapper" className="border border-blue-100 rounded-xl overflow-hidden bg-blue-50/30">
+            <button
+                id="program-note-trigger"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full px-4 py-2.5 flex items-center justify-between text-blue-700 hover:bg-blue-50 transition-colors group"
+            >
+                <div className="flex items-center gap-2">
+                    <Lightbulb size={16} className="text-blue-500 group-hover:animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-wider">Hasznos információk</span>
+                </div>
+                <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                />
+            </button>
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        id="program-note-content-motion"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <FormattedText
+                            id="program-note-text"
+                            className="px-4 pb-4 pt-3 text-sm text-blue-900/80 leading-relaxed border-t border-blue-100/50"
+                            text={content}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Package, ProgramItem } from '../../data/mockData';
 import { usePackages } from '../../hooks/usePackages';
-import { Loader2, Plus, ArrowRight, ArrowLeft, Save, Upload, Trash2, MapPin, Calendar, Pencil } from 'lucide-react';
+import { Loader2, Plus, ArrowRight, ArrowLeft, Save, Upload, Trash2, MapPin, Calendar, Pencil, Lightbulb } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -344,6 +344,12 @@ export const PackageBuilder: React.FC = () => {
                     </div>
                 </div>
                 <p className="text-sm text-gray-500 line-clamp-2 mt-1 pl-[3.2rem]">{item.description}</p>
+                {item.notes && (
+                    <div className="mt-2 pl-[3.2rem] flex items-center gap-1.5 text-blue-600 text-[10px] font-bold uppercase">
+                        <Lightbulb size={12} />
+                        Van hozzáadott megjegyzés
+                    </div>
+                )}
             </div>
         );
     };
@@ -569,6 +575,14 @@ export const PackageBuilder: React.FC = () => {
                                                 <div className="min-w-0">
                                                     <div className="text-[10px] font-bold text-primary">{item.time}</div>
                                                     <div className="text-xs font-bold text-gray-700 leading-tight truncate">{item.title}</div>
+                                                    {item.marketingLabel && (
+                                                        <div className="text-[8px] font-black text-amber-600 uppercase mt-0.5">{item.marketingLabel}</div>
+                                                    )}
+                                                    {item.notes && (
+                                                        <div className="flex items-center gap-1 text-[8px] text-blue-500 mt-0.5">
+                                                            <Lightbulb size={8} /> Megjegyzés
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))

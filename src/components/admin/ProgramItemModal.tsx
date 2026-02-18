@@ -25,6 +25,7 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
         icon: '📍',
         category: 'egyeb',
         marketingLabel: '',
+        notes: '',
         galleryImages: [],
         imageUrl: ''
     });
@@ -63,6 +64,7 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
                     icon: '🚗', // Default icon
                     category: 'utazas',
                     marketingLabel: '',
+                    notes: '',
                     galleryImages: [],
                     imageUrl: ''
                 });
@@ -141,12 +143,12 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
                         </div>
                     </div>
 
-                    <div id="admin-modal-section-notes">
+                    <div id="admin-modal-section-description">
                         <div className="flex items-center gap-2 mb-1">
                             <label className="block text-sm font-bold text-gray-700">Leírás</label>
-                            <HelpTooltip text="Részletes leírás a programról, tippekkel és hasznos infókkal." />
+                            <HelpTooltip text="Részletes leírás a programról. Használhatsz sortöréseket, **félkövér** szöveget és - listákat." />
                         </div>
-                        <textarea id="admin-modal-program-input-notes" name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-primary focus:border-primary" placeholder="Rövid leírás a tevékenységről..." />
+                        <textarea id="admin-modal-program-input-description" name="description" value={formData.description} onChange={handleChange} rows={3} className="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-primary focus:border-primary" placeholder="Leírás (Markdown támogatott: **félkövér**, - listák)..." />
                     </div>
 
                     <div id="admin-modal-section-category" className="grid grid-cols-2 gap-6">
@@ -211,6 +213,14 @@ export const ProgramItemModal: React.FC<ProgramItemModalProps> = ({ isOpen, onCl
                             </div>
                             <input id="admin-modal-program-input-marketing" type="text" name="marketingLabel" value={formData.marketingLabel || ''} onChange={handleChange} maxLength={20} className="w-full rounded-lg border-gray-300 border p-2.5 placeholder-gray-400" placeholder="Pl. 'Kihagyhatatlan', 'Családbarát', 'Ingyenes'" />
                             <p className="text-xs text-gray-400 mt-1">Ez a szöveg kiemelten jelenik meg a kártyán. (Max 20 karakter)</p>
+                        </div>
+
+                        <div id="admin-modal-section-notes">
+                            <div className="flex items-center gap-2 mb-1">
+                                <label className="block text-sm font-bold text-gray-700">Megjegyzés / Hasznos információ</label>
+                                <HelpTooltip text="Extra tippek, amik lenyíló fülként (accordion) jelennek meg. Itt is működik a formázás (**félkövér**, listák)." />
+                            </div>
+                            <textarea id="admin-modal-program-input-notes" name="notes" value={formData.notes || ''} onChange={handleChange} rows={3} className="w-full rounded-lg border-gray-300 border p-2.5 focus:ring-primary focus:border-primary placeholder-gray-400" placeholder="Tippek, fontos tudnivalók (Markdown támogatott)..." />
                         </div>
 
                         <div>
