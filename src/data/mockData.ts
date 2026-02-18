@@ -90,7 +90,13 @@ export const packages: Package[] = [
                 items: [
                     { id: 'm1-1', time: '10:00', icon: '🧳', category: 'ÉRKEZÉS', title: 'Érkezés Mátraházára', description: 'Szállás elfoglalása a hegyek ölelésében.' },
                     { id: 'm1-2', time: '12:00', icon: '🍽️', category: 'GASZTRO', title: 'Ebéd a Vörösmarty fogadóban', description: 'Vadételek és palóc leves.' },
-                    { id: 'm1-3', time: '14:00', icon: '🥾', category: 'AKTÍV', title: 'Kékestető meghódítása', marketingLabel: 'Kihagyhatatlan', notes: 'Érdemes rétegesen öltözködni, mert a csúcson jóval hűvösebb lehet az idő és erős szél fújhat. A kilátóba külön belépőjegy váltása szükséges.', description: 'Séta Magyarország legmagasabb pontjára.' }
+                    {
+                        id: 'm1-3', time: '14:00', icon: '🥾', category: 'AKTÍV', title: 'Kékestető meghódítása', marketingLabel: 'Kihagyhatatlan', notes: 'Érdemes rétegesen öltözködni, mert a csúcson jóval hűvösebb lehet az idő és erős szél fújhat. A kilátóba külön belépőjegy váltása szükséges.', description: 'Séta Magyarország legmagasabb pontjára.', galleryImages: [
+                            'https://images.unsplash.com/photo-1519681393784-d120267933ba',
+                            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
+                            'https://images.unsplash.com/photo-1506744038136-46273834b3fb'
+                        ]
+                    }
                 ]
             },
             {

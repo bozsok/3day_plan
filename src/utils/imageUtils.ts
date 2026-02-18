@@ -2,19 +2,18 @@ import imageCompression from 'browser-image-compression';
 
 export const compressImage = async (file: File): Promise<File> => {
     const options = {
-        maxSizeMB: 1, // Kicsit szigorúbb, hogy biztosan gyors legyen
+        maxSizeMB: 2, // Engedünk kicsit többet a minőségért
         maxWidthOrHeight: 2000,
         useWebWorker: true,
-        fileType: 'image/webp', // WebP preferált
+        fileType: 'image/webp',
     };
 
     try {
         const compressedFile = await imageCompression(file, options);
-        // Ha a tömörített nagyobb lenne (ritka, de előfordulhat már optimalizált képeknél), akkor az eredetit adjuk vissza
-        return compressedFile.size < file.size ? compressedFile : file;
+        return compressedFile;
     } catch (error) {
         console.error('Image compression failed:', error);
-        return file; // Hiba esetén az eredetit küldjük
+        return file;
     }
 };
 

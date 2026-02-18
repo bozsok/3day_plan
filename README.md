@@ -15,9 +15,10 @@ A tervezés nálunk egy játékos, gördülékeny folyamat, ahol az oldalak köz
 
 ## Modern felhasználói élmény
 
-Az alkalmazás legújabb verziója (**v2.2.1**) a vizuális tökéletességre, a közösségi élményre és a biztonságos adminisztrációra fókuszál:
+Az alkalmazás legújabb verziója (**v2.4.0**) a vizuális élményre, a rugalmas tartalomkezelésre és a stabil adminisztrációra fókuszál:
 
-- **Személyre szabott csomagok (v2.2.1):** A programcsomagok készítése mostantól névhez kötött. Csak bejelentkezett résztvevők használhatják a szerkesztőt, és minden csomagon látható az alkotó neve ("Készítette: [Név]").
+- **Gördülékeny Galéria (v2.4.0):** Modernebb, navigálható képgaléria swipe támogatással és billentyűzet vezérléssel.
+- **Gazdag szövegtámogatás:** Markdown-lite formázás (félkövér, listák, sortörések) minden leírásban és megjegyzésben.
 - **Intelligens hozzáférés-kezelés:** Az Admin gomb előzetes ellenőrzést végez — ha nem vagy bejelentkezve, nem nyitunk feleslegesen új lapot, hanem helyben figyelmeztetünk a hiányzó adatokra.
 - **Egyedi Favicon:** Az alkalmazás saját, modern arculatát tükröző 3-szegmensű ikonnal rendelkezik, amely minden böngészőfülön professzionális megjelenést nyújt.
 - **Tesztelhetőségre felkészítve:** Minden UI elem egyedi azonosítót (ID) kapott, amelyek dokumentálva vannak az [element_id_map.md](file:///C:/Users/Bozsó%20Krisztián/.gemini/antigravity/brain/90a6e7d7-da1d-47ba-848d-4a1e225a3634/element_id_map.md) fájlban.

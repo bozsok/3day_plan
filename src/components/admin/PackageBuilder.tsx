@@ -39,6 +39,7 @@ export const PackageBuilder: React.FC = () => {
     // Delete Item Modal
     const [showItemDeleteModal, setShowItemDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<{ dayIndex: number, itemId: string } | null>(null);
+    const [isCoverDragging, setIsCoverDragging] = useState(false);
 
     // Status Modal State
     const [statusModal, setStatusModal] = useState<{
@@ -65,8 +66,7 @@ export const PackageBuilder: React.FC = () => {
         }
     };
 
-    const handleCoverImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
+    const processCoverFiles = async (files: FileList | File[]) => {
         if (!files || files.length === 0) return;
 
         setIsUploading(true);
@@ -82,6 +82,13 @@ export const PackageBuilder: React.FC = () => {
             showStatus('Hiba történt', 'Nem sikerült a borítókép feltöltése. Kérlek próbáld újra!', 'error');
         } finally {
             setIsUploading(false);
+            setIsCoverDragging(false);
+        }
+    };
+
+    const handleCoverImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            processCoverFiles(e.target.files);
         }
     };
 
@@ -109,6 +116,31 @@ export const PackageBuilder: React.FC = () => {
         setStep(1);
         setIsDirty(false); // Reset dirty state when package changes or new package is started
     }, [selectedPackage, isEditing]);
+
+    // Paste handler for Step 2
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            if (step !== 2 || isModalOpen) return;
+
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            const files: File[] = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    if (file) files.push(file);
+                }
+            }
+
+            if (files.length > 0) {
+                processCoverFiles(files);
+            }
+        };
+
+        window.addEventListener('paste', handlePaste);
+        return () => window.removeEventListener('paste', handlePaste);
+    }, [step, isModalOpen]);
 
     const handleInputChange = (field: keyof Package, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -440,7 +472,18 @@ export const PackageBuilder: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-800 mb-2">A kaland arca 📸</h3>
                 <p className="text-gray-500 mb-6 text-sm">Tölts fel egy jó minőségű borítóképet, ami megadja az alaphangulatot. (Ajánlott méret: 800x600px)</p>
 
-                <div id="admin-step2-cover-preview-container" className="group relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 hover:border-primary/50 hover:bg-primary/5 transition-all">
+                <div
+                    id="admin-step2-cover-preview-container"
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsCoverDragging(true); }}
+                    onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsCoverDragging(false); }}
+                    onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsCoverDragging(false);
+                        if (e.dataTransfer.files) processCoverFiles(e.dataTransfer.files);
+                    }}
+                    className={`group relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed transition-all ${isCoverDragging ? 'border-primary bg-primary/5 scale-[1.01] shadow-xl' : 'border-gray-200 bg-gray-50 hover:border-primary/50 hover:bg-primary/5'}`}
+                >
                     {formData.imageUrl ? (
                         <>
                             <img src={formData.imageUrl} alt="Borító" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -460,14 +503,24 @@ export const PackageBuilder: React.FC = () => {
                             </div>
                         </>
                     ) : (
-                        <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-                            <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                {isUploading ? <Loader2 className="animate-spin text-primary" size={24} /> : <Upload className="text-primary" size={24} />}
+                        <div className="flex flex-col items-center justify-center p-12 text-center h-full">
+                            <div className={`p-4 rounded-full mb-4 transition-colors ${isCoverDragging ? 'bg-primary/20 text-primary' : 'bg-white text-gray-400 shadow-sm'}`}>
+                                <Upload size={40} />
                             </div>
-                            <span className="font-bold text-gray-600 text-lg group-hover:text-primary transition-colors">Kattints a feltöltéshez</span>
-                            <span className="text-sm text-gray-400 mt-1">vagy húzd ide a képet</span>
-                            <input id="admin-package-upload-cover" type="file" className="hidden" accept="image/*" onChange={handleCoverImageUpload} disabled={isUploading} />
-                        </label>
+                            <h4 className="text-lg font-bold text-gray-800 mb-1">Engedd el a feltöltéshez!</h4>
+                            <p className="text-gray-500 mb-6 max-w-xs text-sm">Vagy tallózz, esetleg illeszd be vágólapról!</p>
+                            <label className={`cursor-pointer bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center gap-2 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                <Upload size={20} />
+                                {isUploading ? 'Feltöltés...' : 'Tallózás'}
+                                <input id="admin-package-upload-cover-input" type="file" accept="image/*" className="hidden" onChange={handleCoverImageUpload} disabled={isUploading} />
+                            </label>
+
+                            {isCoverDragging && (
+                                <div className="absolute inset-0 bg-primary/10 flex items-center justify-center pointer-events-none backdrop-blur-[2px]">
+                                    <p className="text-primary font-black text-2xl animate-bounce">Feltöltés indítása... 📸</p>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
@@ -549,14 +602,14 @@ export const PackageBuilder: React.FC = () => {
 
             {step === 3 ? (
                 // --- Program Timeline Preview (Step 3) ---
-                <div id="admin-preview-program-card" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 w-full max-w-sm mx-auto flex flex-col max-h-[600px]">
+                <div id="admin-preview-program-card" className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 w-full max-w-sm mx-auto flex flex-col">
                     <div id="admin-preview-program-header" className="p-4 bg-gray-50 border-b border-gray-100 text-center shrink-0">
                         <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide truncate px-4">
                             {formData.title || "Tervezett Program"}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">3 Napos Terv</p>
                     </div>
-                    <div id="admin-preview-program-content" className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
+                    <div id="admin-preview-program-content" className="flex-1 p-5 space-y-8">
                         {formData.days?.map((day, idx) => (
                             <div key={idx} className="relative pl-6 border-l-2 border-gray-100 last:border-0 pb-2">
                                 {/* Day Header */}
@@ -723,9 +776,9 @@ export const PackageBuilder: React.FC = () => {
                 <div id="admin-wizard-layout" className="flex flex-col lg:flex-row gap-8 items-start h-full">
                     {/* Left Side: Wizard Form */}
                     <div id="admin-wizard-form-container" className="flex-1 w-full">
-                        <div id="admin-wizard-card" className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden relative">
+                        <div id="admin-wizard-card" className="bg-white rounded-3xl shadow-2xl border border-gray-100 relative flex flex-col">
                             {/* Wizard Header */}
-                            <div id="admin-wizard-header" className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-start sticky top-0 z-20">
+                            <div id="admin-wizard-header" className="bg-white px-8 py-6 border-b border-gray-100 flex justify-between items-start shrink-0 rounded-t-3xl">
                                 <div>
                                     <div id="admin-wizard-steps-indicator" className="flex items-center gap-3 text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider">
                                         <span className={`flex items-center gap-1 ${step >= 1 ? 'text-primary' : ''}`}>
@@ -765,14 +818,14 @@ export const PackageBuilder: React.FC = () => {
                             </div>
 
                             {/* Content Area */}
-                            <div id="admin-wizard-content-area" className="p-8 lg:p-10 min-h-[500px] bg-white">
+                            <div id="admin-wizard-content-area" className="p-8 lg:p-10 bg-white">
                                 {step === 1 && renderStep1()}
                                 {step === 2 && renderStep2()}
                                 {step === 3 && renderStep3()}
                             </div>
 
                             {/* Footer Navigation */}
-                            <div id="admin-wizard-footer" className="bg-gray-50/80 backdrop-blur-sm px-8 py-6 border-t border-gray-100 flex justify-between items-center sticky bottom-0 z-20">
+                            <div id="admin-wizard-footer" className="bg-white px-8 py-6 border-t border-gray-100 flex justify-between items-center shrink-0 rounded-b-3xl">
                                 <button
                                     id={`admin-step${step}-back-button`}
                                     onClick={() => {

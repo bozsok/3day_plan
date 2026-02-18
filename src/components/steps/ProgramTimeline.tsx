@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { NavButton } from '../common/NavButton';
@@ -14,6 +13,7 @@ import { api, type VoteBlock } from '../../api/client';
 import { ChevronLeft, ArrowRight, ChevronDown, Lightbulb } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormattedText } from '../common/FormattedText';
+import ImageGallery from '../common/ImageGallery';
 
 interface ProgramTimelineProps {
     regionId: string | undefined;
@@ -29,7 +29,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
     const { packages: apiPackages, isLoading } = usePackages();
 
     const [activeDay, setActiveDay] = useState(1);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [galleryData, setGalleryData] = useState<{ images: string[], index: number } | null>(null);
 
     // Adatok egyesítése és származtatása
     const allPackages = [...apiPackages, ...packagesMock].filter((p, index, self) =>
@@ -290,7 +290,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                                                     <div
                                                         key={imgIdx}
                                                         className="relative aspect-square rounded-lg overflow-hidden border border-gray-100 bg-gray-50 shadow-sm transition-transform hover:scale-105 cursor-zoom-in"
-                                                        onClick={() => setSelectedImage(img)}
+                                                        onClick={() => setGalleryData({ images: item.galleryImages!, index: imgIdx })}
                                                     >
                                                         <img src={img} alt={`${item.title} - ${imgIdx + 1}`} className="w-full h-full object-cover" loading="lazy" />
                                                     </div>
@@ -317,27 +317,13 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                 </div>
             </div>
 
-            {/* LIGHTBOX OVERLAY - PORTAL */}
-            {selectedImage && createPortal(
-                <div
-                    className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
-                    onClick={() => setSelectedImage(null)}
-                >
-                    <button
-                        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2"
-                        onClick={() => setSelectedImage(null)}
-                    >
-                        <span className="material-icons-outlined text-4xl">close</span>
-                    </button>
-                    <img
-                        src={selectedImage}
-                        alt="Nagyított nézet"
-                        className="max-w-full max-h-[90vh] object-contain animate-in zoom-in-95 duration-200 select-none shadow-2xl rounded-sm"
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                </div>,
-                document.body
-            )}
+            {/* KÉPGALÉRIA - NAVIGÁLHATÓ LIGHTBOX */}
+            <ImageGallery
+                images={galleryData?.images || []}
+                initialIndex={galleryData?.index || 0}
+                isOpen={!!galleryData}
+                onClose={() => setGalleryData(null)}
+            />
         </>
     );
 }

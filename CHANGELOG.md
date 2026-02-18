@@ -3,6 +3,23 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
  
+  ## [2.4.0] - 2026-02-18
+  
+  ### Gördülékeny Galéria (Lightbox v2)
+  - **Navigálható nézet:** A programpontok képei mostantól egy teljes értékű galériában nyílnak meg, ahol a bal/jobb nyilakkal vagy mobilon söpréssel (swipe) válthatunk a képek között.
+  - **Állapotjelző & Billentyűzet:** A galéria mutatja az aktuális sorszámot (pl. "2 / 5"), és támogatja a billentyűzetes vezérlést (nyilak a váltáshoz, Esc a bezáráshoz).
+  - **Framer Motion animációk:** Minden képváltás és megnyitás sima, spring-alapú animációval történik a prémium felhasználói élmény érdekében.
+  
+  ### Gazdag szövegtámogatás (Markdown-lite)
+  - **FormattedText komponens:** Bevezettük a Markdown-szerű formázást a leírásokban és megjegyzésekben. Támogatott a **félkövér** szöveg, a felsorolások és a sortörések hiteles megőrzése.
+  - **Admin támogatás:** Az admin felületen segéd szövegek és tippek segítik a Markdown használatát a leírásoknál és a megjegyzéseknél.
+  
+   ### Admin UI és stabilitási javítások
+- **Modern Képfeltöltés:** Bevezettük a Drag & Drop (behúzás) és Paste (vágólap) támogatást a csomagok borítóképeihez és a programpontok galériáihoz.
+- **Automatikus Optimalizálás:** Minden feltöltött kép (legyen az tallózott, behúzott vagy beillesztett) automatikusan átméretezésre kerül, ha bármelyik oldala meghaladja a 2000px-et, megőrizve az eredeti méretarányt és átalakítva WebP formátumba a gyorsabb betöltés érdekében.
+- **Természetes Görgetés:** Eltávolítottuk a korlátozó belső görgetéseket és a rögzített (sticky) elemeket a csomagkészítő minden lépéséből, beleértve a programterv előnézetet is.
+  - **Stílus korrekciók:** Javítottuk az admin felületen a "Képek feltöltése" gomb és az ikonválasztó Tailwind osztályait, helyreállítva azok eredeti, színhű megjelenését.
+
   ## [2.3.0] - 2026-02-18
   
   ### Marketing címke fejlesztése
