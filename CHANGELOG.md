@@ -2,6 +2,52 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+  ## [2.6.7] - 2026-02-19
+  
+  ### Backend Univerzális Adatkezelés
+  - **Univerzális db.php:** A központi adatkezelő funkciókat (`processDB`, `readDB`) kiterjesztettük, hogy tetszőleges JSON állományokat (`db.json`, `progress.json`, `packages.json`) biztonságosan és egységesen tudjanak kezelni.
+  - **Minden végpont refaktorálva:** A `progress.php` és `packages.php` is átállt a stabil, zárolás-biztos központi logikára.
+  - **Végső konszolidáció:** Az összes szerveroldali API kódja megtisztult a redundáns fájl- és hibakezelési logikától.
+
+  ### Hibajavítás
+  - **Rendszergazda modál (`SummaryAdminModal.tsx`):** Javítva a több eszközről leadott szavazatok megjelenítése. Korábban a `find()` csak az első szavazatot mutatta felhasználónként; mostantól a `filter()` az összes szavazatot listázza, mindegyik mellé saját „Visszavon" gombbal.
+
+  ## [2.6.6] - 2026-02-19
+  
+  ### Backend API Konszolidáció
+  - **Kódduplikáció felszámolása:** Minden API végpont (`votes.php`, `dates.php`, `summary.php`, `admin.php`, `upload.php`) átállítva a `db.php` központi, stabil függvényeire.
+  - **Hibatűrés javítása:** Egységesített `Throwable` alapú hibakezelés és robusztusabb fájlzárolás az 500-as hibák elkerülése érdekében.
+  - **Tisztább kódstruktúra:** Eltávolítottuk a redundáns adatbázis-elérési logikákat az összes végpontból.
+
+  ## [2.6.5] - 2026-02-19
+  
+  ### Bejelentkezés egyszerűsítése
+  - **Automatikus jelszókitöltés:** Eltávolítottuk a jelszómezőt a vizuális felületről. A rendszer mostantól automatikusan a közös jelszót használja a háttérben.
+  - **PWA Stabilitás:** Finomítottuk a Service Worker kizárásokat, hogy elkerüljük az API hívások elakadását.
+
+  ## [2.5.4] - 2026-02-19
+
+  ### PHP Kompatibilitási Javítás
+  - **Throwable -> Exception:** A modern `Throwable` típust lecseréltük a klasszikus `Exception`-re minden API végpontban. Ez garantálja a stabil működést a PHP 7.0-nál régebbi (pl. 5.6-os) szerverkörnyezetekben is, megelőzve az 500-as (Internal Server Error) hibákat.
+
+  ## [2.5.3] - 2026-02-19
+
+  ### PHP Szintaktikai Javítások
+  - **Nyitótagek helyreállítása:** Pótoltuk a korábbi frissítés során véletlenül törölt `<?php` tageket az API végpontokban.
+  - **Summary API fix:** Helyreállítottuk a `summary.php` kódstruktúráját és a hibás megjegyzés-kezelést.
+
+  ## [2.5.2] - 2026-02-19
+
+  ### Robusztus Relatív Útvonalak
+  - **API Kliens Finomhangolás:** Átállás a natív `URL` objektumra az API kérések feloldásához, biztosítva a hibátlan működést almappába történő telepítés esetén is.
+
+  ## [2.5.1] - 2026-02-19
+
+  ### Kritikus Biztonsági és Munkamenet Javítás
+  - **Session Crossover Fix:** Megszüntettük azt a hibát, ahol a felhasználók idegen neveket láthattak belépéskor.
+  - **Szigorú API Caching Tiltás:** Minden szerveroldali válasz mostantól tiltja a gyorsítótárazást (`Cache-Control: no-store`).
+  - **Kliensoldali Cache-Busting:** Minden API kérés egyedi időbélyeget kap, garantálva, hogy a hálózati proxyk ne szolgáljanak ki elavult adatot.
+
   ## [2.5.0] - 2026-02-19
 
   ### PWA (Progressive Web App) támogatás

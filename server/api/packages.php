@@ -5,65 +5,38 @@ require_once 'db.php';
 handleOptions();
 sendHeaders();
 
-// 2. Útvonalak meghatározása
-$DATA_DIR = __DIR__ . '/../data';
-$PACKAGES_FILE = $DATA_DIR . '/packages.json';
+try {
+    sendHeaders();
+    handleOptions();
+    $method = $_SERVER['REQUEST_METHOD'];
 
-// Ensure data directory exists
-if (!file_exists($DATA_DIR)) {
-    if (!@mkdir($DATA_DIR, 0777, true)) {
-        // Try alternative path if structure is flat
-        $DATA_DIR = __DIR__ . '/data';
-        $PACKAGES_FILE = $DATA_DIR . '/packages.json';
-        if (!file_exists($DATA_DIR)) {
-            if (!@mkdir($DATA_DIR, 0777, true)) {
-                // Log error but continue to return empty array for GET
-                error_log("Failed to create data directory: " . $DATA_DIR);
-            }
-        }
-    }
-}
-
-// 3. GET: Csomagok lekérése
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    if (file_exists($PACKAGES_FILE)) {
-        readfile($PACKAGES_FILE);
-    } else {
-        // Ha még nincs fájl, üres tömböt adunk vissza
-        echo json_encode([]);
-    }
-    exit;
-}
-
-// 4. POST: Csomagok mentése (Teljes lista felülírása)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // TODO: Itt később be kell vezetni egy admin jelszó ellenőrzést (Authorization header)
-
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-
-    if (!is_array($data)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid JSON input']);
+    // 1. GET: Csomagok lekérése
+    if ($method === 'GET') {
+        $data = readDB('packages.json');
+        echo json_encode($data);
         exit;
     }
 
-    // Biztonsági mentés készítése (opcionális, de ajánlott)
-    if (file_exists($PACKAGES_FILE)) {
-        copy($PACKAGES_FILE, $PACKAGES_FILE . '.bak');
-    }
+    // 2. POST: Csomagok mentése (Teljes lista felülírása)
+    if ($method === 'POST') {
+        $input = getJsonInput();
+        if (!is_array($input)) {
+            throw new Exception('Invalid JSON input', 400);
+        }
 
-    // Mentés
-    if (file_put_contents($PACKAGES_FILE, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        processDB(function (&$db) use ($input) {
+            $db = $input; // Full overwrite
+            return true;
+        }, 'packages.json');
+
         echo json_encode(['success' => true, 'message' => 'Packages saved successfully']);
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => 'Failed to write to packages.json']);
+        exit;
     }
-    exit;
-}
 
-// Egyéb metódusok
-http_response_code(405);
-echo json_encode(['error' => 'Method not allowed']);
+    throw new Exception('Method not allowed', 405);
+
+} catch (Throwable $e) {
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode(['error' => $e->getMessage()]);
+}
 ?>

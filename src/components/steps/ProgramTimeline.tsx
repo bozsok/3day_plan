@@ -151,7 +151,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
         <div id="program-timeline-sidebar-actions" className="flex flex-col">
             {/* Várható összköltség elem */}
             <div id="program-timeline-cost-box" className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-6 mt-4 lg:mt-0">
-                <span id="program-timeline-cost-label" className="text-gray-500 text-sm block mb-1">Várható összköltség</span>
+                <span id="program-timeline-cost-label" className="text-gray-500 text-sm block mb-1">Várható szállásköltség</span>
                 <div id="program-timeline-cost-amount-wrapper" className="flex items-baseline gap-2">
                     <span id="program-timeline-cost-value" className="text-3xl font-bold text-gray-900">{selectedPackage.estimatedCost}</span>
                     <span id="program-timeline-cost-currency" className="text-gray-600 font-semibold">Ft</span>

@@ -7,11 +7,24 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   base: './',
   plugins: [
-    react(), 
+    react(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
+      workbox: {
+        navigateFallbackDenylist: [/server\/api/, /server\/data/, /server\/uploads/],
+        runtimeCaching: [
+          {
+            urlPattern: /.*\/server\/api\/.*/,
+            handler: 'NetworkOnly',
+          },
+          {
+            urlPattern: /.*\/server\/uploads\/.*/,
+            handler: 'NetworkOnly',
+          }
+        ]
+      },
       manifest: {
         name: 'Hosszú Hétvége Tervező',
         short_name: 'Hétvége',

@@ -9,6 +9,12 @@ function sendHeaders()
     header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type");
     header("Content-Type: application/json; charset=UTF-8");
+
+    // Disable caching strictly
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Cache-Control: post-check=0, pre-check=0", false);
+    header("Pragma: no-cache");
+    header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 }
 
 // 2. Helper: Handle Preflight OPTIONS
@@ -29,9 +35,9 @@ function getJsonInput()
 }
 
 // 4. Helper: Get DB Path & Ensure Directory
-function getDBPath()
+function getDBPath($filename = 'db.json')
 {
-    $path = __DIR__ . '/../data/db.json';
+    $path = __DIR__ . '/../data/' . $filename;
     $dir = dirname($path);
     if (!is_dir($dir)) {
         @mkdir($dir, 0777, true);
@@ -40,15 +46,16 @@ function getDBPath()
 }
 
 // 5. Helper: Read DB (No Lock for Speed/Stability)
-function readDB()
+function readDB($filename = 'db.json')
 {
-    $path = getDBPath();
+    $path = getDBPath($filename);
     $defaultDB = ["users" => [], "date_selections" => [], "vote_blocks" => []];
+    if ($filename === 'progress.json' || $filename === 'packages.json')
+        $defaultDB = [];
 
     if (!file_exists($path))
         return $defaultDB;
 
-    // Simple read without lock to avoid file system issues
     $json = @file_get_contents($path);
     if ($json === false)
         return $defaultDB;
@@ -58,15 +65,17 @@ function readDB()
 }
 
 // 6. Helper: Process DB (Write Lock)
-function processDB(callable $callback)
+function processDB(callable $callback, $filename = 'db.json')
 {
-    $path = getDBPath();
+    $path = getDBPath($filename);
     $defaultDB = ["users" => [], "date_selections" => [], "vote_blocks" => []];
+    if ($filename === 'progress.json' || $filename === 'packages.json')
+        $defaultDB = [];
 
-    $fp = @fopen($path, 'c+'); // Suppress warning
+    $fp = @fopen($path, 'c+');
     if (!$fp) {
         http_response_code(500);
-        echo json_encode(["error" => "Database IO error"]);
+        echo json_encode(["error" => "Database IO error: " . $filename]);
         exit;
     }
 
@@ -78,7 +87,7 @@ function processDB(callable $callback)
 
         try {
             $result = $callback($db);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             flock($fp, LOCK_UN);
             fclose($fp);
             throw $e;
@@ -111,4 +120,16 @@ function getNextId($array)
             $maxId = $item['id'];
     }
     return $maxId + 1;
+}
+
+// 8. Helper: Verify Password
+function verifyPassword($password)
+{
+    $config = require __DIR__ . '/config.php';
+    $hash = $config['admin_password'];
+    // Támogatjuk a sima szöveget is az egyszerűség kedvéért, ha nem hash
+    if (strpos($hash, '$2y$') === 0) {
+        return password_verify($password, $hash);
+    }
+    return $password === $hash;
 }

@@ -99,71 +99,70 @@ export const SummaryAdminModal: React.FC<SummaryAdminModalProps> = ({
                                 <p className="text-sm text-gray-400 text-center italic py-4">Nincs felhasználó a rendszerben.</p>
                             ) : (
                                 userStatuses.map(user => {
-                                    // Megkeressük a felhasználó szavazatát
-                                    const vote = detailedVotes.find(v => v.userId === user.id);
-                                    const hasVote = !!vote;
-
-                                    // Adatok előkészítése megjelenítéshez
-                                    const regionName = vote?.regionId ? (counties.find(c => c.id === vote.regionId)?.name || vote.regionId) : '-';
-                                    const packageTitle = vote?.packageId ? (allPackages.find(p => p.id === vote.packageId)?.title || 'Ismeretlen csomag') : '-';
-
-                                    let datesDisplay = '-';
-                                    if (vote?.dates && vote.dates.length > 0) {
-                                        const start = new Date(vote.dates[0]);
-                                        const end = new Date(vote.dates[vote.dates.length - 1]);
-                                        datesDisplay = `${format(start, 'MMM d.', { locale: hu })} - ${format(end, 'MMM d.', { locale: hu })}`;
-                                    }
+                                    // Megkeressük az ÖSSZES szavazatát
+                                    const userVotes = detailedVotes.filter(v => v.userId === user.id);
+                                    const hasVote = userVotes.length > 0;
 
                                     return (
                                         <div key={user.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors group">
-                                            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                                                <div className="flex-1 w-full">
-                                                    <div className="flex items-center gap-2 mb-2">
+                                            <div className="flex flex-col gap-3">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
                                                         <span className="font-bold text-gray-900 text-lg">{user.name}</span>
                                                         <span className="text-xs text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded">ID: {user.id}</span>
                                                         {!hasVote && <span className="text-xs text-gray-400 italic ml-2">(Nincs aktív szavazat)</span>}
                                                     </div>
-
-                                                    {hasVote && (
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 bg-white p-2 rounded-lg border border-gray-100">
-                                                            <div className="flex items-center gap-1.5" title="Helyszín">
-                                                                <MapPin size={14} className="text-gray-400" />
-                                                                <span className="truncate max-w-[150px]">{regionName}</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-1.5" title="Időpont">
-                                                                <Calendar size={14} className="text-gray-400" />
-                                                                <span>{datesDisplay}</span>
-                                                            </div>
-                                                            {(vote?.packageId) && (
-                                                                <div className="col-span-1 sm:col-span-2 flex items-center gap-1.5 mt-1" title="Csomag">
-                                                                    <Package size={14} className="text-gray-400" />
-                                                                    <span className="truncate text-xs font-medium text-gray-500">{packageTitle}</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                <div className="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-                                                    {hasVote && (
-                                                        <button
-                                                            id={`summary-admin-reset-vote-btn-${user.id}`}
-                                                            onClick={() => onDeleteVote(user.id)}
-                                                            className="flex-1 sm:w-32 px-3 py-2 rounded-lg text-xs font-bold transition-all bg-white text-orange-500 hover:bg-orange-50 border border-orange-200 hover:border-orange-300 flex items-center justify-center gap-2 shadow-sm"
-                                                            title="Csak a szavazat visszavonása"
-                                                        >
-                                                            <RotateCcw size={14} /> Visszavon
-                                                        </button>
-                                                    )}
                                                     <button
                                                         id={`summary-admin-delete-user-btn-${user.id}`}
                                                         onClick={() => onDeleteUser(user.id)}
-                                                        className="flex-1 sm:w-32 px-3 py-2 rounded-lg text-xs font-bold transition-all bg-white text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-300 flex items-center justify-center gap-2 shadow-sm"
+                                                        className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-300 flex items-center gap-1.5 shadow-sm shrink-0"
                                                         title="Felhasználó és adatai végleges törlése"
                                                     >
-                                                        <Trash2 size={14} /> Törlés
+                                                        <Trash2 size={13} /> Törlés
                                                     </button>
                                                 </div>
+
+                                                {/* Összes szavazat felsorolva */}
+                                                {userVotes.map(vote => {
+                                                    const regionName = vote.regionId ? (counties.find(c => c.id === vote.regionId)?.name || vote.regionId) : '-';
+                                                    const packageTitle = vote.packageId ? (allPackages.find(p => p.id === vote.packageId)?.title || 'Ismeretlen csomag') : '-';
+
+                                                    let datesDisplay = '-';
+                                                    if (vote.dates && vote.dates.length > 0) {
+                                                        const start = new Date(vote.dates[0]);
+                                                        const end = new Date(vote.dates[vote.dates.length - 1]);
+                                                        datesDisplay = `${format(start, 'MMM d.', { locale: hu })} - ${format(end, 'MMM d.', { locale: hu })}`;
+                                                    }
+
+                                                    return (
+                                                        <div key={vote.id} className="flex items-center justify-between gap-3 bg-white p-2 rounded-lg border border-gray-100">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600 flex-1">
+                                                                <div className="flex items-center gap-1.5" title="Helyszín">
+                                                                    <MapPin size={14} className="text-gray-400" />
+                                                                    <span className="truncate max-w-[150px]">{regionName}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-1.5" title="Időpont">
+                                                                    <Calendar size={14} className="text-gray-400" />
+                                                                    <span>{datesDisplay}</span>
+                                                                </div>
+                                                                {vote.packageId && (
+                                                                    <div className="col-span-1 sm:col-span-2 flex items-center gap-1.5" title="Csomag">
+                                                                        <Package size={14} className="text-gray-400" />
+                                                                        <span className="truncate text-xs font-medium text-gray-500">{packageTitle}</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <button
+                                                                id={`summary-admin-reset-vote-btn-${vote.id}`}
+                                                                onClick={() => onDeleteVote(user.id)}
+                                                                className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-orange-500 hover:bg-orange-50 border border-orange-200 hover:border-orange-300 flex items-center gap-1.5 shadow-sm shrink-0"
+                                                                title="Csak a szavazat visszavonása"
+                                                            >
+                                                                <RotateCcw size={13} /> Visszavon
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     );

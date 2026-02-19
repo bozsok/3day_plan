@@ -23,7 +23,7 @@ export function Hero({ }: HeroProps) {
         }
 
         try {
-            await login(name);
+            await login(name, '3nap2026');
             navigate('/terv/helyszin');
         } catch (err) {
             setError('Hiba történt a bejelentkezéskor. Próbáld újra!');
@@ -93,7 +93,7 @@ export function Hero({ }: HeroProps) {
                     {!user && (
                         <span className="italic">
                             <br /><br />
-                            Ha most vagy itt először, akkor írd be a neved!
+                            Ha most vagy itt először, írd be a neved a kezdéshez!
                         </span>
                     )}
                 </p>
@@ -152,32 +152,46 @@ export function Hero({ }: HeroProps) {
                             </div>
                         </div>
                     ) : (
-                        <form id="login-form-wrapper" onSubmit={handleSubmit} className="bg-white p-2 rounded-2xl shadow-lg border border-gray-100 flex flex-col md:flex-row gap-2">
-                            <div id="login-input-container" className="flex-1 relative">
-                                <div id="login-input-icon" className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                                    <Users size={20} />
+                        <form id="login-form-wrapper" onSubmit={handleSubmit} className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 flex flex-col gap-4">
+                            <div id="login-name-container" className="relative text-left">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Név</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <Users size={18} />
+                                    </div>
+                                    <input
+                                        id="login-name-input"
+                                        type="text"
+                                        placeholder="Hogy hívnak?"
+                                        className="w-full pl-11 pr-4 py-3.5 bg-gray-50 rounded-xl border border-transparent focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all font-medium text-gray-900"
+                                        value={name}
+                                        onChange={(e) => {
+                                            setName(e.target.value);
+                                            setError('');
+                                        }}
+                                        disabled={isLoading}
+                                    />
                                 </div>
-                                <input
-                                    id="login-name-input"
-                                    type="text"
-                                    placeholder="Hogy hívnak?"
-                                    className="w-full pl-11 pr-4 py-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-primary/50 font-medium text-gray-900 placeholder:text-gray-400 h-full"
-                                    value={name}
-                                    onChange={(e) => {
-                                        setName(e.target.value);
-                                        setError('');
-                                    }}
-                                    disabled={isLoading}
-                                />
                             </div>
+
+
                             <button
                                 id="login-submit-button"
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 py-4 rounded-xl transition-all shadow-md hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+                                className="w-full bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg py-4 rounded-xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                {isLoading ? 'Betöltés...' : 'Kezdés'}
-                                <ArrowRight size={20} />
+                                {isLoading ? (
+                                    <span className="flex items-center gap-2">
+                                        <div className="w-5 h-5 border-2 border-gray-900/30 border-t-gray-900 rounded-full animate-spin" />
+                                        Betöltés...
+                                    </span>
+                                ) : (
+                                    <>
+                                        Kezdés
+                                        <ArrowRight size={20} />
+                                    </>
+                                )}
                             </button>
                         </form>
                     )}

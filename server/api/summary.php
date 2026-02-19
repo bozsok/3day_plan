@@ -1,8 +1,8 @@
 <?php
-// "Soft Failure" + NON-BLOCKING RETRY READ
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
+require_once __DIR__ . '/db.php';
+sendHeaders();
 
+// Production: disable direct error display
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);
@@ -13,52 +13,15 @@ function safe_json_encode($value)
 }
 
 try {
-    $dbPath = __DIR__ . '/../data/db.json';
-    $db = [];
+    $db = readDB();
 
-    if (file_exists($dbPath)) {
-        if (function_exists('opcache_invalidate'))
-            @opcache_invalidate($dbPath, true);
-
-        $fp = @fopen($dbPath, 'r');
-        if ($fp) {
-            $locked = false;
-            $maxRetries = 5; // 5 * 100ms = 0.5s max wait
-
-            for ($i = 0; $i < $maxRetries; $i++) {
-                if (flock($fp, LOCK_SH | LOCK_NB)) { // Non-blocking attempt
-                    $locked = true;
-                    break;
-                }
-                usleep(100000); // Wait 100ms
-            }
-
-            if ($locked) {
-                // Got lock, read file
-                $size = fstat($fp)['size'];
-                if ($size > 0) {
-                    $json = fread($fp, $size);
-                    $data = json_decode($json, true);
-                    if (is_array($data))
-                        $db = $data;
-                }
-                flock($fp, LOCK_UN);
-            } else {
-                // Could not lock file (Busy)
-                // Return empty DB (safe fallback) or handle error
-                // For this app, empty DB prevents crash, data will load next poll
-                // Ideally we would return 503, but partial data is safer for protocol/UI
-            }
-            fclose($fp);
-        }
-    }
-
-    // --- Logic (Unchanged) ---
+    // --- Logic ---
     $usersMap = [];
     if (!empty($db['users']) && is_array($db['users'])) {
         foreach ($db['users'] as $u) {
-            if (isset($u['id'], $u['name']))
+            if (isset($u['id'], $u['name'])) {
                 $usersMap[$u['id']] = $u['name'];
+            }
         }
     }
 
@@ -82,22 +45,24 @@ try {
 
     $topIntervals = array_values($intervalCounts);
     usort($topIntervals, function ($a, $b) {
-        return ($b['count'] ?? 0) - ($a['count'] ?? 0);
+        return (isset($b['count']) ? $b['count'] : 0) - (isset($a['count']) ? $a['count'] : 0);
     });
     $topIntervals = array_slice($topIntervals, 0, 3);
 
     $voteRanking = [];
     if (!empty($db['vote_blocks']) && is_array($db['vote_blocks'])) {
         foreach ($db['vote_blocks'] as $vb) {
-            $rid = $vb['region_id'] ?? 'unknown';
-            $uid = $vb['user_id'] ?? 0;
-            $uName = $usersMap[$uid] ?? "Unknown";
+            $rid = isset($vb['region_id']) ? $vb['region_id'] : 'unknown';
+            $uid = isset($vb['user_id']) ? $vb['user_id'] : 0;
+            $uName = isset($usersMap[$uid]) ? $usersMap[$uid] : "Unknown";
 
-            if (!isset($voteRanking[$rid]))
+            if (!isset($voteRanking[$rid])) {
                 $voteRanking[$rid] = ['regionId' => $rid, 'count' => 0, 'voters' => []];
+            }
             $voteRanking[$rid]['count']++;
-            if (!in_array($uName, $voteRanking[$rid]['voters']))
+            if (!in_array($uName, $voteRanking[$rid]['voters'])) {
                 $voteRanking[$rid]['voters'][] = $uName;
+            }
         }
     }
     usort($voteRanking, function ($a, $b) {
@@ -108,16 +73,28 @@ try {
     $userStatuses = [];
     foreach ($usersMap as $uid => $name) {
         $datesCount = 0;
-        if (!empty($db['date_selections']))
-            foreach ($db['date_selections'] as $d)
-                if (($d['user_id'] ?? 0) === $uid)
+        if (!empty($db['date_selections'])) {
+            foreach ($db['date_selections'] as $d) {
+                if ((isset($d['user_id']) ? $d['user_id'] : 0) === $uid) {
                     $datesCount++;
+                }
+            }
+        }
         $votesCount = 0;
-        if (!empty($db['vote_blocks']))
-            foreach ($db['vote_blocks'] as $v)
-                if (($v['user_id'] ?? 0) === $uid)
+        if (!empty($db['vote_blocks'])) {
+            foreach ($db['vote_blocks'] as $v) {
+                if ((isset($v['user_id']) ? $v['user_id'] : 0) === $uid) {
                     $votesCount++;
-        $userStatuses[] = ['id' => $uid, 'name' => $name, 'isComplete' => ($datesCount >= 3 && $votesCount >= 1), 'datesCount' => $datesCount, 'votesCount' => $votesCount];
+                }
+            }
+        }
+        $userStatuses[] = [
+            'id' => $uid,
+            'name' => $name,
+            'isComplete' => ($datesCount >= 3 && $votesCount >= 1),
+            'datesCount' => $datesCount,
+            'votesCount' => $votesCount
+        ];
     }
 
     // --- Progress Adatok Lekérése (Live haladás) ---
@@ -129,14 +106,13 @@ try {
         if (is_array($pData)) {
             $now = time();
             foreach ($pData as $uid => $p) {
-                // Csak az utolsó 15 percben aktívakat küldjük el
-                if (($p['lastActive'] ?? 0) >= ($now - 900)) {
+                if ((isset($p['lastActive']) ? $p['lastActive'] : 0) >= ($now - 900)) {
                     $userProgress[$uid] = [
-                        'hasDates' => $p['hasDates'] ?? false,
-                        'regionId' => $p['regionId'] ?? null,
-                        'packageId' => $p['packageId'] ?? null,
-                        'dates' => $p['dates'] ?? [],
-                        'lastActive' => $p['lastActive'] ?? 0
+                        'hasDates' => isset($p['hasDates']) ? $p['hasDates'] : false,
+                        'regionId' => isset($p['regionId']) ? $p['regionId'] : null,
+                        'packageId' => isset($p['packageId']) ? $p['packageId'] : null,
+                        'dates' => isset($p['dates']) ? $p['dates'] : [],
+                        'lastActive' => isset($p['lastActive']) ? $p['lastActive'] : 0
                     ];
                 }
             }
@@ -149,18 +125,18 @@ try {
         foreach ($db['vote_blocks'] as $vb) {
             $ts = isset($vb['created_at']) ? strtotime($vb['created_at']) : 0;
             $detailedVotes[] = [
-                "id" => $vb['id'] ?? 0,
-                "userId" => $vb['user_id'] ?? 0,
-                "userName" => $usersMap[$vb['user_id'] ?? 0] ?? "Ismeretlen",
-                "dates" => $vb['dates'] ?? [],
-                "regionId" => $vb['region_id'] ?? null,
-                "packageId" => $vb['package_id'] ?? null,
-                "timestamp" => $ts * 1000 // JS format (ms)
+                "id" => isset($vb['id']) ? $vb['id'] : 0,
+                "userId" => isset($vb['user_id']) ? $vb['user_id'] : 0,
+                "userName" => isset($usersMap[isset($vb['user_id']) ? $vb['user_id'] : 0]) ? $usersMap[isset($vb['user_id']) ? $vb['user_id'] : 0] : "Ismeretlen",
+                "dates" => isset($vb['dates']) ? $vb['dates'] : [],
+                "regionId" => isset($vb['region_id']) ? $vb['region_id'] : null,
+                "packageId" => isset($vb['package_id']) ? $vb['package_id'] : null,
+                "timestamp" => $ts * 1000
             ];
         }
     }
     usort($detailedVotes, function ($a, $b) {
-        return ($b['timestamp'] ?? 0) - ($a['timestamp'] ?? 0);
+        return (isset($b['timestamp']) ? $b['timestamp'] : 0) - (isset($a['timestamp']) ? $a['timestamp'] : 0);
     });
 
     echo safe_json_encode([
@@ -172,6 +148,7 @@ try {
     ]);
 
 } catch (Throwable $e) {
+    http_response_code(500);
     echo safe_json_encode(["error" => "Server Error", "message" => $e->getMessage()]);
 }
 exit;

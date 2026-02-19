@@ -3,7 +3,7 @@ import { api, type User } from '../api/client';
 
 interface UserContextType {
     user: User | null;
-    login: (name: string) => Promise<void>;
+    login: (name: string, password: string) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
 }
@@ -63,10 +63,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
         initUser();
     }, []);
 
-    const login = async (name: string) => {
+    const login = async (name: string, password: string) => {
         setIsLoading(true);
         try {
-            const userData = await api.users.login(name);
+            const userData = await api.users.login(name, password);
             setUser(userData);
             localStorage.setItem('3nap_user', JSON.stringify(userData));
         } catch (err) {

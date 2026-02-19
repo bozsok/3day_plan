@@ -30,32 +30,39 @@ export interface User {
 const API_URL = import.meta.env.PROD ? 'server/api' : '/api';
 const EXT = import.meta.env.PROD ? '.php' : '';
 
+// Helper for cache busting and safe relative URLs
+const getUrl = (endpoint: string, params: Record<string, any> = {}) => {
+    // A relatív utat az API_URL-ből építjük fel
+    const relativePath = `${API_URL}/${endpoint}${EXT}`;
+    // A böngésző a window.location.href-hez képest oldja fel a relatív utat
+    const url = new URL(relativePath, window.location.href);
+
+    Object.entries(params).forEach(([key, val]) => url.searchParams.append(key, String(val)));
+    url.searchParams.append('t', Date.now().toString()); // Cache busting
+    return url.toString();
+};
+
 export const api = {
     users: {
-        login: async (name: string): Promise<User> => {
-            const res = await fetch(`${API_URL}/users${EXT}`, {
+        login: async (name: string, password: string): Promise<User> => {
+            const res = await fetch(getUrl('users'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({ name, password }),
             });
+            if (res.status === 401) throw new Error('Hibás jelszó');
             if (!res.ok) throw new Error('Login failed');
             return res.json();
         },
         get: async (userId: number): Promise<User> => {
-            // PHP uses query param: users.php?userId=1
-            // Node uses path param: users/1
-            const url = import.meta.env.PROD
-                ? `${API_URL}/users${EXT}?userId=${userId}`
-                : `${API_URL}/users/${userId}`;
-
-            const res = await fetch(url);
+            const res = await fetch(getUrl('users', { userId }));
             if (!res.ok) throw new Error('User fetch failed');
             return res.json();
         }
     },
     dates: {
         save: async (userId: number, dates: string[], regionId?: string) => {
-            const res = await fetch(`${API_URL}/dates${EXT}`, {
+            const res = await fetch(getUrl('dates'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, dates, regionId }),
@@ -63,10 +70,10 @@ export const api = {
             if (!res.ok) {
                 throw new Error(`Date save failed: ${res.statusText}`);
             }
-            return res.json(); // Returns { userId, dateSelections: [...] }
+            return res.json();
         },
         delete: async (userId: number, dates: string[], regionId?: string) => {
-            const res = await fetch(`${API_URL}/dates${EXT}`, {
+            const res = await fetch(getUrl('dates'), {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, dates, regionId }),
@@ -76,9 +83,8 @@ export const api = {
         }
     },
     votes: {
-        // ÚJ: 3 napos blokk létrehozása
         cast: async (userId: number, regionId: string, dates: string[], packageId?: string) => {
-            const res = await fetch(`${API_URL}/votes${EXT}`, {
+            const res = await fetch(getUrl('votes'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, regionId, dates, packageId }),
@@ -86,9 +92,8 @@ export const api = {
             if (!res.ok) throw new Error('Vote failed');
             return res.json();
         },
-        // ÚJ: Blokk törlése ID alapján
         revoke: async (userId: number, blockId: number) => {
-            const res = await fetch(`${API_URL}/votes${EXT}`, {
+            const res = await fetch(getUrl('votes'), {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, blockId }),
@@ -97,21 +102,21 @@ export const api = {
             return res.json();
         },
         list: async (userId: number): Promise<VoteBlock[]> => {
-            const res = await fetch(`${API_URL}/votes${EXT}?userId=${userId}`);
+            const res = await fetch(getUrl('votes', { userId }));
             if (!res.ok) throw new Error('Vote list failed');
             return res.json();
         }
     },
     summary: {
         get: async () => {
-            const res = await fetch(`${API_URL}/summary${EXT}`);
+            const res = await fetch(getUrl('summary'));
             if (!res.ok) throw new Error('Summary fetch failed');
             return res.json();
         }
     },
     progress: {
         update: async (userId: number, data: { hasDates?: boolean, regionId?: string | null, packageId?: string | null, dates?: string[] }) => {
-            const res = await fetch(`${API_URL}/progress${EXT}`, {
+            const res = await fetch(getUrl('progress'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId, ...data }),
@@ -120,7 +125,7 @@ export const api = {
             return res.json();
         },
         clear: async (userId: number) => {
-            const res = await fetch(`${API_URL}/progress${EXT}?action=clear&userId=${userId}`, {
+            const res = await fetch(getUrl('progress', { action: 'clear', userId }), {
                 method: 'DELETE'
             });
             if (!res.ok) throw new Error('Progress clear failed');
@@ -129,26 +134,17 @@ export const api = {
     },
     admin: {
         reset: async () => {
-            const url = import.meta.env.PROD
-                ? `${API_URL}/admin.php?action=reset`
-                : `${API_URL}/admin/reset`;
-            const res = await fetch(url, { method: 'POST' });
+            const res = await fetch(getUrl('admin', { action: 'reset' }), { method: 'POST' });
             if (!res.ok) throw new Error('Admin reset failed');
             return res.json();
         },
         resetUserVote: async (id: number) => {
-            const url = import.meta.env.PROD
-                ? `${API_URL}/admin.php?action=reset_user_vote&id=${id}`
-                : `${API_URL}/admin/users/${id}/reset_vote`;
-            const res = await fetch(url, { method: 'POST' });
+            const res = await fetch(getUrl('admin', { action: 'reset_user_vote', id }), { method: 'POST' });
             if (!res.ok) throw new Error('Admin reset user vote failed');
             return res.json();
         },
         deleteUser: async (id: number) => {
-            const url = import.meta.env.PROD
-                ? `${API_URL}/admin.php?action=delete_user&id=${id}` // action param is ignored by standard REST but good for doc, id is crucial
-                : `${API_URL}/admin/users/${id}`;
-            const res = await fetch(url, { method: 'DELETE' });
+            const res = await fetch(getUrl('admin', { action: 'delete_user', id }), { method: 'DELETE' });
             if (!res.ok) throw new Error('Admin delete user failed');
             return res.json();
         }
