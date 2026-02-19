@@ -34,8 +34,8 @@ function queryAll(sql: string, params: any[] = []): any[] {
 /** POST /api/votes — Új szavazási blokk létrehozása */
 router.post('/', (req, res) => {
     const { userId, regionId, dates, packageId } = req.body; // packageId hozzáadva
-    if (!userId || !regionId || !Array.isArray(dates) || dates.length !== 3) {
-        res.status(400).json({ error: 'userId, regionId és pontosan 3 dátum kötelező.' });
+    if (!userId || !regionId || !Array.isArray(dates) || dates.length < 3 || dates.length > 4) {
+        res.status(400).json({ error: 'userId, regionId és 3 vagy 4 dátum kötelező.' });
         return;
     }
 

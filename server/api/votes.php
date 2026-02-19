@@ -76,7 +76,7 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
 
     if ($method === 'POST') {
-        if (empty($input['userId']) || empty($input['regionId']) || !isset($input['dates']) || count($input['dates']) !== 3)
+        if (empty($input['userId']) || empty($input['regionId']) || !isset($input['dates']) || count($input['dates']) < 3 || count($input['dates']) > 4)
             throw new Exception("Invalid Vote");
         $userId = (int) $input['userId'];
         $regionId = $input['regionId']; // countyId

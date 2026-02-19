@@ -106,8 +106,8 @@ export function CustomCalendar({ selected, onSelect }: CustomCalendarProps) {
             return;
         }
 
-        if (selected.length >= 3) {
-            // 3 nap már ki van jelölve — újrakezdés ezzel a nappal
+        if (selected.length >= 4) {
+            // 4 nap már ki van jelölve — újrakezdés ezzel a nappal
             onSelect([day]);
             return;
         }

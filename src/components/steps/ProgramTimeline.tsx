@@ -114,7 +114,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                         <span className="text-left md:text-center lg:text-left leading-tight">{selectedPackage.title}</span>
                     </div>
                 </div>}
-                description="3 napos programterv"
+                description="programterv"
                 titleClassName="text-2xl font-bold text-gray-900 mb-2 text-left md:text-center lg:text-left"
                 descriptionClassName="text-gray-500 text-sm text-left md:text-center lg:text-left mb-6"
             />

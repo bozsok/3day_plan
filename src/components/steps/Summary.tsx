@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { differenceInCalendarDays, format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { hu } from 'date-fns/locale';
 import { NavButton } from '../common/NavButton';
@@ -168,6 +168,7 @@ export function Summary({ onContinue, onRegionSelect }: SummaryProps) {
                                 count={item.count}
                                 users={item.users}
                                 isFirst={idx === 0}
+                                duration={differenceInCalendarDays(new Date(item.end), new Date(item.start)) + 1}
                             />
                         ))}
                     </RankingSection>

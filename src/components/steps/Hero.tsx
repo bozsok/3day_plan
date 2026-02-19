@@ -74,7 +74,7 @@ export function Hero({ }: HeroProps) {
                         <>
                             Tervezd meg a tökéletes <br />
                             <span id="hero-title-gradient-text" className="text-transparent bg-clip-text bg-gradient-to-r from-primary-dark via-primary to-emerald-400">
-                                három napot.
+                                hosszú hétvégét.
                             </span>
                             🌲
                         </>
@@ -89,7 +89,7 @@ export function Hero({ }: HeroProps) {
                 </h1>
 
                 <p id="hero-description-text" className="text-lg md:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-                    Néhány lépés, és máris készen állnak a 3 napos programok.
+                    Néhány lépés, és máris készen állnak a közös programok.
                     {!user && (
                         <span className="italic">
                             <br /><br />

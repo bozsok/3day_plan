@@ -29,18 +29,33 @@ export function DateSelection({ selected, onSelect, onVoteSuccess, regionId, pac
     const [isSaving, setIsSaving] = useState(false);
 
     const isConsecutive = (d: Date[]) => {
-        if (d.length !== 3) return false;
+        if (d.length < 3 || d.length > 4) return false;
         const sorted = [...d].sort((a, b) => a.getTime() - b.getTime());
-        return (
-            differenceInCalendarDays(sorted[1], sorted[0]) === 1 &&
-            differenceInCalendarDays(sorted[2], sorted[1]) === 1
-        );
+        for (let i = 0; i < sorted.length - 1; i++) {
+            if (differenceInCalendarDays(sorted[i + 1], sorted[i]) !== 1) return false;
+        }
+        return true;
     };
 
-    const hasThreeConsecutiveDays = isConsecutive(dates) && dates.length > 0 && dates[0].getDay() === 5;
+    const isValidSelection = (d: Date[]) => {
+        if (!isConsecutive(d)) return false;
+        const sorted = [...d].sort((a, b) => a.getTime() - b.getTime());
+        const startDay = sorted[0].getDay();
+
+        if (d.length === 3) {
+            // 3 nap esetén csak Péntek-Vasárnap (Pénteki kezdéssel: 5)
+            return startDay === 5;
+        } else if (d.length === 4) {
+            // 4 nap esetén: Csütörtök-Vasárnap (4) VAGY Péntek-Hétfő (5)
+            return startDay === 4 || startDay === 5;
+        }
+        return false;
+    };
+
+    const hasValidDates = isValidSelection(dates);
 
     const handleNext = async () => {
-        if (!hasThreeConsecutiveDays || !user || !regionId || !packageId || isSaving) return;
+        if (!hasValidDates || !user || !regionId || !packageId || isSaving) return;
 
         try {
             setIsSaving(true);
@@ -73,9 +88,9 @@ export function DateSelection({ selected, onSelect, onVoteSuccess, regionId, pac
     const handleCalendarSelect = async (newDates: Date[]) => {
         onSelect(newDates);
 
-        // Live progress frissítése: Ha érvényes (3 nap) -> zöld, ha nem -> szürke
+        // Live progress frissítése: Ha érvényes -> zöld, ha nem -> szürke
         if (user) {
-            const isValid = isConsecutive(newDates) && newDates.length > 0 && newDates[0].getDay() === 5;
+            const isValid = isValidSelection(newDates);
             // Csak akkor küldjük, ha változik a validitás, vagy ha van kiválasztás
             try {
                 const dateStrings = newDates.map(d => format(d, 'yyyy-MM-dd'));
@@ -118,7 +133,7 @@ export function DateSelection({ selected, onSelect, onVoteSuccess, regionId, pac
                         id="date-selection-next-btn"
                         className="group bg-primary hover:bg-primary-dark text-gray-900 font-bold text-lg px-8 h-14 rounded-2xl transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
                         onClick={handleNext}
-                        disabled={!hasThreeConsecutiveDays || isSaving}
+                        disabled={!hasValidDates || isSaving}
                     >
                         {isSaving ? 'Szavazat elküldése...' : 'Szavazat véglegesítése'}
                         {!isSaving && <ArrowRight id="date-selection-next-icon" size={20} className="group-hover:translate-x-1 transition-transform" />}
@@ -143,17 +158,17 @@ export function DateSelection({ selected, onSelect, onVoteSuccess, regionId, pac
                     {/* Info box */}
                     <div id="calendar-info-box" className="mt-8 pt-6 border-t border-gray-200">
                         <InfoPill
-                            variant={hasThreeConsecutiveDays ? 'primary' : 'none'}
+                            variant={hasValidDates ? 'primary' : 'none'}
                             icon={<Calendar size={20} />}
                             label="Kijelölt időszak"
                             value={formattedRange}
                         />
 
-                        {/* Figyelmeztetés ha nem Péntek-Vasárnap */}
-                        {isConsecutive(dates) && dates.length > 0 && dates[0].getDay() !== 5 && (
+                        {/* Figyelmeztetés ha nem szabályos intervallum */}
+                        {isConsecutive(dates) && dates.length > 0 && !hasValidDates && (
                             <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-medium flex items-center gap-2 text-left">
                                 <span className="text-lg">⚠️</span>
-                                Csak Péntek-Vasárnap hétvége választható!
+                                Érvénytelen napok! Csak P-V, Cs-V vagy P-H intervallum választható.
                             </div>
                         )}
                     </div>

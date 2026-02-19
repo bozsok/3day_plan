@@ -12,6 +12,7 @@ interface RankingCardProps {
     variant: 'date' | 'location';
     imageUrl?: string;
     tags?: { icon: string; label: string }[];
+    duration?: number;
 }
 
 // Segédfüggvény a Material icon nevek Lucide-re fordításához
@@ -47,7 +48,8 @@ export function RankingCard({
     onClick,
     variant,
     imageUrl,
-    tags
+    tags,
+    duration
 }: RankingCardProps) {
     // ... (maradék kód változatlan az adatok feldolgozásáig)
 
@@ -105,9 +107,9 @@ export function RankingCard({
                     )}
                 </div>
 
-                {/* Jobbra: 3 NAP */}
+                {/* Jobbra: NAP szám */}
                 <div className="flex items-center gap-1 text-[9px] font-black text-primary uppercase tracking-widest pr-1 pb-1">
-                    3 NAP
+                    {duration || 3} NAP
                 </div>
             </div>
         </div>
