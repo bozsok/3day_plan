@@ -1,7 +1,7 @@
 {
   "name": "3nap-tervezo",
   "private": true,
-  "version": "2.4.0",
+  "version": "2.4.2",
   "type": "module",
   "scripts": {
     "dev": "vite",

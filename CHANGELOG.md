@@ -3,6 +3,19 @@
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
  
+  ## [2.4.2] - 2026-02-19
+
+  ### Gördülékeny Galéria Frissítés
+  - **Nagyítás (Zoom) funkció:** A képgalériában dupla kattintással, egérgörgővel vagy mobilon kétujjas nagyítással (pinch-to-zoom) is megtekinthetők a részletek a folyamatos nagyítási élményért.
+  - **Mozgatás (Panning):** Nagyított állapotban a kép szabadon mozgatható, hogy minden részlet elérhető legyen.
+  - **Letisztult Lapozás:** Megszüntettük a zavaró animációkat. Mostantól gyors, lineáris és szinkronizált slide effekttel válthatunk a képek között, ahol az új kép azonnal követi a régit (nincs várakozási idő).
+  - **Zoom vezérlők:** Új, diszkrét kezelőfelület a manuális nagyításhoz és kicsinyítéshez.
+
+  ## [2.4.1] - 2026-02-19
+
+  ### Admin UI fejlesztés
+  - **Szerző és Szerkesztő megjelenítése:** Az admin felületen mostantól az eredeti „Létrehozó” neve látszik. Ha más szerkeszti a csomagot, egy külön „Szerkesztő” jelvény mutatja az aktuális felhasználót.
+
   ## [2.4.0] - 2026-02-18
   
   ### Gördülékeny Galéria (Lightbox v2)
@@ -14,11 +27,11 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
   - **FormattedText komponens:** Bevezettük a Markdown-szerű formázást a leírásokban és megjegyzésekben. Támogatott a **félkövér** szöveg, a felsorolások és a sortörések hiteles megőrzése.
   - **Admin támogatás:** Az admin felületen segéd szövegek és tippek segítik a Markdown használatát a leírásoknál és a megjegyzéseknél.
   
-   ### Admin UI és stabilitási javítások
-- **Modern Képfeltöltés:** Bevezettük a Drag & Drop (behúzás) és Paste (vágólap) támogatást a csomagok borítóképeihez és a programpontok galériáihoz.
-- **Automatikus Optimalizálás:** Minden feltöltött kép (legyen az tallózott, behúzott vagy beillesztett) automatikusan átméretezésre kerül, ha bármelyik oldala meghaladja a 2000px-et, megőrizve az eredeti méretarányt és átalakítva WebP formátumba a gyorsabb betöltés érdekében.
-- **Természetes Görgetés:** Eltávolítottuk a korlátozó belső görgetéseket és a rögzített (sticky) elemeket a csomagkészítő minden lépéséből, beleértve a programterv előnézetet is.
-  - **Stílus korrekciók:** Javítottuk az admin felületen a "Képek feltöltése" gomb és az ikonválasztó Tailwind osztályait, helyreállítva azok eredeti, színhű megjelenését.
+  ### Admin UI és stabilitási javítások
+  - **Modern Képfeltöltés:** Bevezettük a Drag & Drop (behúzás) és Paste (vágólap) támogatást a csomagok borítóképeihez és a programpontok galériáihoz.
+  - **Automatikus Optimalizálás:** Minden feltöltött kép automatikusan átméretezésre kerül (max 2000px), megőrizve a méretarányt és WebP formátumba konvertálva.
+  - **Természetes Görgetés:** Eltávolítottuk a korlátozó belső görgetéseket és a rögzített (sticky) elemeket, beleértve a programterv előnézetet is.
+  - **Stílus korrekciók:** Javítottuk az admin felület gombjainak és ikonválasztójának megjelenését.
 
   ## [2.3.0] - 2026-02-18
   

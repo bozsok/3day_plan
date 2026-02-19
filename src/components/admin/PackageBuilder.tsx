@@ -802,9 +802,17 @@ export const PackageBuilder: React.FC = () => {
                                         {step === 3 && 'A program összeállítása 🗺️'}
                                     </h2>
                                     {user && (
-                                        <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">
-                                            <span className="opacity-70">Létrehozó:</span>
-                                            <span>{user.name}</span>
+                                        <div className="mt-2 flex flex-wrap gap-2">
+                                            <div id="admin-wizard-author-badge" className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100 shadow-sm">
+                                                <span className="opacity-70">Létrehozó:</span>
+                                                <span>{formData.authorName || user.name}</span>
+                                            </div>
+                                            {formData.authorName && formData.authorName !== user.name && (
+                                                <div id="admin-wizard-editor-badge" className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-bold border border-amber-100 shadow-sm animate-in fade-in slide-in-from-left-2 duration-300">
+                                                    <span className="opacity-70">Szerkesztő:</span>
+                                                    <span>{user.name}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
