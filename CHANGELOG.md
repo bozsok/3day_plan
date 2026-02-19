@@ -2,39 +2,46 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+  ## [2.5.0] - 2026-02-19
+
+  ### PWA (Progressive Web App) támogatás
+  - **Telepíthetőség:** Az alkalmazás mostantól telepíthető mobilra és asztali gépre is a kezdőképernyőre.
+  - **Standalone mód:** Indításkor eltűnik a böngésző címsora, így valódi alkalmazás élményt nyújt.
+  - **Manifesztum és Service Worker:** Automatikusan generált erőforrások a gyorsítótárazáshoz és az offline alapfunkciókhoz.
+
   ## [2.4.7] - 2026-02-19
 
-  ### Professzionális Galéria Integráció
+  ### Professzionális galéria integráció
   - **Lightbox váltás:** Teljesen lecseréltük a saját készítésű galériát a professzionális `yet-another-react-lightbox` könyvtárra.
   - **Professzionális Galéria (v2.4.7):** A `yet-another-react-lightbox` integrációjával elértük a piacvezető alkalmazások színvonalát. A nagyítás, mozgatás és lapozás hibátlan, gesztusvezérelt és ugrálásmentes.
   - **Gesztusvezérlés:** Teljes körű támogatás a mobil gesztusokhoz (pinch-to-zoom, swipe, double-tap).
 
   ## [2.4.6] - 2026-02-19
 
-  ### Galéria Stabilitás
+  ### Galéria stabilitás
   - **Jittermentes mozgatás:** Kikapcsoltuk a lendületet és a rugalmas visszapattanást nagyításnál, így a kép „ugrálás” nélkül, azonnal és pontosan követi a felhasználó mozdulatait.
   - **Feszes irányítás:** Optimalizáltuk az animációs átmeneteket, hogy a nagyított kép mozgatása és a nagyítási szintek közötti váltás is profi, stabil érzetet nyújtson.
 
   ## [2.4.5] - 2026-02-19
 
-  ### Galéria Finomhangolás
+  ### Galéria finomhangolás
   - **Reset javítása:** A nagyítás alaphelyzetbe állításakor (Maximize ikon) a kép mostantól nem csak visszakicsinyedik, hanem automatikusan középre is ugrik.
   - **Mozgási korlátok:** Szigorúbb korlátokat vezettünk be a képmozgatáshoz, így a kép már nem lökhető ki véletlenül a látható tartományon kívülre.
 
   ## [2.4.4] - 2026-02-19
 
-  ### Galéria Hotfix
+  ### Galéria hotfix
   - **Zoom & Pan javítása:** Nagyított állapotban mostantól zavartalanul mozgatható (pan) a kép minden irányba mobil eszközökön is. A korábbi hiba, ahol a lapozási logika megakadályozta a mozgatást, megszűnt.
 
   ## [2.4.3] - 2026-02-19
   
-  ### Dátumválasztás és Hotfix
+  ### Dátumválasztás és hotfix
   - **Dátumválasztás kiterjesztése:** Bevezettük a 4 napos intervallumok (Cs-V vagy P-H) támogatását a rugalmasabb tervezés érdekében.
   - **Backend Szinkronizáció:** Frissítettük a PHP és a Node.js backend validációs logikáját is a 4 napos szavazatok fogadásához.
 
   ## [2.4.2] - 2026-02-19
 
-  ### Gördülékeny Galéria Frissítés
+  ### Gördülékeny galéria frissítés
   - **Nagyítás (Zoom) funkció:** A képgalériában dupla kattintással, egérgörgővel vagy mobilon kétujjas nagyítással (pinch-to-zoom) is megtekinthetők a részletek a folyamatos nagyítási élményért.
   - **Mozgatás (Panning):** Nagyított állapotban a kép szabadon mozgatható, hogy minden részlet elérhető legyen.
   - **Letisztult Lapozás:** Megszüntettük a zavaró animációkat. Mostantól gyors, lineáris és szinkronizált slide effekttel válthatunk a képek között, ahol az új kép azonnal követi a régit (nincs várakozási idő).
