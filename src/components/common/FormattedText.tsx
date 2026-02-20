@@ -20,7 +20,7 @@ export const FormattedText: React.FC<FormattedTextProps> = ({ text, className = 
     const lines = text.split('\n');
 
     return (
-        <div id={id} className={`whitespace-pre-wrap ${className}`}>
+        <div id={id} className={`whitespace-pre-wrap break-words ${className}`}>
             {lines.map((line, lineIdx) => {
                 let content: React.ReactNode = line;
 
@@ -52,17 +52,45 @@ export const FormattedText: React.FC<FormattedTextProps> = ({ text, className = 
 };
 
 /**
- * Inline formázások kezelése (félkövér)
+ * Inline formázások kezelése (félkövér és linkek)
  */
 function processInlineFormatting(text: string): React.ReactNode[] {
-    // Regex a **bold** vagy __bold__ mintákra
-    const parts = text.split(/(\*\*.*?\*\*|__.*?__)/g);
+    // 1. Első lépés: Szétvágjuk a szöveget URL-ek mentén
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const partsWithUrls = text.split(urlRegex);
 
-    return parts.map((part, index) => {
-        if ((part.startsWith('**') && part.endsWith('**')) || (part.startsWith('__') && part.endsWith('__'))) {
-            const innerText = part.slice(2, -2);
-            return <strong key={index} className="font-black text-gray-900">{innerText}</strong>;
+    const result: React.ReactNode[] = [];
+
+    partsWithUrls.forEach((part, i) => {
+        if (part.match(urlRegex)) {
+            // Ez egy URL
+            result.push(
+                <a
+                    key={`url-${i}`}
+                    href={part}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline font-medium break-all"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {part}
+                </a>
+            );
+        } else {
+            // Ez sima szöveg, amiben még lehetnek félkövér részek
+            const boldRegex = /(\*\*.*?\*\*|__.*?__)/g;
+            const boldParts = part.split(boldRegex);
+
+            boldParts.forEach((boldPart, j) => {
+                if ((boldPart.startsWith('**') && boldPart.endsWith('**')) || (boldPart.startsWith('__') && boldPart.endsWith('__'))) {
+                    const innerText = boldPart.slice(2, -2);
+                    result.push(<strong key={`bold-${i}-${j}`} className="font-black text-gray-900">{innerText}</strong>);
+                } else if (boldPart) {
+                    result.push(boldPart);
+                }
+            });
         }
-        return part;
     });
+
+    return result;
 }

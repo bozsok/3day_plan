@@ -2,9 +2,17 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+  ## [2.6.8] - 2026-02-20
+  
+  ### Szövegtördelés és linkfelismerés (Best Practice)
+  - **Dinamikus linkfelismerés:** A `FormattedText` komponens mostantól automatikusan felismeri a `http://` és `https://` kezdetű hivatkozásokat, és kattintható (`<a>`) elemként jeleníti meg őket.
+  - **Intelligens tördelés:** Speciális `break-all` szabályt alkalmazunk kizárólag az URL-ekre, így a hosszú linkek nem feszítik szét a layoutot, miközben a normál szöveg olvashatósága megmarad.
+  - **Flexbox stabilitás:** Bevezettük a `min-w-0` osztályt a programpontok tartalmánál, ami kényszeríti a böngészőt a szöveg tördelésére flexbox környezetben is, megszüntetve a mobilnézeti szétcsúszásokat.
+  - **Admin felület:** A szerkesztő modal textarea mezői is megkapták a tördelési javítást a konzisztens felhasználói élmény érdekében.
+
   ## [2.6.7] - 2026-02-19
   
-  ### Backend Univerzális Adatkezelés
+  ### Backend univerzális adatkezelés
   - **Univerzális db.php:** A központi adatkezelő funkciókat (`processDB`, `readDB`) kiterjesztettük, hogy tetszőleges JSON állományokat (`db.json`, `progress.json`, `packages.json`) biztonságosan és egységesen tudjanak kezelni.
   - **Minden végpont refaktorálva:** A `progress.php` és `packages.php` is átállt a stabil, zárolás-biztos központi logikára.
   - **Végső konszolidáció:** Az összes szerveroldali API kódja megtisztult a redundáns fájl- és hibakezelési logikától.
@@ -14,7 +22,7 @@ Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
   ## [2.6.6] - 2026-02-19
   
-  ### Backend API Konszolidáció
+  ### Backend API konszolidáció
   - **Kódduplikáció felszámolása:** Minden API végpont (`votes.php`, `dates.php`, `summary.php`, `admin.php`, `upload.php`) átállítva a `db.php` központi, stabil függvényeire.
   - **Hibatűrés javítása:** Egységesített `Throwable` alapú hibakezelés és robusztusabb fájlzárolás az 500-as hibák elkerülése érdekében.
   - **Tisztább kódstruktúra:** Eltávolítottuk a redundáns adatbázis-elérési logikákat az összes végpontból.

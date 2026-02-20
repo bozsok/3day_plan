@@ -258,7 +258,7 @@ export function ProgramTimeline({ regionId, packageId, dates }: ProgramTimelineP
                                             {item.icon}
                                         </span>
                                     </div>
-                                    <div id="program-timeline-item-content" className="flex-1">
+                                    <div id="program-timeline-item-content" className="flex-1 min-w-0">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
                                             <span id="program-timeline-item-time" className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full w-fit">
                                                 {item.time}
