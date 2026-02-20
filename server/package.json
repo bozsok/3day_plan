@@ -1,7 +1,7 @@
 {
     "name": "3nap-tervezo-server",
     "private": true,
-    "version": "2.6.8",
+    "version": "2.6.9",
     "type": "module",
     "scripts": {
         "dev": "tsx watch src/index.ts",

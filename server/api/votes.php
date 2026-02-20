@@ -118,7 +118,7 @@ try {
         echo json_encode($ret);
     }
 
-} catch (Throwable $e) {
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode(["error" => $e->getMessage()]);
 }

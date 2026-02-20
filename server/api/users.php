@@ -90,7 +90,7 @@ try {
         echo json_encode(["id" => $res['id'], "name" => $res['name']]);
     }
 
-} catch (Throwable $e) {
+} catch (Exception $e) {
     if (!headers_sent()) {
         http_response_code($e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         header('Content-Type: application/json');

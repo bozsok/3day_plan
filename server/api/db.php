@@ -87,7 +87,7 @@ function processDB(callable $callback, $filename = 'db.json')
 
         try {
             $result = $callback($db);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             flock($fp, LOCK_UN);
             fclose($fp);
             throw $e;

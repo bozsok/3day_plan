@@ -2,6 +2,13 @@
 
 Minden jelentős változtatás ebben a dokumentumban kerül rögzítésre.
 
+  ## [2.6.9] - 2026-02-20
+  
+  ### Adminisztrációs felület és API stabilizálás
+  - **Felhasználó törlés javítása:** Megszüntettük az 500-as Internal Server Error hibát az `admin.php` végponton a hiányzó függőségek pótlásával.
+  - **Biztonságos adatkezelés:** Az adminisztrációs műveletek (törlés, reset) mostantól atomi, zárolással védett folyamatokon keresztül futnak, beleértve a felhasználói haladás (`progress.json`) kezelését is.
+  - **Univerzális PHP kompatibilitás:** A hibakezelési mechanizmust (`Throwable` -> `Exception`) egységesítettük az összes API végponton, biztosítva a stabil működést régebbi szerverkörnyezetekben is.
+
   ## [2.6.8] - 2026-02-20
   
   ### Szövegtördelés és linkfelismerés (Best Practice)
