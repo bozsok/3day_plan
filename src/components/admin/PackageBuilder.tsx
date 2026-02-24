@@ -431,7 +431,7 @@ export const PackageBuilder: React.FC = () => {
 
             <div id="admin-step1-section-price">
                 <h3 className="text-xl font-bold text-gray-800 mb-2">Mennyibe fog kerülni? 💰</h3>
-                <p className="text-gray-500 mb-4 text-sm">Becsült ár 2 főre, teljes hétvégére. Nem muszáj kitölteni.</p>
+                <p className="text-gray-500 mb-4 text-sm">Becsült ár 1 főre. Nem muszáj kitölteni.</p>
                 <div className="relative">
                     <input
                         id="admin-package-input-price"
