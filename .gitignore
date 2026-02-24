@@ -37,3 +37,7 @@ server/public/uploads/*
 !server/public/uploads/.gitkeep
 public/uploads/*
 !public/uploads/.gitkeep
+
+# Database files
+server/data/*.db
+server/data/*.sqlite
