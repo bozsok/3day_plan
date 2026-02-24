@@ -1,3 +1,4 @@
+<?php
 require_once __DIR__ . '/db.php';
 
 // Production: disable direct error display
@@ -80,7 +81,7 @@ for ($i = 0; $i < $count; $i++) { if ($files['error'][$i] !==UPLOAD_ERR_OK) { th
     $newName; writeLog("Saved: $targetPath"); } else { throw new Exception("Failed to move uploaded file to
     $targetPath"); } } echo json_encode(["status"=> "success", "files" => $uploadedFiles]);
 
-    } catch (Throwable $e) {
+    } catch (Exception $e) {
     http_response_code($e->getCode() ?: 500);
     writeLog("ERROR: " . $e->getMessage());
     echo json_encode(["status" => "error", "message" => $e->getMessage()]);
